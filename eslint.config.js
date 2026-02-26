@@ -19,5 +19,26 @@ export default defineConfig([
       ecmaVersion: 2020,
       globals: globals.browser,
     },
+    rules: {
+      ...react.configs.recommended.rules,
+      // A. Turn off the base JS quote rule
+      'quotes': 'off',
+
+      // B. Enforce Single Quotes in TypeScript/JS
+      '@typescript-eslint/quotes': [
+        'error',
+        'single',
+        {
+          'avoidEscape': true,
+          'allowTemplateLiterals': true
+        }
+      ],
+
+      // C. Enforce Double Quotes for JSX Attributes (React Standard)
+      'jsx-quotes': ['error', 'prefer-double'],
+
+      // Optional: React 17+ doesn't need React in scope
+      'react/react-in-jsx-scope': 'off',
+    }
   },
 ])
