@@ -1,30 +1,19 @@
+import IconButton from './IconButton'
+import { Facebook, Instagram, MapPin } from 'lucide-react'
+
 function Footer() {
     return (
         <footer className="bg-black text-white pt-24 pb-12 border-t border-white/10">
             <div className="max-w-[1440px] mx-auto px-6 lg:px-10">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-16">
-                    <div className="col-span-1 lg:col-span-2 pr-0 lg:pr-12">
-                        <div className="flex items-center gap-2 mb-6">
-                            <span className="material-symbols-outlined text-secondary text-2xl">watch</span>
-                            <h4 className="text-2xl font-bold text-white">Kronos</h4>
+                    <div className="col-span-1 lg:col-span-2 pr-0 lg:pr-12 flex items-center justify-center">
+                        <div className="flex items-center gap-2 mb-6 mr-6">
+                            <img src={`${import.meta.env.BASE_URL}logo_white.png`} alt='logo' className='h-24' />
                         </div>
-                        <p className="text-gray-400 text-sm leading-relaxed mb-8 font-light">
-                            Crafting eternity, one second at a time. The pursuit of perfection since 1889. Every
-                            timepiece tells a story of heritage, innovation, and unparalleled craftsmanship.
-                        </p>
                         <div className="flex gap-4">
-                            <a className="w-10 h-10 rounded-full border border-gray-700 flex items-center justify-center hover:border-secondary hover:text-secondary transition-colors text-white"
-                                href="#">
-                                <span className="material-symbols-outlined text-lg">public</span>
-                            </a>
-                            <a className="w-10 h-10 rounded-full border border-gray-700 flex items-center justify-center hover:border-secondary hover:text-secondary transition-colors text-white"
-                                href="#">
-                                <span className="material-symbols-outlined text-lg">photo_camera</span>
-                            </a>
-                            <a className="w-10 h-10 rounded-full border border-gray-700 flex items-center justify-center hover:border-secondary hover:text-secondary transition-colors text-white"
-                                href="#">
-                                <span className="material-symbols-outlined text-lg">play_arrow</span>
-                            </a>
+                            <IconButton icon={<Facebook strokeWidth={1} />} label={'Facebook'} className='text-white rounded-full border border-white/10' />
+                            <IconButton icon={<Instagram strokeWidth={1} />} label={'Instagram'} className='text-white rounded-full border border-white/10' />
+                            <IconButton icon={<MapPin strokeWidth={1} />} label={'Location'} className='text-white rounded-full border border-white/10' />
                         </div>
                     </div>
                     <div>

@@ -1,8 +1,8 @@
-import { useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
-import IconButton from './IconButton';
-import { MenuIcon, WatchIcon, SearchIcon } from 'lucide-react';
-import { useMotionValueEvent, MotionValue } from 'motion/react';
+import { useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
+import IconButton from './IconButton'
+import { MenuIcon, WatchIcon, SearchIcon } from 'lucide-react'
+import { useMotionValueEvent, MotionValue } from 'motion/react'
 
 interface Props {
     scrollY: MotionValue<number>;
