@@ -1,6 +1,6 @@
 function SecondBrand() {
     return (
-        <section className="py-24 max-w-7xl mx-auto px-6">
+        <section className="py-12 md:py-24 max-w-7xl mx-auto px-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
                 <div className="bg-slate-100 dark:bg-slate-900 aspect-square overflow-hidden rounded-2xl">
                     <img alt="Watchmaker at work" className="w-full h-full object-cover"

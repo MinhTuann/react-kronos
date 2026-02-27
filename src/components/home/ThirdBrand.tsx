@@ -1,8 +1,8 @@
 function ThirdBrand() {
     return (
-        <section className="py-24 max-w-7xl mx-auto px-6">
+        <section className="py-12 md:py-24 max-w-7xl mx-auto px-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-                <div className="space-y-8">
+                <div className="order-2 md:order-1 space-y-8">
                     <div>
                         <p className="text-[11px] tracking-[0.3em] uppercase text-slate-400 mb-4">Rolex</p>
                         <h2 className="text-5xl font-display mb-6">1908 <br /> REF. M52508-0008</h2>
@@ -29,7 +29,7 @@ function ThirdBrand() {
                     <a className="inline-block px-8 py-4 bg-primary text-white text-[11px] tracking-widest uppercase font-semibold hover:bg-opacity-90 transition-all rounded-lg"
                         href="#">Discover the Model</a>
                 </div>
-                <div className="bg-slate-100 dark:bg-slate-900 aspect-square overflow-hidden rounded-2xl">
+                <div className="order-1 md:order-2 bg-slate-100 dark:bg-slate-900 aspect-square overflow-hidden rounded-2xl">
                     <img alt="Watchmaker at work" className="w-full h-full object-cover"
                         src={`${import.meta.env.BASE_URL}rolex-m525080008.png`} />
                 </div>
