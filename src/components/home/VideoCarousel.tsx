@@ -11,7 +11,6 @@ const VideoCarousel = ({ videos }: Props) => {
   const [index, setIndex] = useState(0);
 
   const [hoverSide, setHoverSide] = useState<'left' | 'right' | null>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
 
   const [isPlaying, setIsPlaying] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -34,7 +33,7 @@ const VideoCarousel = ({ videos }: Props) => {
     // 1. Update coordinates
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
-    
+
     mouseX.set(x); // Relative to container
     mouseY.set(e.clientY - rect.top);
 
@@ -77,13 +76,12 @@ const VideoCarousel = ({ videos }: Props) => {
 
   return (
     <div
-      ref={containerRef}
-      className="w-full max-h-screen mx-auto overflow-hidden bg-black aspect-video cursor-none group"
+      className='relative w-full h-[100dvh] overflow-hidden bg-black cursor-none group flex items-center justify-center'
       onMouseMove={handleMouseMove}
       onMouseLeave={() => setHoverSide(null)}
       onClick={handleClick}>
       {/* 1. The Video Layer */}
-      <AnimatePresence mode="wait">
+      <AnimatePresence mode='wait'>
         <motion.video
           key={index}
           ref={videoRef}
@@ -91,15 +89,20 @@ const VideoCarousel = ({ videos }: Props) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="w-full max-h-screen object-cover pointer-events-none"
+          transition={{ duration: 0.6, ease: 'easeInOut' }}
+          /* - playsInline is required for autoPlay on iOS 
+             - object-cover ensures no black bars on tall mobile screens
+          */
+          className='absolute inset-0 w-full h-full object-cover pointer-events-none'
           autoPlay
           muted
           loop
+          playsInline
         />
       </AnimatePresence>
 
       {/* 2. The Custom Following Cursor */}
-      <AnimatePresence>
+      <AnimatePresence mode='wait'>
         {hoverSide && (
           <motion.div
             initial={{ opacity: 0, scale: 0 }}
@@ -111,7 +114,7 @@ const VideoCarousel = ({ videos }: Props) => {
               translateX: '-50%', // Center the cursor on the mouse tip
               translateY: '-50%'
             }}
-            className="absolute top-0 left-0 z-50 pointer-events-none flex items-center justify-center w-12 h-12 bg-white/20 backdrop-blur-md rounded-full text-white shadow-2xl border border-white/30"
+            className='absolute top-0 left-0 z-50 pointer-events-none flex items-center justify-center w-12 h-12 bg-white/20 backdrop-blur-md rounded-full text-white shadow-2xl border border-white/30'
           >
             {/* Swap Icon based on side */}
             <motion.div
@@ -128,41 +131,43 @@ const VideoCarousel = ({ videos }: Props) => {
       </AnimatePresence>
 
       {/* 3. Video Content */}
-      <AnimatePresence mode="wait">
+      <AnimatePresence mode='wait'>
         <motion.div
           key={index}
           initial={{ opacity: 0, x: 50 }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -50 }}
           transition={{ duration: 0.5 }}
-          className="w-full max-h-screen pointer-events-none"
+          className='absolute inset-0 w-full h-full pointer-events-none'
         >
           {/* Title */}
-          <div className="absolute bottom-0 left-0 p-32 bg-gradient-to-t from-black/80 to-transparent w-full">
+          <div className='absolute w-full bottom-0 left-0 p-[10dvh] bg-gradient-to-t from-black/80 to-transparent'>
             <div
-              className='opacity-60 hover:opacity-100 transition-opacity pointer-events-auto cursor-auto w-fit'
+              className='w-fit opacity-60 hover:opacity-100 transition-opacity pointer-events-auto cursor-auto'
               onMouseEnter={() => setHoverSide(null)}
               onMouseMove={(e) => e.stopPropagation()}
               onClick={(e) => e.stopPropagation()}
             >
               {video.title.split('\n').map(
                 (title, index) => 
-                  <h1 className={`text-6xl ${index === 0 ? 'text-white' : 'text-secondary'}`} key={`video-${index}-title`}>
+                  <h1 className={`text-4xl md:text-6xl ${index === 0 ? 'text-white' : 'text-secondary'}`} key={`video-${index}-title`}>
                     {title}
                   </h1>
               )}
-              <h3 className="text-white my-6 max-w-md border-l border-white pl-4">{video.description}</h3>
-              <button className='bg-primary text-[11px] text-white uppercase tracking-widest font-medium px-6 py-3 rounded-lg' onClick={(e) => {
-                e.preventDefault();
-                console.log('press');
-              }}>
+              <h3 className='text-white my-4 md:my-6 max-w-md border-l border-white pl-2 md:pl-4'>{video.description}</h3>
+              <button
+                className='bg-primary text-[10px] md:text-[11px] text-white uppercase tracking-widest font-medium px-6 py-3 rounded-lg'
+                onClick={(e) => {
+                  e.preventDefault();
+                  console.log('press');
+                }}>
                 Discover More
               </button>
             </div>
           </div>
 
           {/* Progress Indicators */}
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 pointer-events-auto cursor-auto">
+          <div className='absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 pointer-events-auto cursor-auto'>
             {videos.map((_, i) => (
               <div
                 key={i}
@@ -183,7 +188,7 @@ const VideoCarousel = ({ videos }: Props) => {
                 e.preventDefault();
                 setIsPlaying(!isPlaying)
               }}
-              className="p-4 bg-white/20 hover:bg-white/40 rounded-full backdrop-blur-md text-white"
+              className='p-4 bg-white/20 hover:bg-white/40 rounded-full backdrop-blur-md text-white'
             >
               {isPlaying ? <Pause size={24} strokeWidth={1} /> : <Play size={24} strokeWidth={1} />}
             </button>
