@@ -1,5 +1,3 @@
-import React from 'react';
-
 function Collections() {
     return (
         <section className="py-24 bg-background-light dark:bg-background-dark">
@@ -16,7 +14,7 @@ function Collections() {
                     <div className="group cursor-pointer relative overflow-hidden aspect-[3/4]">
                         <img alt="Patek Philippe watch"
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-90 group-hover:opacity-100"
-                            src="/patek_philippe.png" />
+                            src={`${import.meta.env.BASE_URL}patek_philippe.png`} />
                         <div
                             className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent p-10 flex flex-col justify-end">
                             <h3
@@ -28,7 +26,7 @@ function Collections() {
                         className="group cursor-pointer relative overflow-hidden aspect-[3/4] md:translate-y-12">
                         <img alt="Rolex watch"
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-90 group-hover:opacity-100"
-                            src="/rolex.png" />
+                            src={`${import.meta.env.BASE_URL}rolex.png`} />
                         <div
                             className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent p-10 flex flex-col justify-end">
                             <h3
@@ -39,7 +37,7 @@ function Collections() {
                     <div className="group cursor-pointer relative overflow-hidden aspect-[3/4]">
                         <img alt="Hublot watch"
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-90 group-hover:opacity-100"
-                            src="/hublot.png" />
+                            src={`${import.meta.env.BASE_URL}hublot.png`} />
                         <div
                             className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent p-10 flex flex-col justify-end">
                             <h3
@@ -50,7 +48,7 @@ function Collections() {
                     <div className="group cursor-pointer relative overflow-hidden aspect-[3/4] md:translate-y-12">
                         <img alt="Cartier watch"
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-90 group-hover:opacity-100"
-                            src="/cartier.png" />
+                            src={`${import.meta.env.BASE_URL}cartier.png`} />
                         <div
                             className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent p-10 flex flex-col justify-end">
                             <h3

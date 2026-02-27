@@ -1,4 +1,3 @@
-import React from "react";
 import OurStory from "@/components/home/OurStory";
 import VideoCarousel from "@/components/home/VideoCarousel";
 import BestBrand from "@/components/home/BestBrand";

@@ -1,5 +1,3 @@
-import React from 'react';
-
 function OurStory() {
     return (
         <>
@@ -7,8 +5,8 @@ function OurStory() {
                 <div className='mx-w-7xl h-full px-32 grid md:grid-cols-2 gap-16 items-center'>
                     <div className="order-2 md:order-1">
                         <div className='relative w-[420px] aspect-[2/3]'>
-                            <img src='/DSC04304.jpg' className='absolute inset-0 w-full h-full object-cover rounded-2xl shadow-lg' />
-                            <img src='/DSC04299.jpg' className='absolute -bottom-6 -right-6 w-[140px] aspect-[2/3] object-cover rounded-xl border-4 border-white shadow-xl' />
+                            <img src={`${import.meta.env.BASE_URL}DSC04304.jpg`} className='absolute inset-0 w-full h-full object-cover rounded-2xl shadow-lg' />
+                            <img src={`${import.meta.env.BASE_URL}DSC04299.jpg`} className='absolute -bottom-6 -right-6 w-[140px] aspect-[2/3] object-cover rounded-xl border-4 border-white shadow-xl' />
                         </div>
                     </div>
                     <div className="order-1 md:order-2 space-y-4">

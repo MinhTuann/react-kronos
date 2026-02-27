@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import IconButton from './IconButton';
 import { MenuIcon, WatchIcon, SearchIcon } from 'lucide-react';
@@ -9,12 +9,9 @@ interface Props {
 }
 
 function Header({ scrollY }: Props) {
-    const [scrollDirection, setScrollDirection] = useState("down");
     const [isScrolledOutOfVideo, setIsScrolledOutOfVideo] = useState(false);
 
     useMotionValueEvent(scrollY, "change", (current) => {
-        const diff = current - (scrollY.getPrevious() ?? 0)
-        setScrollDirection(diff > 0 ? "down" : "up")
         setIsScrolledOutOfVideo(current > window.innerHeight)
     })
 
@@ -25,7 +22,7 @@ function Header({ scrollY }: Props) {
                 <IconButton icon={<MenuIcon strokeWidth={1} />} label={'Menu'} className={isScrolledOutOfVideo ? 'text-black' : 'text-white'} />
                 {/* logo */}
                 <Link to="/" className='flex items-center gap-2'>
-                    <img src={`/logo_${isScrolledOutOfVideo ? 'black' : 'white'}.png`} alt="logo" className='h-32' />
+                    <img src={`${import.meta.env.BASE_URL}logo_${isScrolledOutOfVideo ? 'black' : 'white'}.png`} alt="logo" className='h-32' />
                 </Link>
                 {/* menu */}
                 <nav className='flex gap-6'>

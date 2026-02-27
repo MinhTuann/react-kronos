@@ -1,5 +1,3 @@
-import React from 'react';
-
 function NewsEvents() {
     return (
         <section className="py-24">

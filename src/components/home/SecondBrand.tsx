@@ -1,12 +1,10 @@
-import React from 'react';
-
 function SecondBrand() {
     return (
         <section className="py-24 max-w-7xl mx-auto px-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
                 <div className="bg-slate-100 dark:bg-slate-900 aspect-square overflow-hidden rounded-2xl">
                     <img alt="Watchmaker at work" className="w-full h-full object-cover"
-                        src="/richard_mile_rm4101.png" />
+                        src={`${import.meta.env.BASE_URL}richard_mile_rm4101.png`} />
                 </div>
                 <div className="space-y-8">
                     <div>

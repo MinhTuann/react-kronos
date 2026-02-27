@@ -1,5 +1,3 @@
-import React from 'react';
-
 function ThirdBrand() {
     return (
         <section className="py-24 max-w-7xl mx-auto px-6">
@@ -33,7 +31,7 @@ function ThirdBrand() {
                 </div>
                 <div className="bg-slate-100 dark:bg-slate-900 aspect-square overflow-hidden rounded-2xl">
                     <img alt="Watchmaker at work" className="w-full h-full object-cover"
-                        src="/rolex-m525080008.png" />
+                        src={`${import.meta.env.BASE_URL}rolex-m525080008.png`} />
                 </div>
             </div>
         </section>

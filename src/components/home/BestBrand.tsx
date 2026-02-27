@@ -1,10 +1,8 @@
-import React from 'react';
-
 function BestBrand() {
     return (
         <section className="w-screen h-[70vh] overflow-hidden">
             <div className='relative w-full h-full flex'>
-                <img alt="Best Seller Watch Close-up" className="absolute inset-0 object-cover opacity-80" src="/patek_philippe_7140G001.jpeg" />
+                <img alt="Best Seller Watch Close-up" className="absolute inset-0 object-cover opacity-80" src={`${import.meta.env.BASE_URL}patek_philippe_7140G001.jpeg`} />
                 <div className="absolute inset-0 bg-black/70"></div>
                 <div className="relative px-32 grid grid-cols-2 gap-32">
                     <div className="order-2 md:order-1 flex flex-col justify-between py-24">
