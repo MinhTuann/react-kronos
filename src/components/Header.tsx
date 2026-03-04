@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import IconButton from './IconButton'
@@ -33,10 +33,6 @@ function Header({ scrollY }: Props) {
         setIsMenuOpen(false);
         setIsSearchOpen(!isSearchOpen);
     }
-
-    useEffect(() => {
-        console.log(navigation.location?.pathname)
-    }, [navigation.location?.pathname])
 
     useMotionValueEvent(scrollY, 'change', (current) => {
         setIsScrolledOutOfVideo(current > window.innerHeight - (viewRef.current?.offsetHeight || 0))

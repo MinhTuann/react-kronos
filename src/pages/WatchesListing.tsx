@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Filter, ChevronDown, ChevronUp, X, ArrowUp } from 'lucide-react';
+import { Filter, ChevronDown, ArrowUp } from 'lucide-react';
 import type { Watch } from '@/types';
 import { WatchItem } from '@/components/home/InStocks';
 
