@@ -7,22 +7,20 @@ export default {
   theme: {
     extend: {
       colors: {
-        'primary': '#34656D',
-        'secondary': '#F1E5AC',
-        'tertiary': '#D1CCC0',
-        'quaternary': '#6B99A1',
         'black': '#0D0D0D',
         'white': '#FFFFFF',
+        'stormy': '#34656D',
+        'vanilla': '#F1E5AC',
+        'golden': '#B69A45',
+        'bone': '#D1CCC0',
+        'blue': '#6B99A1',
+        'gunmetal': '#2C3032',
       },
-      // colors: {
-      //   'primary': '#34656D',
-      //   'secondary': '#334443',
-      //   'tertiary': '#C98986',
-      //   'black': '#0D0D0D',
-      //   'white': '#FFFFFF',
-      // },
-    },
+      fontFamily: {
+        branding: ['"Krona One"', 'sans-serif'],
+      }
+    }
   },
-  plugins: [],
+  plugins: []
 }
 

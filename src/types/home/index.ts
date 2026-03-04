@@ -4,3 +4,15 @@ export interface VideoSlide {
   title: string;
   description: string;
 }
+
+export interface WatchItem {
+  id: number;
+  brand: string;
+  collection: string;
+  name: string;
+  ref: string;
+  price: number;
+  image: string;
+  color: string;
+  description: string;
+}

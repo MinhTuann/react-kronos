@@ -7,7 +7,7 @@ function MainLayout() {
     const { scrollY } = useScroll();
 
     return (
-        <div className='bg-white text-black font-extralight'>
+        <div className='font-serif bg-white text-black font-thin antialiased'>
             <Header scrollY={scrollY} />
             <main className="min-h-screen">
                 <Outlet />

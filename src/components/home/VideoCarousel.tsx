@@ -150,13 +150,13 @@ const VideoCarousel = ({ videos }: Props) => {
             >
               {video.title.split('\n').map(
                 (title, index) => 
-                  <h1 className={`text-4xl md:text-6xl ${index === 0 ? 'text-white' : 'text-secondary'}`} key={`video-${index}-title`}>
+                  <h1 className={`font-branding text-2xl md:text-4xl ${index === 0 ? 'text-white' : 'text-vanilla'}`} key={`video-${index}-title`}>
                     {title}
                   </h1>
               )}
-              <h3 className='text-white my-4 md:my-6 max-w-md border-l border-white pl-2 md:pl-4'>{video.description}</h3>
+              <p className='italic text-sm text-white my-4 md:my-6 max-w-md border-l border-white pl-2 md:pl-4'>{video.description}</p>
               <button
-                className='bg-primary text-[10px] md:text-[11px] text-white uppercase tracking-widest font-medium px-6 py-3 rounded-lg'
+                className='font-branding bg-stormy hover:bg-opacity-90 text-[10px] md:text-[11px] text-white uppercase tracking-widest font-medium px-6 py-3 rounded-lg'
                 onClick={(e) => {
                   e.preventDefault();
                   console.log('press');

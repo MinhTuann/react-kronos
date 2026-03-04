@@ -1,6 +1,6 @@
 const SpecItem = ({ label, value }: { label: string; value: string }) => (
     <div className='flex flex-col space-y-1 md:items-end'>
-        <h1 className='text-secondary text-[10px] tracking-[0.3em] uppercase font-bold'>{label}</h1>
+        <h1 className='font-branding text-vanilla text-[10px] tracking-[0.3em] uppercase'>{label}</h1>
         <p className='text-white text-[15px] font-light md:text-right'>{value}</p>
     </div>
 );
@@ -17,14 +17,14 @@ function BestBrand() {
             <div className='absolute inset-0 bg-black/70'></div>
 
             {/* Content Container */}
-            <div className='relative z-10 w-full h-full px-8 py-16 md:px-32 md:py-24 grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-32'>
+            <div className='relative z-10 w-full h-full px-8 py-16 md:px-32 md:py-32 grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-32'>
 
                 {/* Left Column: Branding & Main CTA */}
                 <div className='flex flex-col space-y-8 md:justify-between h-full'>
-                    <span className='text-[11px] tracking-[0.4em] uppercase text-secondary font-semibold'>Patek Philippe</span>
+                    <span className='font-branding text-[11px] tracking-[0.4em] uppercase text-vanilla font-semibold'>Patek Philippe</span>
 
                     <div className='space-y-2'>
-                        <h2 className='text-3xl md:text-4xl text-white border-l-2 border-secondary pl-4 leading-tight'>GRAND COMPLICATIONS</h2>
+                        <h2 className='text-3xl md:text-4xl text-white border-l-2 border-vanilla pl-4 leading-tight'>GRAND COMPLICATIONS</h2>
                         <h4 className='text-lg md:text-xl text-white/70 pl-4 italic'>REF. 7140G-001</h4>
                     </div>
 
@@ -33,7 +33,7 @@ function BestBrand() {
                     </p>
 
                     <div>
-                        <a className='inline-block w-full md:w-auto text-center px-10 py-4 bg-white text-primary text-[11px] tracking-widest uppercase font-bold hover:bg-slate-100 transition-all rounded-lg'
+                        <a className='inline-block w-full md:w-auto text-center px-6 py-3 bg-white text-stormy text-[8px] tracking-widest uppercase font-branding hover:bg-opacity-90 transition-all rounded-lg'
                             href='#'>Explore the Icon</a>
                     </div>
                 </div>
