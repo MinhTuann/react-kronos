@@ -1,5 +1,5 @@
-import { useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, useRef, useState } from 'react'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import IconButton from './IconButton'
 import { WatchIcon, SearchIcon, XIcon } from 'lucide-react'
@@ -11,13 +11,15 @@ interface Props {
 
 function Header({ scrollY }: Props) {
     const viewRef = useRef<HTMLDivElement>(null)
+    const navigate = useNavigate()
+    const isHomePage = useLocation().pathname === '/'
     const [isScrolledOutOfVideo, setIsScrolledOutOfVideo] = useState(false)
     // 1. State to manage the menu open/close status
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     const [isSearchOpen, setIsSearchOpen] = useState(false)
     
     // Dynamic color logic: If the menu is open OR we scrolled out of the video, use dark mode.
-    const useDarkTheme = isMenuOpen || isSearchOpen || isScrolledOutOfVideo
+    const useDarkTheme = isMenuOpen || isSearchOpen || !isHomePage || isScrolledOutOfVideo
     const iconColorClass = useDarkTheme ? 'text-black' : 'text-white'
     const logoSrc = `${import.meta.env.BASE_URL}logo_${useDarkTheme ? 'black' : 'white'}.png`
 
@@ -32,6 +34,10 @@ function Header({ scrollY }: Props) {
         setIsSearchOpen(!isSearchOpen);
     }
 
+    useEffect(() => {
+        console.log(navigation.location?.pathname)
+    }, [navigation.location?.pathname])
+
     useMotionValueEvent(scrollY, 'change', (current) => {
         setIsScrolledOutOfVideo(current > window.innerHeight - (viewRef.current?.offsetHeight || 0))
     })
@@ -41,7 +47,7 @@ function Header({ scrollY }: Props) {
             {/* --- 1. The Fixed Header (Now z-[80] to float above drawer) --- */}
             <header
                 ref={viewRef}
-                className={`fixed top-0 z-[80] w-[100dvw] transition-colors duration-500 items-center ${isScrolledOutOfVideo && !isMenuOpen && !isSearchOpen ? 'bg-white' : 'bg-transparent'}`}
+                className={`fixed top-0 z-[80] w-[100dvw] transition-colors duration-500 items-center ${!isHomePage || (isScrolledOutOfVideo && !isMenuOpen && !isSearchOpen) ? 'bg-white' : 'bg-transparent'}`}
             >
                 <div className='mx-auto px-6 py-4 grid grid-cols-3 items-center justify-between'>
                     <div className='flex justify-start'>
@@ -62,7 +68,17 @@ function Header({ scrollY }: Props) {
                     
                     <div className='flex justify-end'>
                         <div className='flex gap-2 md:gap-6 items-center'>
-                            <IconButton icon={<WatchIcon strokeWidth={1.5} />} label={'Products'} className={iconColorClass} />
+                            {/* Watches Listing Button */}
+                            <IconButton 
+                                onClick={() => {
+                                    setIsMenuOpen(false);
+                                    setIsSearchOpen(false);
+                                    navigate('/listings');
+                                }} 
+                                icon={<WatchIcon strokeWidth={1.5} />} 
+                                label={'Products'} 
+                                className={iconColorClass} 
+                            />
                             
                             {/* Search Toggle Button */}
                             <button 

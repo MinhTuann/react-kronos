@@ -5,13 +5,13 @@ export interface VideoSlide {
   description: string;
 }
 
-export interface WatchItem {
+export interface Watch {
   id: number;
   brand: string;
   collection: string;
   name: string;
   ref: string;
-  price: number;
+  price?: number;
   image: string;
   color: string;
   description: string;

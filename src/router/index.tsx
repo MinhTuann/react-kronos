@@ -1,16 +1,23 @@
-import { createHashRouter } from "react-router-dom";
-import MainLayout from "../layouts/MainLayout";
-import Home from "../pages/Home";
+import { createBrowserRouter } from 'react-router-dom';
+import MainLayout from '@/layouts/MainLayout';
+import Home from '@/pages/Home';
+import WatchesListing from '@/pages/WatchesListing';
 
-export const router = createHashRouter([
+export const router = createBrowserRouter([
     {
-        path: "/",
+        path: '/',
         element: <MainLayout />,
         children: [
             {
                 index: true,
                 element: <Home />,
             },
+            {
+                path: 'listings',
+                element: <WatchesListing />,
+            },
         ],
     },
-]);
+], {
+    basename: import.meta.env.BASE_URL
+});
