@@ -9,7 +9,7 @@ interface Props {
     scrollY: MotionValue<number>;
 }
 
-function Header({ scrollY }: Props) {
+const Header = ({ scrollY }: Props) => {
     const viewRef = useRef<HTMLDivElement>(null)
     const navigate = useNavigate()
     const isHomePage = useLocation().pathname === '/'
@@ -69,10 +69,10 @@ function Header({ scrollY }: Props) {
                                 onClick={() => {
                                     setIsMenuOpen(false);
                                     setIsSearchOpen(false);
-                                    navigate('/listings');
+                                    navigate('/collections');
                                 }} 
                                 icon={<WatchIcon strokeWidth={1.5} />} 
-                                label={'Products'} 
+                                label={'Collections'} 
                                 className={iconColorClass} 
                             />
                             

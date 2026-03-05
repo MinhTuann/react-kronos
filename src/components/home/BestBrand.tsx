@@ -5,7 +5,7 @@ const SpecItem = ({ label, value }: { label: string; value: string }) => (
     </div>
 );
 
-function BestBrand() {
+const BestBrand = () => {
     return (
         <section className='w-full min-h-[600px] md:h-auto md:aspect-[16/6] overflow-hidden relative'>
             {/* Background remains absolute */}

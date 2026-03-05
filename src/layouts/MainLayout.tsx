@@ -1,15 +1,14 @@
-import Header from "../components/Header";
-import Footer from "../components/Footer";
-import { Outlet } from "react-router-dom";
-import { useScroll } from "motion/react";
+import { Outlet } from 'react-router-dom';
+import { useScroll } from 'motion/react';
+import { Footer, Header } from '@/components';
 
-function MainLayout() {
+const MainLayout = () => {
     const { scrollY } = useScroll();
 
     return (
         <div className='font-serif bg-white text-black font-thin antialiased'>
             <Header scrollY={scrollY} />
-            <main className="min-h-screen">
+            <main className='min-h-screen'>
                 <Outlet />
             </main>
             <Footer />

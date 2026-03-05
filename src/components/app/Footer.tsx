@@ -18,7 +18,7 @@ const FooterNavGroup = ({ title, links }: { title: string, links: string[] }) =>
     </div>
 );
 
-function Footer() {
+const Footer = () => {
     return (
         <footer className="bg-black text-white py-16 border-t border-white/10">
             <div className="max-[1440px] mx-auto px-6 sm:px-8 lg:px-12">

@@ -1,0 +1,7 @@
+export { default as BestBrand } from './BestBrand'
+export { default as InStocks } from './InStocks'
+export { default as NewsEvents } from './NewsEvents'
+export { default as OurStory } from './OurStory'
+export { default as SecondBrand } from './SecondBrand'
+export { default as ThirdBrand } from './ThirdBrand'
+export { default as VideoCarousel } from './VideoCarousel'

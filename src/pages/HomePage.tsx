@@ -1,13 +1,7 @@
-import OurStory from '@/components/home/OurStory';
-import VideoCarousel from '@/components/home/VideoCarousel';
-import BestBrand from '@/components/home/BestBrand';
 import type { VideoSlide, Watch } from '@/types';
-import SecondBrand from '@/components/home/SecondBrand';
-import ThirdBrand from '@/components/home/ThirdBrand';
-import NewsEvents from '@/components/home/NewsEvents';
-import InStocks from '@/components/home/InStocks';
+import { BestBrand, InStocks, NewsEvents, OurStory, SecondBrand, ThirdBrand, VideoCarousel } from '@/components/home';
 
-function Home() {
+const HomePage = () => {
     const videos: VideoSlide[] = [
         { id: 1, url: './patek_philippe.mp4', title: `THE ART OF\nPRECISION`, description: 'Where watchmaking meets Haute Joaillerie. Our gemsetters practice an extremely delicate art, which requires skills that are further refined over time.' },
         { id: 2, url: './rolex.mp4', title: 'ROLEX LAND-DWELLER\nOPENING NEW HORIZONS', description: 'Rolex begins a new chapter in its history with the Oyster Perpetual Land-Dweller. This most contemporary watch represents the culmination of the brand’s expertise today, fruit of more than a century of experience in watchmaking. The Land-Dweller is designed for those who build their own destinies, seeing opportunity in every moment.' },
@@ -38,4 +32,4 @@ function Home() {
     );
 }
 
-export default Home;
+export default HomePage;
