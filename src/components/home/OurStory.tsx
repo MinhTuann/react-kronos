@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 const OurStory = () => {
     return (
         <>
@@ -27,9 +29,9 @@ const OurStory = () => {
                         <p className='leading-relaxed'>
                             Today, we blend centuries-old craftsmanship with modern innovation, ensuring every movement that leaves our workshop is a masterpiece of precision and a legacy for the future.
                         </p>
-                        <button className='font-branding text-stormy uppercase tracking-widest flex items-center gap-2 hover:gap-4 transition-all'>
+                        <Link to='/about-us' className='font-branding text-stormy uppercase tracking-widest inline-flex items-center gap-2 hover:gap-4 transition-all'>
                             Discover Our Heritage <span className='material-symbols-outlined'>arrow_forward</span>
-                        </button>
+                        </Link>
                     </div>
                 </div>
             </section>

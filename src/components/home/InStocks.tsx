@@ -1,8 +1,9 @@
 import type { Watch } from '@/types'
+import { Link } from 'react-router-dom'
 
 export const WatchItem = ({ watch }: { watch: Watch }) => {
     return (
-        <div className='group cursor-pointer relative rounded-lg overflow-hidden transition-all duration-500 hover:shadow-[0_20px_50px_rgba(0,0,0,0.05)]'>
+        <Link to={`/watch/${watch.id}`} className='block group cursor-pointer relative rounded-lg overflow-hidden transition-all duration-500 hover:shadow-[0_20px_50px_rgba(0,0,0,0.05)]'>
             {/* Image Container with subtle zoom and shift */}
             <div className='relative aspect-[4/5] w-full overflow-hidden flex items-center justify-center p-12'>
                 <img
@@ -21,10 +22,8 @@ export const WatchItem = ({ watch }: { watch: Watch }) => {
                 </span>
 
                 <h3 className='text-lg tracking-tight text-gunmetal italic'>
-                    <a href="#">
-                        <span aria-hidden='true' className='absolute inset-0'></span>
-                        {watch.collection}
-                    </a>
+                    <span aria-hidden='true' className='absolute inset-0'></span>
+                    {watch.collection}
                 </h3>
 
                 <div className='flex flex-col items-center'>
@@ -42,7 +41,7 @@ export const WatchItem = ({ watch }: { watch: Watch }) => {
                     </p>
                 </div>
             </div>
-        </div>
+        </Link >
     )
 }
 
