@@ -1,4 +1,13 @@
+import { CONTACT_EMAIL, CONTACT_PHONE, YEAR_OF_FOUNDATION } from '@/utils';
 import { Facebook, Instagram, MapPin } from 'lucide-react';
+import { Link } from 'react-router-dom';
+
+const paths: Record<string, string> = {
+    'Our Story': '/about-us',
+    'Contact Us': '/contact-us',
+}
+
+const getPath = (link: string) => paths[link] || '/collections';
 
 // --- Reusable Navigation Column ---
 const FooterNavGroup = ({ title, links }: { title: string, links: string[] }) => (
@@ -9,11 +18,11 @@ const FooterNavGroup = ({ title, links }: { title: string, links: string[] }) =>
         <ul className="flex flex-col gap-4 text-[13px] text-stone-500 font-light">
             {links.map((link, index) => (
                 <li key={index}>
-                    <a className="hover:text-black transition-colors duration-300 flex items-center group w-fit" href="#">
+                    <Link className="hover:text-black transition-colors duration-300 flex items-center group w-fit" to={getPath(link)}>
                         {/* Luxury Detail: A tiny line that smoothly extends out on hover */}
                         <span className="h-[1px] w-0 bg-black mr-0 group-hover:w-4 group-hover:mr-3 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"></span>
                         {link}
-                    </a>
+                    </Link>
                 </li>
             ))}
         </ul>
@@ -51,7 +60,7 @@ const Footer = () => {
                                 Kronos Luxury Timepieces
                             </span>
                             <span className="font-branding text-[10px] uppercase tracking-[0.4em] text-stone-400 block">
-                                Ho Chi Minh City, VN — Est. 2022
+                                Ho Chi Minh City, VN — Est. {YEAR_OF_FOUNDATION}
                             </span>
                         </div>
                     </div>
@@ -71,20 +80,7 @@ const Footer = () => {
                 </div>
 
                 {/* --- Middle Section: Navigation Grid --- */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-y-16 gap-x-8 mb-24">
-                    <FooterNavGroup
-                        title="Collections"
-                        links={['Grand Complications', 'Complications', 'Calatrava', 'Gondolo', 'Golden Ellipse', 'Nautilus', 'Aquanaut']}
-                    />
-                    <FooterNavGroup
-                        title="The Company"
-                        links={['Savoir-Faire', 'The Manufacture', 'Library', 'Museum', 'Press Room', 'Careers']}
-                    />
-                    <FooterNavGroup
-                        title="Services"
-                        links={['Owners', 'Instructions for Use', 'Service Centers', 'Extract from Archives', 'Contact Us', 'FAQ']}
-                    />
-
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-y-16 gap-x-8 mb-24">
                     {/* Social & Contact Column */}
                     <div className="flex flex-col">
                         <h5 className="font-branding mb-8 text-[10px] uppercase tracking-[0.4em] text-gunmetal font-bold">
@@ -105,13 +101,27 @@ const Footer = () => {
                         <h5 className="font-branding mb-6 text-[10px] uppercase tracking-[0.4em] text-gunmetal font-bold">
                             Client Relations
                         </h5>
-                        <a href="tel:+18001234567" className="text-[13px] text-stone-500 font-light hover:text-black transition-colors mb-3 block w-fit">
-                            +1 800 123 4567
+                        <a href={`tel:${CONTACT_PHONE}`} className="text-[13px] text-stone-500 font-light hover:text-black transition-colors mb-3 block w-fit">
+                            {CONTACT_PHONE}
                         </a>
-                        <a href="mailto:concierge@kronos.com" className="text-[13px] text-stone-500 font-light hover:text-black transition-all duration-300 block border-b border-transparent hover:border-black w-fit pb-1">
-                            concierge@kronos.com
+                        <a href={`mailto:${CONTACT_EMAIL}`} className="text-[13px] text-stone-500 font-light hover:text-black transition-all duration-300 block border-b border-transparent hover:border-black w-fit pb-1">
+                            {CONTACT_EMAIL}
                         </a>
                     </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-y-16 gap-x-8 mb-24">
+                        <FooterNavGroup
+                            title="The Brands"
+                            links={['Richard Mille', 'Rolex', 'Hublot', 'Patek Philippe', 'Cartier', 'Audemars Piguet', 'Vacheron Constantin']}
+                        />
+                        <FooterNavGroup
+                            title="The Company"
+                            links={['Our Story', 'Contact Us']}
+                        />
+                    </div>
+                    {/* <FooterNavGroup
+                        title="Services"
+                        links={['Owners', 'Instructions for Use', 'Service Centers', 'Extract from Archives', 'Contact Us', 'FAQ']}
+                    /> */}
                 </div>
 
                 {/* --- Bottom Section: Legal Row --- */}

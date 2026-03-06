@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 const SecondBrand = () => {
     return (
         <section className="py-12 md:py-24 max-w-7xl mx-auto px-6">
@@ -30,8 +32,9 @@ const SecondBrand = () => {
                             <p>Alligator</p>
                         </div>
                     </div>
-                    <a className="inline-block px-6 py-3 font-branding bg-stormy text-white text-[11px] tracking-widest uppercase hover:bg-opacity-90 transition-all rounded-lg"
-                        href="#">Discover the Model</a>
+                    <Link to='/watch/2' className="inline-block px-6 py-3 font-branding bg-stormy text-white text-[11px] tracking-widest uppercase hover:bg-opacity-90 transition-all rounded-lg">
+                        Discover the Model
+                    </Link>
                 </div>
             </div>
         </section>

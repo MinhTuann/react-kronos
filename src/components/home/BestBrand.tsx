@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 const SpecItem = ({ label, value }: { label: string; value: string }) => (
     <div className='flex flex-col space-y-1 md:items-end'>
         <h1 className='font-branding text-vanilla text-[10px] tracking-[0.3em] uppercase'>{label}</h1>
@@ -33,8 +35,9 @@ const BestBrand = () => {
                     </p>
 
                     <div>
-                        <a className='inline-block w-full md:w-auto text-center px-6 py-3 bg-white text-stormy text-[8px] tracking-widest uppercase font-branding hover:bg-opacity-90 transition-all rounded-lg'
-                            href='#'>Explore the Icon</a>
+                        <Link to='/watch/1' className='inline-block w-full md:w-auto text-center px-6 py-3 bg-white text-stormy text-[8px] tracking-widest uppercase font-branding hover:bg-opacity-90 transition-all rounded-lg'>
+                            Explore the Icon
+                        </Link>
                     </div>
                 </div>
 

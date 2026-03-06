@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import type { Variants, Easing } from 'framer-motion';
+import { YEAR_OF_FOUNDATION } from '@/utils';
 
 const AboutUsPage: React.FC = () => {
     useEffect(() => {
@@ -40,7 +41,7 @@ const AboutUsPage: React.FC = () => {
                 {/* Architectural Watermark */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full text-center pointer-events-none select-none z-0">
                     <span className="font-branding text-[16vw] leading-none tracking-tighter text-stone-50 font-bold">
-                        2022
+                        {YEAR_OF_FOUNDATION}
                     </span>
                 </div>
 
@@ -110,7 +111,7 @@ const AboutUsPage: React.FC = () => {
                                     In ancient mythology, Kronos is the personification of time itself—an unstoppable force that shapes the universe. We adopted this name because true luxury timepieces transcend their mechanical purpose; they become immortal values that endure through generations.
                                 </motion.p>
                                 <motion.p variants={fadeUp}>
-                                    Kronos Luxury Timepieces was established to be the premier destination for high-end, genuine watches in Ho Chi Minh City. We bridge the gap between Vietnamese collectors and the world's most illustrious brands, including Rolex, Patek Philippe, Hublot, and Richard Mille.
+                                    Kronos Luxury Timepieces was established to be the premier destination for high-end, genuine watches in Ho Chi Minh City. We bridge the gap between Vietnamese collectors and the world's most illustrious brands, including Rolex, Patek Philippe, Hublot, and Richard Mille, etc.
                                 </motion.p>
                             </motion.div>
                         </div>

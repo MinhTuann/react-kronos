@@ -59,13 +59,13 @@ const InStocks = ({ watches }: { watches: Watch[] }) => {
                     ))}
                 </div>
                 <div className='flex justify-center mt-8'>
-                    <button className='group relative inline-flex justify-center items-center pb-2 text-xs tracking-[0.4em] uppercase text-bone font-semibold transition-colors duration-500 hover:text-bone'>
+                    <Link to='/collections' className='group relative inline-flex justify-center items-center pb-2 text-xs tracking-[0.4em] uppercase text-bone font-semibold transition-colors duration-500 hover:text-bone'>
                         {/* The Button Text */}
                         <span>Find Your Watch</span>
 
                         {/* The Animated Underline */}
                         <span className='absolute bottom-0 left-1/2 h-[1px] w-0 -translate-x-1/2 bg-bone transition-all duration-[600ms] ease-out group-hover:w-full group-hover:bg-bone' />
-                    </button>
+                    </Link>
                 </div>
             </div>
         </div>
