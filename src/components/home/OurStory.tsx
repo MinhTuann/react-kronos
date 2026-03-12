@@ -17,7 +17,7 @@ const OurStory = () => {
                     </div>
                     <div className='order-2 space-y-8'>
                         <div className='space-y-4'>
-                            <h2 className='font-branding text-4xl md:text-5xl text-gunmetal leading-tight'>The Kronos</h2>
+                            <h2 className='font-branding text-4xl md:text-5xl text-gunmetal leading-tight'>The Kronos Story</h2>
                             <div className='w-20 h-1 bg-stormy' />
                         </div>
                         <p className='text-lg text-bone leading-relaxed italic'>
