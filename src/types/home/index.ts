@@ -6,7 +6,7 @@ export interface VideoSlide {
 }
 
 export interface Watch {
-  id: number;
+  id: string | number;
   brand: string;
   collection: string;
   name: string;

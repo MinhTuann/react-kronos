@@ -5,27 +5,24 @@ import type { Watch } from '@/types';
 import { WatchItem } from '@/components/home/InStocks';
 import { Dropdown } from '@/components/app';
 
-// --- Mock Data ---
-const MOCK_WATCHES: Watch[] = Array.from({ length: 24 }).map((_, i) => ({
-    id: i,
-    brand: 'KRONOS',
-    collection: i % 3 === 0 ? 'Grand Complications' : i % 2 === 0 ? 'Nautilus' : 'Calatrava',
-    name: `Reference ${5000 + i}`,
-    ref: `5000-${i}`,
-    color: i % 2 === 0 ? 'Rose Gold' : 'Platinum',
-    image: 'https://thekronos.vn/public/uploads/product/hxwQ_5119-51891.avif', // Placeholder
-    price: 35000 + (i * 1500),
-    description: 'A jewelry version of a Patek Philippe classic, this platinum perpetual calendar chronograph is lit up by a setting of baguette-cut rubies on the bezel, lugs and folding clasp. The intense color of the stones is echoed by the lacquered red dial with black-gradient rim as well as by the shiny black alligator strap with contrasting red stitching.',
-}));
+import { publicApi } from '@/lib/api';
+import type { PublicBrand, PublicCollection } from '@/lib/api';
 
-// --- Main Listing Page ---
 const CollectionsPage: React.FC = () => {
     // States
-    const [watches, setWatches] = useState<Watch[]>(MOCK_WATCHES);
+    const [watches, setWatches] = useState<Watch[]>([]);
+    const [originalWatches, setOriginalWatches] = useState<Watch[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [sortMethod, setSortMethod] = useState<'recommended' | 'price-asc' | 'price-desc'>('recommended');
     const [showGoTop, setShowGoTop] = useState(false);
+
+    // Filter States
+    const [brands, setBrands] = useState<PublicBrand[]>([]);
+    const [collections, setCollections] = useState<PublicCollection[]>([]);
+    const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
+    const [selectedCollections, setSelectedCollections] = useState<string[]>([]);
 
     const itemsPerPage = 9;
 
@@ -34,6 +31,36 @@ const CollectionsPage: React.FC = () => {
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentWatches = watches.slice(indexOfFirstItem, indexOfLastItem);
     const totalPages = Math.ceil(watches.length / itemsPerPage);
+
+    // Initial Data Fetch
+    useEffect(() => {
+        const fetchWatches = async () => {
+            try {
+                setIsLoading(true);
+                const data = await publicApi.getWatches();
+                setOriginalWatches(data);
+                setWatches(data);
+            } catch (err) {
+                console.error("Failed to fetch public watches:", err);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        const fetchFilters = async () => {
+            try {
+                const [bData, cData] = await Promise.all([
+                    publicApi.getBrands(),
+                    publicApi.getCollections()
+                ]);
+                setBrands(bData);
+                setCollections(cData);
+            } catch (err) {
+                console.error("Failed to fetch filters:", err);
+            }
+        };
+        fetchWatches();
+        fetchFilters();
+    }, []);
 
     // Scroll Listener for "Go to Top" button
     useEffect(() => {
@@ -48,45 +75,108 @@ const CollectionsPage: React.FC = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    // Sorting Logic
+    // Filtering & Sorting Logic
     useEffect(() => {
-        let sorted = [...MOCK_WATCHES];
-        if (sortMethod === 'price-asc') sorted.sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
-        if (sortMethod === 'price-desc') sorted.sort((a, b) => (b.price ?? 0) - (a.price ?? 0));
-        setWatches(sorted);
-        setCurrentPage(1);
-    }, [sortMethod]);
+        let filtered = [...originalWatches];
 
-    // --- Extracted Filter Content for reusability (Desktop Sidebar & Mobile Drawer) ---
-    const FilterContent = () => (
-        <div className='pr-4 lg:pr-8 space-y-10 lg:space-y-12'>
-            <div>
-                <h4 className='text-[10px] tracking-[0.3em] uppercase font-bold border-b border-gunmetal/10 pb-4 mb-4'>Collections</h4>
-                <ul className='space-y-4 lg:space-y-3 text-sm font-light text-gunmetal/80'>
-                    <li><label className='flex items-center gap-3 cursor-pointer hover:text-black'><input type='checkbox' className='accent-gunmetal w-4 h-4' /> Calatrava</label></li>
-                    <li><label className='flex items-center gap-3 cursor-pointer hover:text-black'><input type='checkbox' className='accent-gunmetal w-4 h-4' /> Nautilus</label></li>
-                    <li><label className='flex items-center gap-3 cursor-pointer hover:text-black'><input type='checkbox' className='accent-gunmetal w-4 h-4' /> Grand Complications</label></li>
-                </ul>
+        // Apply filters
+        if (selectedBrands.length > 0) {
+            filtered = filtered.filter(w => selectedBrands.includes(w.brand));
+        }
+        if (selectedCollections.length > 0) {
+            filtered = filtered.filter(w => selectedCollections.includes(w.collection));
+        }
+
+        // Apply sorting
+        if (sortMethod === 'price-asc') filtered.sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
+        if (sortMethod === 'price-desc') filtered.sort((a, b) => (b.price ?? 0) - (a.price ?? 0));
+        
+        setWatches(filtered);
+        setCurrentPage(1);
+    }, [sortMethod, originalWatches, selectedBrands, selectedCollections]);
+
+    // --- Filter Content Render Function (Desktop Sidebar & Mobile Drawer) ---
+    const renderFilterContent = () => {
+        const toggleBrand = (brandName: string) => {
+            setSelectedBrands(prevBrands => {
+                const isRemoving = prevBrands.includes(brandName);
+                if (isRemoving) {
+                    // Un-check corresponding collections when a brand is unchecked
+                    const brandObj = brands.find(b => b.name === brandName);
+                    if (brandObj) {
+                        const associatedCollections = collections.filter(c => c.brand_id === brandObj.id).map(c => c.name);
+                        setSelectedCollections(prevCols => prevCols.filter(c => !associatedCollections.includes(c)));
+                    }
+                    return prevBrands.filter(b => b !== brandName);
+                }
+                return [...prevBrands, brandName];
+            });
+        };
+
+        const toggleCollection = (collectionName: string) => {
+            setSelectedCollections(prev => 
+                prev.includes(collectionName) ? prev.filter(c => c !== collectionName) : [...prev, collectionName]
+            );
+        };
+
+        const selectedBrandIds = brands.filter(b => selectedBrands.includes(b.name)).map(b => b.id);
+        const visibleCollections = collections.filter(c => selectedBrandIds.includes(c.brand_id));
+
+        return (
+            <div className='pr-4 lg:pr-8 space-y-10 lg:space-y-12'>
+                {brands.length > 0 && (
+                    <div>
+                        <h4 className='text-[10px] tracking-[0.3em] uppercase font-bold border-b border-gunmetal/10 pb-4 mb-4'>Brands</h4>
+                        <ul className='space-y-4 lg:space-y-3 text-sm font-light text-gunmetal/80 max-h-48 overflow-y-auto pr-2 custom-scrollbar'>
+                            {brands.map(brand => (
+                                <li key={brand.id}>
+                                    <label className='flex items-center gap-3 cursor-pointer hover:text-black'>
+                                        <input 
+                                            type='checkbox' 
+                                            className='accent-gunmetal w-4 h-4'
+                                            checked={selectedBrands.includes(brand.name)}
+                                            onChange={() => toggleBrand(brand.name)}
+                                        /> 
+                                        {brand.name}
+                                    </label>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
+                
+                {selectedBrands.length > 0 && visibleCollections.length > 0 && (
+                    <div>
+                        <h4 className='text-[10px] tracking-[0.3em] uppercase font-bold border-b border-gunmetal/10 pb-4 mb-4'>Collections</h4>
+                        <ul className='space-y-4 lg:space-y-3 text-sm font-light text-gunmetal/80 max-h-48 overflow-y-auto pr-2 custom-scrollbar'>
+                            {visibleCollections.map(collection => (
+                                <li key={collection.id}>
+                                    <label className='flex items-center gap-3 cursor-pointer hover:text-black'>
+                                        <input 
+                                            type='checkbox' 
+                                            className='accent-gunmetal w-4 h-4'
+                                            checked={selectedCollections.includes(collection.name)}
+                                            onChange={() => toggleCollection(collection.name)}
+                                        /> 
+                                        {collection.name}
+                                    </label>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
+                {/* Mobile Apply Button */}
+                <div className="lg:hidden pt-8 border-t border-gunmetal/10">
+                    <button
+                        onClick={() => setIsFilterOpen(false)}
+                        className="w-full bg-gunmetal text-white text-xs uppercase tracking-widest py-4 rounded hover:bg-black transition-colors"
+                    >
+                        Apply Filters ({selectedBrands.length + selectedCollections.length})
+                    </button>
+                </div>
             </div>
-            <div>
-                <h4 className='text-[10px] tracking-[0.3em] uppercase font-bold border-b border-gunmetal/10 pb-4 mb-4'>Material</h4>
-                <ul className='space-y-4 lg:space-y-3 text-sm font-light text-gunmetal/80'>
-                    <li><label className='flex items-center gap-3 cursor-pointer hover:text-black'><input type='checkbox' className='accent-gunmetal w-4 h-4' /> Rose Gold</label></li>
-                    <li><label className='flex items-center gap-3 cursor-pointer hover:text-black'><input type='checkbox' className='accent-gunmetal w-4 h-4' /> Platinum</label></li>
-                    <li><label className='flex items-center gap-3 cursor-pointer hover:text-black'><input type='checkbox' className='accent-gunmetal w-4 h-4' /> Stainless Steel</label></li>
-                </ul>
-            </div>
-            {/* Mobile Apply Button */}
-            <div className="lg:hidden pt-8 border-t border-gunmetal/10">
-                <button
-                    onClick={() => setIsFilterOpen(false)}
-                    className="w-full bg-gunmetal text-white text-xs uppercase tracking-widest py-4 rounded hover:bg-black transition-colors"
-                >
-                    Apply Filters
-                </button>
-            </div>
-        </div>
-    );
+        );
+    };
 
     return (
         <div className='pt-24 md:pt-32 pb-24 min-h-screen bg-white relative'>
@@ -143,7 +233,7 @@ const CollectionsPage: React.FC = () => {
                             className='hidden lg:block shrink-0 overflow-hidden'
                         >
                             <div className='w-[280px]'>
-                                <FilterContent />
+                                {renderFilterContent()}
                             </div>
                         </motion.aside>
                     )}
@@ -151,29 +241,35 @@ const CollectionsPage: React.FC = () => {
 
                 {/* --- Product Grid --- */}
                 {/* 1. Add motion.div and layout here so the container animates its width change smoothly */}
-                <div className='flex-1'>
-                    <motion.div
-                        key={currentPage + sortMethod}
-                        initial='hidden'
-                        animate='visible'
-                        variants={{
-                            hidden: { opacity: 0 },
-                            visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
-                        }}
-                        className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-12 md:gap-y-16 xl:gap-x-8'
-                    >
-                        {currentWatches.map((watch) => (
-                            <motion.div
-                                key={watch.id}
-                                variants={{
-                                    hidden: { opacity: 0, y: 30 },
-                                    visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
-                                }}
-                            >
-                                <WatchItem watch={watch} />
-                            </motion.div>
-                        ))}
-                    </motion.div>
+                <div className='flex-1 relative min-h-[400px]'>
+                    {isLoading ? (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="w-8 h-8 border-2 border-gunmetal/20 border-t-gunmetal rounded-full animate-spin" />
+                        </div>
+                    ) : (
+                        <motion.div
+                            key={`${currentPage}-${sortMethod}-${selectedBrands.join(',')}-${selectedCollections.join(',')}`}
+                            initial='hidden'
+                            animate='visible'
+                            variants={{
+                                hidden: { opacity: 0 },
+                                visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
+                            }}
+                            className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-12 md:gap-y-16 xl:gap-x-8'
+                        >
+                            {currentWatches.map((watch) => (
+                                <motion.div
+                                    key={watch.id}
+                                    variants={{
+                                        hidden: { opacity: 0, y: 30 },
+                                        visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
+                                    }}
+                                >
+                                    <WatchItem watch={watch} />
+                                </motion.div>
+                            ))}
+                        </motion.div>
+                    )}
 
                     {/* --- Pagination --- */}
                     <motion.div layout className='mt-16 md:mt-24 border-t border-gunmetal/10 pt-8 md:pt-10 flex justify-between md:justify-center items-center gap-4 md:gap-8'>
@@ -239,7 +335,7 @@ const CollectionsPage: React.FC = () => {
 
                             {/* Reuse the filter content */}
                             <div className="flex-1">
-                                <FilterContent />
+                                {renderFilterContent()}
                             </div>
                         </motion.div>
                     </div>

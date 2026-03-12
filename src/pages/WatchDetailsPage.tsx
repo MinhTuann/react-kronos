@@ -4,34 +4,7 @@ import { motion } from 'framer-motion';
 import { ChevronRight, ShieldCheck, ArrowLeft } from 'lucide-react';
 import type { Watch } from '@/types';
 
-// Extended Mock data that combines elements from HomePage and CollectionsPage
-const MOCK_WATCHES: Watch[] = [
-    { id: 1, brand: 'Patek Philippe', collection: 'Grand Complication', ref: '5271/12P-010', name: 'Chronograph. Perpetual Calendar. Joaillerie.', color: 'Platinum', price: 12105300000, image: 'https://thekronos.vn/public/uploads/product/hxwQ_5119-51891.avif', description: 'A jewelry version of a Patek Philippe classic, this platinum perpetual calendar chronograph is lit up by a setting of baguette-cut rubies on the bezel, lugs and folding clasp. The intense color of the stones is echoed by the lacquered red dial with black-gradient rim as well as by the shiny black alligator strap with contrasting red stitching.' },
-    { id: 2, brand: 'Patek Philippe', collection: 'Grand Complication', ref: '5327G-001', name: 'Perpetual Calendar', color: 'White Gold', price: 3541000000, image: 'https://thekronos.vn/public/uploads/product/i6Hz_5105-51891.avif', description: "Equipped with the famous ultra-thin self-winding Caliber 240 Q, this perpetual calendar is distinguished by its round Calatrava-style case with scalloped flanks accentuating the watch's elegant silhouette. The white gold version features a sunburst blue dial with applied Breguet numerals, adding a dynamic touch." },
-    { id: 3, brand: 'Patek Philippe', collection: 'Grand Complication', ref: '5271P-010', name: 'Chronograph. Perpetual Calendar. Joaillerie.', color: 'Platinum', price: 9958700000, image: 'https://thekronos.vn/public/uploads/product/l4i9_202321-51891.avif', description: "Heir to a classic launched in 1941, this perpetual calendar chronograph is one of Patek Philippe's most prized complication combinations. The aesthetic harmony of this platinum version set with baguette-cut diamonds is complemented by a lacquered black dial. The manually wound movement combines traditional construction with six patented innovations." },
-    { id: 4, brand: 'Patek Philippe', collection: 'Complication', ref: '5231G-001', name: 'World Time. Rare Handcrafts.', color: 'White Gold', price: 3152000000, image: 'https://thekronos.vn/public/uploads/product/jzbj_202402-51891.avif', description: "Patek Philippe pays tribute to the dynamism of Southeast Asia and Oceania in a white gold Rare Handcrafts World Time with a cloisonné Grand Feu enamel map representing that part of the world. The ultra-thin self-winding movement driving a city disk and a 24-hour disk with day/night zones enables the time to be read at will in all 24 time zones." },
-    { id: 5, brand: 'Patek Philippe', collection: 'Grand Complication', ref: '5271/12P-010', name: 'Chronograph. Perpetual Calendar. Joaillerie.', color: 'Platinum', price: 12105300000, image: 'https://thekronos.vn/public/uploads/product/hxwQ_5119-51891.avif', description: 'A jewelry version of a Patek Philippe classic, this platinum perpetual calendar chronograph is lit up by a setting of baguette-cut rubies on the bezel, lugs and folding clasp. The intense color of the stones is echoed by the lacquered red dial with black-gradient rim as well as by the shiny black alligator strap with contrasting red stitching.' },
-    { id: 6, brand: 'Patek Philippe', collection: 'Grand Complication', ref: '5327G-001', name: 'Perpetual Calendar', color: 'White Gold', price: 3541000000, image: 'https://thekronos.vn/public/uploads/product/i6Hz_5105-51891.avif', description: "Equipped with the famous ultra-thin self-winding Caliber 240 Q, this perpetual calendar is distinguished by its round Calatrava-style case with scalloped flanks accentuating the watch's elegant silhouette. The white gold version features a sunburst blue dial with applied Breguet numerals, adding a dynamic touch." },
-    { id: 7, brand: 'Patek Philippe', collection: 'Grand Complication', ref: '5271P-010', name: 'Chronograph. Perpetual Calendar. Joaillerie.', color: 'Platinum', price: 9958700000, image: 'https://thekronos.vn/public/uploads/product/l4i9_202321-51891.avif', description: "Heir to a classic launched in 1941, this perpetual calendar chronograph is one of Patek Philippe's most prized complication combinations. The aesthetic harmony of this platinum version set with baguette-cut diamonds is complemented by a lacquered black dial. The manually wound movement combines traditional construction with six patented innovations." },
-    { id: 8, brand: 'Patek Philippe', collection: 'Complication', ref: '5231G-001', name: 'World Time. Rare Handcrafts.', color: 'White Gold', price: 3152000000, image: 'https://thekronos.vn/public/uploads/product/jzbj_202402-51891.avif', description: "Patek Philippe pays tribute to the dynamism of Southeast Asia and Oceania in a white gold Rare Handcrafts World Time with a cloisonné Grand Feu enamel map representing that part of the world. The ultra-thin self-winding movement driving a city disk and a 24-hour disk with day/night zones enables the time to be read at will in all 24 time zones." },
-];
-
-// Add extra mock watches from the collection page loop if not found (for IDs > 8)
-for (let i = 0; i < 24; i++) {
-    if (!MOCK_WATCHES.find(w => w.id === i)) {
-        MOCK_WATCHES.push({
-            id: i,
-            brand: 'KRONOS',
-            collection: i % 3 === 0 ? 'Grand Complications' : i % 2 === 0 ? 'Nautilus' : 'Calatrava',
-            name: `Reference ${5000 + i}`,
-            ref: `5000-${i}`,
-            color: i % 2 === 0 ? 'Rose Gold' : 'Platinum',
-            image: 'https://thekronos.vn/public/uploads/product/hxwQ_5119-51891.avif',
-            price: 35000 + (i * 1500),
-            description: 'A jewelry version of a Patek Philippe classic, this platinum perpetual calendar chronograph is lit up by a setting of baguette-cut rubies on the bezel, lugs and folding clasp. The intense color of the stones is echoed by the lacquered red dial with black-gradient rim as well as by the shiny black alligator strap with contrasting red stitching.',
-        });
-    }
-}
+import { publicApi } from '@/lib/api';
 
 const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -45,19 +18,37 @@ const formatPrice = (price: number) => {
 const WatchDetailsPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const [watch, setWatch] = useState<Watch | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         // Scroll to top when page loads
         window.scrollTo(0, 0);
 
-        // Find the watch from mock data
-        if (id) {
-            const found = MOCK_WATCHES.find(w => w.id === parseInt(id));
-            if (found) {
-                setWatch(found);
+        // Fetch watch details from public API
+        const fetchDetails = async () => {
+            if (!id) return;
+            try {
+                setIsLoading(true);
+                const data = await publicApi.getWatchById(id);
+                setWatch(data);
+            } catch (err) {
+                console.error("Failed to load details:", err);
+                setWatch(null);
+            } finally {
+                setIsLoading(false);
             }
-        }
+        };
+
+        fetchDetails();
     }, [id]);
+
+    if (isLoading) {
+        return (
+            <div className="pt-32 pb-24 min-h-[60vh] flex flex-col items-center justify-center">
+                 <div className="w-8 h-8 border-2 border-gunmetal/20 border-t-gunmetal rounded-full animate-spin" />
+            </div>
+        );
+    }
 
     if (!watch) {
         return (
