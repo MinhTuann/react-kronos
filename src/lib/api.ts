@@ -1,7 +1,7 @@
 import axios from 'axios';
 import type { Watch } from '../types';
 
-const API_URL = 'http://localhost:3000/api/public';
+const API_URL = import.meta.env.VITE_API_URL;
 
 // Add simple generic interfaces for Brands/Collections in case they are needed
 export interface PublicBrand {
