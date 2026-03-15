@@ -49,7 +49,13 @@ export const publicApi = {
 
   // Fetch In-Stock Watches (Random 8)
   getInStockWatches: async (): Promise<Watch[]> => {
-    const response = await axios.get(`${API_URL.replace('/watches', '')}/in-stock`);
+    const response = await axios.get(`${API_URL}/in-stock`);
+    return response.data;
+  },
+
+  // Fetch Home Page Dynamic Content
+  getHomePageData: async (): Promise<any> => {
+    const response = await axios.get(`${API_URL}/homepage`);
     return response.data;
   }
 };
