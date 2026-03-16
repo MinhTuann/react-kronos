@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "kronos-dev-c8fba"
+  },
+  "targets": {
+    "kronos-dev-c8fba": {
+      "hosting": {
+        "storefront": [
+          "react-kronos"
+        ]
+      }
+    }
+  }
+}
