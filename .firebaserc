@@ -1,12 +1,20 @@
 {
   "projects": {
-    "default": "kronos-dev-c8fba"
+    "uat": "kronos-uat",
+    "prod": "kronos-prod"
   },
   "targets": {
-    "kronos-dev-c8fba": {
+    "kronos-uat": {
       "hosting": {
         "storefront": [
-          "react-kronos"
+          "kronos-storefront-uat"
+        ]
+      }
+    },
+    "kronos-prod": {
+      "hosting": {
+        "storefront": [
+          "kronos-storefront-prod"
         ]
       }
     }
