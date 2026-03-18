@@ -45,7 +45,7 @@ const videoVariants = {
 };
 
 // --- 3. The Isolated Video Component (Fixes the Ref bug) ---
-const ParallaxVideo = ({ url, direction, isPlaying }: { url: string; direction: number; isPlaying: boolean }) => {
+const ParallaxVideo = ({ url, poster, direction, isPlaying }: { url: string; poster?: string; direction: number; isPlaying: boolean }) => {
   const localVideoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -72,6 +72,7 @@ const ParallaxVideo = ({ url, direction, isPlaying }: { url: string; direction: 
       transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
       ref={localVideoRef}
       src={url}
+      poster={poster}
       className="absolute inset-0 w-full h-full object-cover pointer-events-none"
       muted
       loop
@@ -187,6 +188,7 @@ const VideoCarousel = ({ videos }: Props) => {
           {/* REPLACE the old <motion.video> block with our new isolated component */}
           <ParallaxVideo 
             url={video.url} 
+            poster={video.thumbnail_url}
             direction={direction} 
             isPlaying={isPlaying} 
           />

@@ -19,7 +19,8 @@ const HomePage = () => {
                 // Map backend video_url to url for VideoCarousel
                 const mappedSlides = home.slides?.map((slide: any) => ({
                     ...slide,
-                    url: slide.video_url
+                    url: slide.video_url,
+                    thumbnail_url: slide.thumbnail_url
                 })) || [];
 
                 setInStockWatches(inStock);

@@ -1,6 +1,7 @@
 export interface VideoSlide {
   id: number;
   url: string;
+  thumbnail_url?: string;
   title: string;
   description: string;
 }
