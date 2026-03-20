@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Filter, ArrowUp, X } from 'lucide-react';
 import type { Watch } from '@/types';
@@ -18,6 +19,11 @@ const CollectionsPage: React.FC = () => {
     const [sortMethod, setSortMethod] = useState<'recommended' | 'price-asc' | 'price-desc'>('recommended');
     const [showGoTop, setShowGoTop] = useState(false);
 
+    // Search Query parsing
+    const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    const searchQuery = queryParams.get('search') || undefined;
+
     // Filter States
     const [brands, setBrands] = useState<PublicBrand[]>([]);
     const [collections, setCollections] = useState<PublicCollection[]>([]);
@@ -32,20 +38,8 @@ const CollectionsPage: React.FC = () => {
     const currentWatches = watches.slice(indexOfFirstItem, indexOfLastItem);
     const totalPages = Math.ceil(watches.length / itemsPerPage);
 
-    // Initial Data Fetch
+    // Initial Filters Fetch (Runs Once)
     useEffect(() => {
-        const fetchWatches = async () => {
-            try {
-                setIsLoading(true);
-                const data = await publicApi.getWatches();
-                setOriginalWatches(data);
-                setWatches(data);
-            } catch (err) {
-                console.error("Failed to fetch public watches:", err);
-            } finally {
-                setIsLoading(false);
-            }
-        };
         const fetchFilters = async () => {
             try {
                 const [bData, cData] = await Promise.all([
@@ -58,9 +52,30 @@ const CollectionsPage: React.FC = () => {
                 console.error("Failed to fetch filters:", err);
             }
         };
-        fetchWatches();
         fetchFilters();
     }, []);
+
+    // Fetch Watches (Runs on mount and when filters/search changes)
+    useEffect(() => {
+        const fetchWatches = async () => {
+            try {
+                setIsLoading(true);
+                // Pass the first selected brand ID (if any) and all selected collection IDs
+                const brandId = selectedBrands.length > 0 ? selectedBrands[0] : undefined;
+                const collectionIds = selectedCollections.length > 0 ? selectedCollections : undefined;
+                
+                const data = await publicApi.getWatches(brandId, collectionIds, searchQuery);
+                setOriginalWatches(data);
+                setWatches(data);
+                setCurrentPage(1); 
+            } catch (err) {
+                console.error("Failed to fetch public watches:", err);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchWatches();
+    }, [searchQuery, selectedBrands, selectedCollections]);
 
     // Scroll Listener for "Go to Top" button
     useEffect(() => {
@@ -75,76 +90,83 @@ const CollectionsPage: React.FC = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    // Filtering & Sorting Logic
+    // Sorting Logic (Client-side)
     useEffect(() => {
         let filtered = [...originalWatches];
-
-        // Apply filters
-        if (selectedBrands.length > 0) {
-            filtered = filtered.filter(w => selectedBrands.includes(w.brand));
-        }
-        if (selectedCollections.length > 0) {
-            filtered = filtered.filter(w => selectedCollections.includes(w.collection));
-        }
 
         // Apply sorting
         if (sortMethod === 'price-asc') filtered.sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
         if (sortMethod === 'price-desc') filtered.sort((a, b) => (b.price ?? 0) - (a.price ?? 0));
-        
+
         setWatches(filtered);
         setCurrentPage(1);
     }, [sortMethod, originalWatches, selectedBrands, selectedCollections]);
 
     // --- Filter Content Render Function (Desktop Sidebar & Mobile Drawer) ---
     const renderFilterContent = () => {
-        const toggleBrand = (brandName: string) => {
+        const toggleBrand = (brandId: string | null) => {
+            // When brand selection changes, clear all selected collections
+            setSelectedCollections([]);
             setSelectedBrands(prevBrands => {
-                const isRemoving = prevBrands.includes(brandName);
-                if (isRemoving) {
-                    // Un-check corresponding collections when a brand is unchecked
-                    const brandObj = brands.find(b => b.name === brandName);
-                    if (brandObj) {
-                        const associatedCollections = collections.filter(c => c.brand_id === brandObj.id).map(c => c.name);
-                        setSelectedCollections(prevCols => prevCols.filter(c => !associatedCollections.includes(c)));
-                    }
-                    return prevBrands.filter(b => b !== brandName);
+                if (brandId === null) return [];
+                if (prevBrands.includes(brandId)) {
+                    return []; // Allow toggle off
                 }
-                return [...prevBrands, brandName];
+                return [brandId];
             });
         };
 
-        const toggleCollection = (collectionName: string) => {
-            setSelectedCollections(prev => 
-                prev.includes(collectionName) ? prev.filter(c => c !== collectionName) : [...prev, collectionName]
+        const toggleCollection = (collectionId: string) => {
+            setSelectedCollections(prev =>
+                prev.includes(collectionId) ? prev.filter(id => id !== collectionId) : [...prev, collectionId]
             );
         };
 
-        const selectedBrandIds = brands.filter(b => selectedBrands.includes(b.name)).map(b => b.id);
-        const visibleCollections = collections.filter(c => selectedBrandIds.includes(c.brand_id));
+        const visibleCollections = collections.filter(c => selectedBrands.includes(c.brand_id));
 
         return (
             <div className='pr-4 lg:pr-8 space-y-10 lg:space-y-12'>
                 {brands.length > 0 && (
                     <div>
                         <h4 className='text-[10px] tracking-[0.3em] uppercase font-bold border-b border-gunmetal/10 pb-4 mb-4'>Brands</h4>
-                        <ul className='space-y-4 lg:space-y-3 text-sm font-light text-gunmetal/80 max-h-48 overflow-y-auto pr-2 custom-scrollbar'>
-                            {brands.map(brand => (
-                                <li key={brand.id}>
-                                    <label className='flex items-center gap-3 cursor-pointer hover:text-black'>
-                                        <input 
-                                            type='checkbox' 
-                                            className='accent-gunmetal w-4 h-4'
-                                            checked={selectedBrands.includes(brand.name)}
-                                            onChange={() => toggleBrand(brand.name)}
-                                        /> 
-                                        {brand.name}
-                                    </label>
-                                </li>
-                            ))}
+                        <ul className='space-y-4 lg:space-y-3 text-sm font-light max-h-48 overflow-y-auto pr-2 custom-scrollbar'>
+                            {brands.map(brand => {
+                                const isSelected = selectedBrands.includes(brand.id);
+                                return (
+                                    <li key={brand.id}>
+                                        <label className={`flex items-center gap-3 cursor-pointer group transition-colors ${isSelected ? 'text-black font-medium' : 'text-gunmetal/60 hover:text-black'}`}>
+                                            <div className="relative flex items-center justify-center">
+                                                <input
+                                                    type='radio'
+                                                    name='brand'
+                                                    className='sr-only'
+                                                    checked={isSelected}
+                                                    onClick={() => toggleBrand(brand.id)}
+                                                    onChange={() => { }}
+                                                />
+                                                {/* Outer Circle */}
+                                                <div className={`w-4 h-4 rounded-full border transition-all duration-300 ${isSelected ? 'border-gunmetal bg-gunmetal/5' : 'border-gunmetal/20 group-hover:border-gunmetal/40'}`} />
+                                                {/* Inner Dot */}
+                                                <AnimatePresence>
+                                                    {isSelected && (
+                                                        <motion.div
+                                                            initial={{ scale: 0 }}
+                                                            animate={{ scale: 1 }}
+                                                            exit={{ scale: 0 }}
+                                                            className="absolute w-1.5 h-1.5 rounded-full bg-gunmetal"
+                                                        />
+                                                    )}
+                                                </AnimatePresence>
+                                            </div>
+                                            {brand.name}
+                                        </label>
+                                    </li>
+                                );
+                            })}
                         </ul>
                     </div>
                 )}
-                
+
                 {selectedBrands.length > 0 && visibleCollections.length > 0 && (
                     <div>
                         <h4 className='text-[10px] tracking-[0.3em] uppercase font-bold border-b border-gunmetal/10 pb-4 mb-4'>Collections</h4>
@@ -152,12 +174,12 @@ const CollectionsPage: React.FC = () => {
                             {visibleCollections.map(collection => (
                                 <li key={collection.id}>
                                     <label className='flex items-center gap-3 cursor-pointer hover:text-black'>
-                                        <input 
-                                            type='checkbox' 
+                                        <input
+                                            type='checkbox'
                                             className='accent-gunmetal w-4 h-4'
-                                            checked={selectedCollections.includes(collection.name)}
-                                            onChange={() => toggleCollection(collection.name)}
-                                        /> 
+                                            checked={selectedCollections.includes(collection.id)}
+                                            onChange={() => toggleCollection(collection.id)}
+                                        />
                                         {collection.name}
                                     </label>
                                 </li>
@@ -211,11 +233,11 @@ const CollectionsPage: React.FC = () => {
                     <span className="sm:hidden">Filter</span>
                 </button>
 
-                {/* REPLACE THE OLD SELECT CODE WITH THIS: */}
-                <Dropdown
+                {/* Temporarily hide sort UI */}
+                {/* <Dropdown
                     value={sortMethod}
                     onChange={setSortMethod}
-                />
+                /> */}
             </div>
 
             {/* --- Main Content Layout --- */}

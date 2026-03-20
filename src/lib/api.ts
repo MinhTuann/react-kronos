@@ -31,11 +31,12 @@ export const publicApi = {
   },
 
   // Fetch Public Watches (Array)
-  getWatches: async (brandId?: string, collectionId?: string): Promise<Watch[]> => {
+  getWatches: async (brandId?: string, collectionIds?: string | string[], search?: string): Promise<Watch[]> => {
     const response = await axios.get(`${API_URL}/watches`, {
       params: {
          brand_id: brandId,
-         collection_id: collectionId
+         collection_ids: collectionIds,
+         search: search
       }
     });
     return response.data;

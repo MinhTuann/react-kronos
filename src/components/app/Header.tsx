@@ -17,6 +17,9 @@ const Header = ({ scrollY }: Props) => {
     // 1. State to manage the menu open/close status
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     const [isSearchOpen, setIsSearchOpen] = useState(false)
+    
+    // Search States
+    const [searchQuery, setSearchQuery] = useState('')
 
     // Dynamic color logic: If the menu is open OR we scrolled out of the video, use dark mode.
     const useDarkTheme = isMenuOpen || isSearchOpen || !isHomePage || isScrolledOutOfVideo
@@ -32,6 +35,9 @@ const Header = ({ scrollY }: Props) => {
     const toggleSearch = () => {
         setIsMenuOpen(false);
         setIsSearchOpen(!isSearchOpen);
+        if (isSearchOpen) {
+            setSearchQuery('');
+        }
     }
 
     useMotionValueEvent(scrollY, 'change', (current) => {
@@ -194,12 +200,16 @@ const Header = ({ scrollY }: Props) => {
                                     type="text"
                                     placeholder="Search collections, models, or materials..."
                                     autoFocus
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
                                     className="w-full bg-transparent text-2xl md:text-5xl italic text-gunmetal outline-none placeholder:text-gunmetal/20 pb-4 md:pb-6 border-b border-gunmetal/20 transition-colors"
                                     onKeyDown={(e) => {
-                                        if (e.key === 'Enter') {
+                                        if (e.key === 'Enter' && searchQuery.trim()) {
                                             setIsMenuOpen(false);
                                             setIsSearchOpen(false);
-                                            navigate('/collections');
+                                            // Navigate to collections with search query
+                                            navigate(`/collections?search=${encodeURIComponent(searchQuery.trim())}`);
+                                            setSearchQuery('');
                                         }
                                     }}
                                 />
@@ -232,9 +242,12 @@ const Header = ({ scrollY }: Props) => {
                                             <button
                                                 className="text-lg text-gunmetal hover:text-black transition-colors flex items-center gap-4 group"
                                                 onClick={() => {
+                                                    // Temporarily disabled
+                                                    /*
                                                     setIsMenuOpen(false);
                                                     setIsSearchOpen(false);
-                                                    navigate('/collections');
+                                                    navigate(`/collections?search=${encodeURIComponent(suggestion)}`);
+                                                    */
                                                 }}>
                                                 <span className="h-[1px] w-4 bg-gunmetal/20 group-hover:w-8 group-hover:bg-gunmetal transition-all duration-300"></span>
                                                 {suggestion}
@@ -243,7 +256,6 @@ const Header = ({ scrollY }: Props) => {
                                     ))}
                                 </ul>
                             </motion.div>
-
                         </div>
                     </motion.div>
                 )}
