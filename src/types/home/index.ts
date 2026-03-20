@@ -16,4 +16,10 @@ export interface Watch {
   image: string;
   color: string;
   description: string;
+  size?: string;
+  material?: string;
+  movement?: string;
+  strap?: string;
+  dial?: string;
+  condition?: string;
 }

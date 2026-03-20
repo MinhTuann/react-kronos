@@ -1,9 +1,10 @@
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import IconButton from './IconButton'
-import { WatchIcon, SearchIcon, XIcon } from 'lucide-react'
+import { WatchIcon, SearchIcon, XIcon, ChevronLeft } from 'lucide-react'
 import { useMotionValueEvent, MotionValue } from 'motion/react'
+import { publicApi, type PublicBrand, type PublicCollection } from '@/lib/api'
 
 interface Props {
     scrollY: MotionValue<number>;
@@ -18,6 +19,42 @@ const Header = ({ scrollY }: Props) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     const [isSearchOpen, setIsSearchOpen] = useState(false)
 
+    // Search States
+    const [searchQuery, setSearchQuery] = useState('')
+
+    // Nested Menu States
+    const [menuDepth, setMenuDepth] = useState<'main' | 'brands' | 'collections'>('main')
+    const [brands, setBrands] = useState<PublicBrand[]>([])
+    const [collections, setCollections] = useState<PublicCollection[]>([])
+    const [selectedBrand, setSelectedBrand] = useState<PublicBrand | null>(null)
+
+    // Fetch Brands when menu opens
+    useEffect(() => {
+        const fetchBrands = async () => {
+            try {
+                const data = await publicApi.getBrands();
+                setBrands(data);
+            } catch (err) {
+                console.error("Failed to fetch brands in Header:", err);
+            }
+        }
+        if (isMenuOpen && brands.length === 0) {
+            fetchBrands();
+        }
+    }, [isMenuOpen, brands.length]);
+
+    // Handle Brand Selection
+    const handleBrandSelect = async (brand: PublicBrand) => {
+        setSelectedBrand(brand);
+        try {
+            const data = await publicApi.getCollections(brand.id);
+            setCollections(data);
+            setMenuDepth('collections');
+        } catch (err) {
+            console.error("Failed to fetch collections for brand:", brand.name, err);
+        }
+    }
+
     // Dynamic color logic: If the menu is open OR we scrolled out of the video, use dark mode.
     const useDarkTheme = isMenuOpen || isSearchOpen || !isHomePage || isScrolledOutOfVideo
     const iconColorClass = useDarkTheme ? 'text-black' : 'text-white'
@@ -27,11 +64,18 @@ const Header = ({ scrollY }: Props) => {
     const toggleMenu = () => {
         setIsSearchOpen(false);
         setIsMenuOpen(!isMenuOpen);
+        if (!isMenuOpen) {
+            setMenuDepth('main');
+            setSelectedBrand(null);
+        }
     }
 
     const toggleSearch = () => {
         setIsMenuOpen(false);
         setIsSearchOpen(!isSearchOpen);
+        if (isSearchOpen) {
+            setSearchQuery('');
+        }
     }
 
     useMotionValueEvent(scrollY, 'change', (current) => {
@@ -72,7 +116,7 @@ const Header = ({ scrollY }: Props) => {
                                     navigate('/collections');
                                 }}
                                 icon={<WatchIcon strokeWidth={1.5} />}
-                                label={'Collections'}
+                                label={'Brands'}
                                 className={iconColorClass}
                             />
 
@@ -121,46 +165,126 @@ const Header = ({ scrollY }: Props) => {
                             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
                             className="fixed top-0 left-0 h-[100dvh] w-full md:w-[450px] bg-white z-[70] shadow-2xl overflow-hidden flex flex-col pt-32"
                         >
-                            {/* Drawer Links */}
-                            <motion.div
-                                initial="hidden"
-                                animate="visible"
-                                exit="hidden"
-                                variants={{
-                                    visible: { transition: { staggerChildren: 0.1, delayChildren: 0.2 } },
-                                    hidden: { transition: { staggerChildren: 0.05, staggerDirection: -1 } }
-                                }}
-                                className="flex flex-col gap-8 px-12"
-                            >
-                                <span className="font-branding text-[10px] tracking-[0.4em] uppercase text-gunmetal/50 mb-4 border-b border-gunmetal/20 pb-4">
+                            <div className="flex flex-col h-full px-12">
+                                <span className="font-branding text-[10px] tracking-[0.4em] uppercase text-gunmetal/50 mb-8 border-b border-gunmetal/20 pb-4 block">
                                     Kronos Luxury Timepieces
                                 </span>
 
-                                {['Collections', 'New Arrivals', 'The Company', 'Services'].map((item) => (
-                                    <motion.div
-                                        key={item}
-                                        variants={{
-                                            hidden: { opacity: 0, x: -20 },
-                                            visible: { opacity: 1, x: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
-                                        }}
-                                    >
-                                        <Link
-                                            to="#"
-                                            onClick={() => setIsMenuOpen(false)}
-                                            className="text-3xl md:text-4xl italic text-gunmetal hover:text-black transition-colors"
-                                        >
-                                            {item}
-                                        </Link>
-                                    </motion.div>
-                                ))}
-                            </motion.div>
+                                <div className="flex-1 overflow-hidden">
+                                    <AnimatePresence mode="wait" initial={false}>
+                                        {menuDepth === 'main' && (
+                                            <motion.div
+                                                key="main"
+                                                initial={{ opacity: 0, x: -20 }}
+                                                animate={{ opacity: 1, x: 0 }}
+                                                exit={{ opacity: 0, x: -20 }}
+                                                transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                                                className="flex flex-col gap-8"
+                                            >
+                                                <button
+                                                    onClick={() => setMenuDepth('brands')}
+                                                    className="text-left text-3xl md:text-4xl italic text-gunmetal hover:text-black transition-colors flex items-center justify-between group"
+                                                >
+                                                    The Brands
+                                                    <span className="text-[10px] tracking-[0.2em] font-branding opacity-0 group-hover:opacity-100 transition-all -translate-x-4 group-hover:translate-x-0">DISCOVER</span>
+                                                </button>
+                                                <Link
+                                                    to="/about-us"
+                                                    onClick={() => setIsMenuOpen(false)}
+                                                    className="text-3xl md:text-4xl italic text-gunmetal hover:text-black transition-colors"
+                                                >
+                                                    The Company
+                                                </Link>
+                                            </motion.div>
+                                        )}
 
-                            {/* Drawer Footer */}
-                            <div className="mt-auto p-12 bg-bone/10 border-t border-gray-100">
-                                <p className="text-[10px] uppercase tracking-widest text-bone mb-4">Contact Us</p>
-                                <a href="mailto:kronos.timepieces08@gmail.com" className="text-sm text-gunmetal border-b border-gunmetal pb-1 hover:text-black hover:border-black transition-colors">
-                                    kronos.timepieces08@gmail.com
-                                </a>
+                                        {menuDepth === 'brands' && (
+                                            <motion.div
+                                                key="brands"
+                                                initial={{ opacity: 0, x: 20 }}
+                                                animate={{ opacity: 1, x: 0 }}
+                                                exit={{ opacity: 0, x: 20 }}
+                                                transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                                                className="flex flex-col h-full"
+                                            >
+                                                <button
+                                                    onClick={() => setMenuDepth('main')}
+                                                    className="flex items-center gap-2 text-gunmetal/50 hover:text-gunmetal mb-10 transition-colors uppercase tracking-[0.2em] text-[10px] font-branding"
+                                                >
+                                                    <ChevronLeft size={16} /> Back to menu
+                                                </button>
+                                                <div className="flex flex-col gap-6 overflow-y-auto pr-4 pb-12 scrollbar-hide">
+                                                    {brands.length > 0 ? (
+                                                        brands.map((brand) => (
+                                                            <button
+                                                                key={brand.id}
+                                                                onClick={() => handleBrandSelect(brand)}
+                                                                className="text-left text-2xl md:text-3xl italic text-gunmetal hover:text-black transition-colors flex items-center justify-between group"
+                                                            >
+                                                                {brand.name}
+                                                                <span className="text-[10px] tracking-[0.2em] font-branding opacity-0 group-hover:opacity-100 transition-all -translate-x-4 group-hover:translate-x-0">VIEW</span>
+                                                            </button>
+                                                        ))
+                                                    ) : (
+                                                        <div className="animate-pulse flex flex-col gap-6">
+                                                            {[1, 2, 3, 4, 5].map(i => <div key={i} className="h-8 bg-bone/20 w-3/4 rounded" />)}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </motion.div>
+                                        )}
+
+                                        {menuDepth === 'collections' && (
+                                            <motion.div
+                                                key="collections"
+                                                initial={{ opacity: 0, x: 20 }}
+                                                animate={{ opacity: 1, x: 0 }}
+                                                exit={{ opacity: 0, x: 20 }}
+                                                transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                                                className="flex flex-col h-full"
+                                            >
+                                                <button
+                                                    onClick={() => setMenuDepth('brands')}
+                                                    className="flex items-center gap-2 text-gunmetal/50 hover:text-gunmetal mb-2 transition-colors uppercase tracking-[0.2em] text-[10px] font-branding"
+                                                >
+                                                    <ChevronLeft size={16} /> Back to brands
+                                                </button>
+                                                <h3 className="text-3xl italic text-black mb-8 border-b border-gunmetal/5 pb-4">{selectedBrand?.name}</h3>
+                                                <div className="flex flex-col gap-6 overflow-y-auto pr-4 pb-12 scrollbar-hide">
+                                                    <button
+                                                        onClick={() => {
+                                                            setIsMenuOpen(false);
+                                                            navigate(`/collections?brandId=${selectedBrand?.id}`);
+                                                        }}
+                                                        className="text-left text-2xl md:text-3xl italic text-stormy hover:text-black transition-colors"
+                                                    >
+                                                        All {selectedBrand?.name}
+                                                    </button>
+                                                    {collections.map((collection) => (
+                                                        <button
+                                                            key={collection.id}
+                                                            onClick={() => {
+                                                                setIsMenuOpen(false);
+                                                                navigate(`/collections?brandId=${selectedBrand?.id}&collections=${collection.id}`);
+                                                            }}
+                                                            className="text-left text-2xl md:text-3xl italic text-gunmetal hover:text-black transition-colors"
+                                                        >
+                                                            {collection.name}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+                                </div>
+
+                                {/* Drawer Footer */}
+                                <div className="mt-auto py-12 border-t border-gray-100">
+                                    <p className="text-[10px] uppercase tracking-widest text-bone mb-4">Contact Us</p>
+                                    <a href="mailto:kronos.timepieces08@gmail.com" className="text-sm text-gunmetal border-b border-gunmetal pb-1 hover:text-black hover:border-black transition-colors">
+                                        kronos.timepieces08@gmail.com
+                                    </a>
+                                </div>
                             </div>
                         </motion.div>
                     </>
@@ -194,12 +318,16 @@ const Header = ({ scrollY }: Props) => {
                                     type="text"
                                     placeholder="Search collections, models, or materials..."
                                     autoFocus
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
                                     className="w-full bg-transparent text-2xl md:text-5xl italic text-gunmetal outline-none placeholder:text-gunmetal/20 pb-4 md:pb-6 border-b border-gunmetal/20 transition-colors"
                                     onKeyDown={(e) => {
-                                        if (e.key === 'Enter') {
+                                        if (e.key === 'Enter' && searchQuery.trim()) {
                                             setIsMenuOpen(false);
                                             setIsSearchOpen(false);
-                                            navigate('/collections');
+                                            // Navigate to collections with search query
+                                            navigate(`/collections?search=${encodeURIComponent(searchQuery.trim())}`);
+                                            setSearchQuery('');
                                         }
                                     }}
                                 />
@@ -232,9 +360,12 @@ const Header = ({ scrollY }: Props) => {
                                             <button
                                                 className="text-lg text-gunmetal hover:text-black transition-colors flex items-center gap-4 group"
                                                 onClick={() => {
+                                                    // Temporarily disabled
+                                                    /*
                                                     setIsMenuOpen(false);
                                                     setIsSearchOpen(false);
-                                                    navigate('/collections');
+                                                    navigate(`/collections?search=${encodeURIComponent(suggestion)}`);
+                                                    */
                                                 }}>
                                                 <span className="h-[1px] w-4 bg-gunmetal/20 group-hover:w-8 group-hover:bg-gunmetal transition-all duration-300"></span>
                                                 {suggestion}
@@ -243,7 +374,6 @@ const Header = ({ scrollY }: Props) => {
                                     ))}
                                 </ul>
                             </motion.div>
-
                         </div>
                     </motion.div>
                 )}
@@ -287,3 +417,4 @@ const AnimatedMenuIcon = ({ isOpen }: { isOpen: boolean }) => (
         />
     </motion.svg>
 );
+

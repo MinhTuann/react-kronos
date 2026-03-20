@@ -143,16 +143,42 @@ const WatchDetailsPage: React.FC = () => {
                         <div className="mb-12">
                             <h3 className="text-xs tracking-[0.3em] uppercase font-bold text-gunmetal mb-6">Specifics</h3>
                             <div className="grid grid-cols-2 gap-y-6 gap-x-12 border-t border-gunmetal/10 pt-6">
-                                {watch.color && (
+                                {watch.size && (
                                     <div>
-                                        <p className="text-[10px] tracking-[0.2em] uppercase text-gunmetal/50 mb-1">Material</p>
-                                        <p className="text-sm font-medium text-gunmetal">{watch.color}</p>
+                                        <p className="text-[10px] tracking-[0.2em] uppercase text-gunmetal/50 mb-1">Case Size</p>
+                                        <p className="text-sm font-medium text-gunmetal">{watch.size}</p>
                                     </div>
                                 )}
-                                <div>
-                                    <p className="text-[10px] tracking-[0.2em] uppercase text-gunmetal/50 mb-1">Condition</p>
-                                    <p className="text-sm font-medium text-gunmetal">Unworn</p>
-                                </div>
+                                {(watch.material || watch.color) && (
+                                    <div>
+                                        <p className="text-[10px] tracking-[0.2em] uppercase text-gunmetal/50 mb-1">Material</p>
+                                        <p className="text-sm font-medium text-gunmetal">{watch.material || watch.color}</p>
+                                    </div>
+                                )}
+                                {watch.movement && (
+                                    <div>
+                                        <p className="text-[10px] tracking-[0.2em] uppercase text-gunmetal/50 mb-1">Movement</p>
+                                        <p className="text-sm font-medium text-gunmetal">{watch.movement}</p>
+                                    </div>
+                                )}
+                                {watch.strap && (
+                                    <div>
+                                        <p className="text-[10px] tracking-[0.2em] uppercase text-gunmetal/50 mb-1">Strap</p>
+                                        <p className="text-sm font-medium text-gunmetal">{watch.strap}</p>
+                                    </div>
+                                )}
+                                {watch.dial && (
+                                    <div>
+                                        <p className="text-[10px] tracking-[0.2em] uppercase text-gunmetal/50 mb-1">Dial</p>
+                                        <p className="text-sm font-medium text-gunmetal">{watch.dial}</p>
+                                    </div>
+                                )}
+                                {watch.condition && (
+                                    <div>
+                                        <p className="text-[10px] tracking-[0.2em] uppercase text-gunmetal/50 mb-1">Condition</p>
+                                        <p className="text-sm font-medium text-gunmetal">{watch.condition}</p>
+                                    </div>
+                                )}
                                 <div>
                                     <p className="text-[10px] tracking-[0.2em] uppercase text-gunmetal/50 mb-1">Availability</p>
                                     <p className="text-sm font-medium text-green-700 flex items-center gap-2">
