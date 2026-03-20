@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Filter, ArrowUp, X } from 'lucide-react';
 import type { Watch } from '@/types';
 import { WatchItem } from '@/components/home/InStocks';
-import { Dropdown } from '@/components/app';
+// import { Dropdown } from '@/components/app';
 
 import { publicApi } from '@/lib/api';
 import type { PublicBrand, PublicCollection } from '@/lib/api';
@@ -12,11 +12,11 @@ import type { PublicBrand, PublicCollection } from '@/lib/api';
 const CollectionsPage: React.FC = () => {
     // States
     const [watches, setWatches] = useState<Watch[]>([]);
-    const [originalWatches, setOriginalWatches] = useState<Watch[]>([]);
+    // const [originalWatches, setOriginalWatches] = useState<Watch[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
-    const [sortMethod, setSortMethod] = useState<'recommended' | 'price-asc' | 'price-desc'>('recommended');
+    // const [sortMethod, setSortMethod] = useState<'recommended' | 'price-asc' | 'price-desc'>('recommended');
     const [showGoTop, setShowGoTop] = useState(false);
 
     // Search Query parsing
@@ -65,7 +65,7 @@ const CollectionsPage: React.FC = () => {
                 const collectionIds = selectedCollections.length > 0 ? selectedCollections : undefined;
                 
                 const data = await publicApi.getWatches(brandId, collectionIds, searchQuery);
-                setOriginalWatches(data);
+                // setOriginalWatches(data);
                 setWatches(data);
                 setCurrentPage(1); 
             } catch (err) {
@@ -91,16 +91,16 @@ const CollectionsPage: React.FC = () => {
     };
 
     // Sorting Logic (Client-side)
-    useEffect(() => {
-        let filtered = [...originalWatches];
+    // useEffect(() => {
+    //     let filtered = [...originalWatches];
 
-        // Apply sorting
-        if (sortMethod === 'price-asc') filtered.sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
-        if (sortMethod === 'price-desc') filtered.sort((a, b) => (b.price ?? 0) - (a.price ?? 0));
+    //     // Apply sorting
+    //     if (sortMethod === 'price-asc') filtered.sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
+    //     if (sortMethod === 'price-desc') filtered.sort((a, b) => (b.price ?? 0) - (a.price ?? 0));
 
-        setWatches(filtered);
-        setCurrentPage(1);
-    }, [sortMethod, originalWatches, selectedBrands, selectedCollections]);
+    //     setWatches(filtered);
+    //     setCurrentPage(1);
+    // }, [sortMethod, originalWatches, selectedBrands, selectedCollections]);
 
     // --- Filter Content Render Function (Desktop Sidebar & Mobile Drawer) ---
     const renderFilterContent = () => {
@@ -270,7 +270,7 @@ const CollectionsPage: React.FC = () => {
                         </div>
                     ) : (
                         <motion.div
-                            key={`${currentPage}-${sortMethod}-${selectedBrands.join(',')}-${selectedCollections.join(',')}`}
+                            key={`${currentPage}-${'sortMethod'}-${selectedBrands.join(',')}-${selectedCollections.join(',')}`}
                             initial='hidden'
                             animate='visible'
                             variants={{
