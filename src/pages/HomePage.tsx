@@ -20,7 +20,7 @@ const HomePage = () => {
                 const mappedSlides = home.slides?.map((slide: any) => ({
                     ...slide,
                     url: slide.video_url,
-                    thumbnail_url: slide.thumbnail_url
+                    thumbnail_url: slide.thumbnail_url,
                 })) || [];
 
                 setInStockWatches(inStock);
