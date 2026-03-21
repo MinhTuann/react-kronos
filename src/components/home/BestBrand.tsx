@@ -65,7 +65,7 @@ const BestBrand = () => {
 
                     <motion.div variants={itemVariants} className='space-y-2'>
                         <h2 className='text-3xl md:text-4xl text-white border-l-2 border-vanilla pl-4 leading-tight'>GRAND COMPLICATIONS</h2>
-                        <h4 className='text-lg md:text-xl text-white/70 pl-4 italic'>REF. 7140G-001</h4>
+                        <h4 className='text-lg md:text-xl text-white/70 pl-4 font-branding'>REF. 7140G-001</h4>
                     </motion.div>
 
                     <motion.p variants={itemVariants} className='text-white/80 leading-relaxed max-w-lg'>

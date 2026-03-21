@@ -122,7 +122,7 @@ const WatchDetailsPage: React.FC = () => {
                                     </p>
                                 )}
                                 {watch.ref && (
-                                    <p className="text-sm tracking-[0.2em] font-medium text-gunmetal/50 uppercase border-l border-gunmetal/20 pl-6">
+                                    <p className="font-branding text-sm tracking-[0.2em] font-medium text-gunmetal/50 uppercase border-l border-gunmetal/20 pl-6">
                                         Ref. {watch.ref}
                                     </p>
                                 )}

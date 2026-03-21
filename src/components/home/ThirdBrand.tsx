@@ -46,7 +46,8 @@ const ThirdBrand = () => {
                 >
                     <div className="space-y-4">
                         <motion.p variants={itemVariants} className="font-branding text-[11px] tracking-[0.3em] uppercase text-golden mb-4">Rolex</motion.p>
-                        <motion.h2 variants={itemVariants} className="text-5xl mb-6">1908 <br /> REF. M52508-0008</motion.h2>
+                        <motion.h2 variants={itemVariants} className="text-5xl mb-6">1908</motion.h2>
+                        <motion.h2 variants={itemVariants} className="text-xl mb-6 font-branding">REF. M52508-0008</motion.h2>
                         <motion.p variants={itemVariants} className="text-gunmetal leading-relaxed max-w-md">Elegant, classic and decidedly contemporary, the Perpetual 1908 immortalizes Rolex’s age-long daring spirit. Heir to the brand’s aesthetic heritage as much as to its numerous innovations in watchmaking, the watch perpetuates the brand’s pursuit of excellence. This fine example of Rolex’s watchmaking prowess, with Superlative Chronometer certification, brings classicism to the future.</motion.p>
                     </div>
                     <div className="grid grid-cols-2 gap-y-8 gap-x-12 border-t border-bone/30 pt-8">
