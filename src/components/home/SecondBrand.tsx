@@ -56,7 +56,8 @@ const SecondBrand = () => {
                 >
                     <div className="space-y-4">
                         <motion.p variants={itemVariants} className="font-branding text-[11px] tracking-[0.3em] uppercase text-golden mb-4">Richard Mille</motion.p>
-                        <motion.h2 variants={itemVariants} className="text-5xl mb-6">CALIBRE <br /> RM41-01</motion.h2>
+                        <motion.h2 variants={itemVariants} className="text-5xl mb-6">CALIBRE</motion.h2>
+                        <motion.h2 variants={itemVariants} className="text-xl mb-6 font-branding">REF. RM41-01</motion.h2>
                         <motion.p variants={itemVariants} className="text-gunmetal leading-relaxed max-w-md">Richard Mille’s relationship with the world of soccer started with the RM 11-01 and the RM 11-04 Roberto Mancini, which introduced an innovative match-time display. Taking this daring concept even further, the new RM 41-01 Tourbillon Soccer tackles a unique challenge: fully tracking a match through the prism of Haute Horlogerie: from kick-off to the final whistle, taking note of every goal.</motion.p>
                     </div>
                     <div className="grid grid-cols-2 gap-y-8 gap-x-12 border-t border-bone/30 pt-8">

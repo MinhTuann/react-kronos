@@ -47,6 +47,12 @@ const videoVariants = {
 // --- 3. The Isolated Video Component (Fixes the Ref bug) ---
 const ParallaxVideo = ({ url, poster, direction, isPlaying }: { url: string; poster?: string; direction: number; isPlaying: boolean }) => {
   const localVideoRef = useRef<HTMLVideoElement>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  // Reset loading state when the source URL changes
+  useEffect(() => {
+    setIsLoaded(false);
+  }, [url]);
 
   useEffect(() => {
     const handlePlayback = async () => {
@@ -58,7 +64,7 @@ const ParallaxVideo = ({ url, poster, direction, isPlaying }: { url: string; pos
             localVideoRef.current.pause();
           }
         } catch (error) {
-          console.log("Video playback interrupted.");
+          // Playback might be interrupted by navigation
         }
       }
     };
@@ -66,18 +72,35 @@ const ParallaxVideo = ({ url, poster, direction, isPlaying }: { url: string; pos
   }, [isPlaying, url]);
 
   return (
-    <motion.video
+    <motion.div
       custom={direction}
       variants={videoVariants}
       transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-      ref={localVideoRef}
-      src={url}
-      poster={poster}
-      className="absolute inset-0 w-full h-full object-cover pointer-events-none"
-      muted
-      loop
-      playsInline
-    />
+      className="absolute inset-0 w-full h-full scale-[1.15]"
+    >
+      <AnimatePresence>
+        {poster && !isLoaded && (
+          <motion.img
+            key="poster"
+            src={poster}
+            initial={{ opacity: 1 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8, ease: "easeInOut" }}
+            className="absolute inset-0 w-full h-full object-cover z-10"
+          />
+        )}
+      </AnimatePresence>
+      <video
+        ref={localVideoRef}
+        src={url}
+        onLoadedData={() => setIsLoaded(true)}
+        className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+        muted
+        loop
+        playsInline
+      />
+    </motion.div>
   );
 };
 
@@ -201,7 +224,7 @@ const VideoCarousel = ({ videos }: Props) => {
               onMouseMove={(e) => e.stopPropagation()}
               onClick={(e) => e.stopPropagation()}
             >
-              {video.title.split('\n').map(
+              {video.title.split('\\n').map(
                 (title, idx) => 
                   <h1 className={`font-branding text-2xl md:text-4xl ${idx === 0 ? 'text-white' : 'text-vanilla'}`} key={`video-${idx}-title`}>
                     {title}
