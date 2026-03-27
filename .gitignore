@@ -26,6 +26,7 @@ dist-ssr
 *.template.tsx
 
 .env*
+!.env.example
 
 .gitnexus
 .claude

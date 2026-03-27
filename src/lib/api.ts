@@ -1,19 +1,10 @@
 import axios from 'axios';
 import type { Watch } from '../types';
+import type { PublicBrand, PublicCollection } from '@kronos/contracts';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-// Add simple generic interfaces for Brands/Collections in case they are needed
-export interface PublicBrand {
-    id: string;
-    name: string;
-}
-
-export interface PublicCollection {
-    id: string;
-    brand_id: string;
-    name: string;
-}
+export type { PublicBrand, PublicCollection };
 
 export const publicApi = {
   // Fetch Brands

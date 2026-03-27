@@ -1,5 +1,6 @@
 {
   "projects": {
+    "dev": "kronos-dev-c8fba",
     "uat": "kronos-uat",
     "prod": "kronos-prod"
   },
