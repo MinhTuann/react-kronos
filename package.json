@@ -12,6 +12,7 @@
     "deploy:prod": "npx firebase-tools deploy --only hosting:storefront --project prod"
   },
   "dependencies": {
+    "@kronos/contracts": "git+ssh://git@github.com/MinhTuann/kronos-packages.git#v0.1.3",
     "axios": "^1.13.6",
     "lucide-react": "^0.563.0",
     "motion": "^12.34.0",

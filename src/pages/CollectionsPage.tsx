@@ -9,6 +9,20 @@ import { WatchItem } from '@/components/home/InStocks';
 import { publicApi } from '@/lib/api';
 import type { PublicBrand, PublicCollection } from '@/lib/api';
 
+const readMultiValueParam = (params: URLSearchParams, key: string): string[] => {
+    const repeated = params.getAll(key).filter(Boolean);
+    if (repeated.length > 0) {
+        return repeated.flatMap(value => value.split(',')).map(value => value.trim()).filter(Boolean);
+    }
+
+    const single = params.get(key);
+    if (!single) {
+        return [];
+    }
+
+    return single.split(',').map(value => value.trim()).filter(Boolean);
+};
+
 const CollectionsPage: React.FC = () => {
     // States
     const [watches, setWatches] = useState<Watch[]>([]);
@@ -29,6 +43,19 @@ const CollectionsPage: React.FC = () => {
     const [collections, setCollections] = useState<PublicCollection[]>([]);
     const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
     const [selectedCollections, setSelectedCollections] = useState<string[]>([]);
+
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const brandId = params.get('brandId') || params.get('brand_id');
+        const collectionIds = [
+            ...readMultiValueParam(params, 'collections'),
+            ...readMultiValueParam(params, 'collectionId'),
+            ...readMultiValueParam(params, 'collection_ids'),
+        ];
+
+        setSelectedBrands(brandId ? [brandId] : []);
+        setSelectedCollections(Array.from(new Set(collectionIds)));
+    }, [location.search]);
 
     const itemsPerPage = 9;
 

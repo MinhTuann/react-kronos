@@ -1,73 +1,101 @@
-# React + TypeScript + Vite
+# Kronos Watch Store - Storefront (React)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the public storefront for the Kronos Watch Store system. The full system is split into three services:
 
-Currently, two official plugins are available:
+- Storefront (this repo, public)
+- CMS admin (private)
+- Backend API (private)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+The shared API contracts live in a private package repo and are intentionally not public.
 
-## React Compiler
+## Architecture Overview
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Frontend: React + Vite
+- API: Node/Express backend (private repo)
+- CMS: React admin app (private repo)
+- Contracts: `@kronos/contracts` (private repo)
+- Hosting: Firebase Hosting (UAT/Prod)
 
-## Expanding the ESLint configuration
+## Local Development
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+1. Install dependencies
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+2. Start development server
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run dev
 ```
+
+## Private Contracts Requirement
+
+This project depends on a private package: `@kronos/contracts`.
+
+The dependency is installed from a private GitHub repo. You must have access to that repo in order to install dependencies and build the project.
+
+If you do not have access, the install will fail with an authentication error. This is expected and intentional to protect internal interfaces.
+
+If you are the project owner and need access on a new machine or CI environment, configure one of the following:
+
+- GitHub Packages with a read-only token (`read:packages`)
+- Git over SSH with a read-only deploy key
+
+Recommended for this project:
+
+- Local machine: Git over SSH
+- CI/deployment: read-only deploy key or read-only token
+
+Quick check for SSH access:
+
+```bash
+ssh -T git@github.com
+git ls-remote git@github.com:MinhTuann/kronos-packages.git
+```
+
+## Environment Variables
+
+Create a `.env.dev`, `.env.uat`, or `.env.prod` based on the environment you want to run. For local development:
+
+```
+VITE_API_URL=http://localhost:8080/api/public
+```
+
+## Deployment
+
+- UAT/Prod use Firebase Hosting
+- The backend is hosted in Firebase App Hosting
+- The CMS is hosted in Firebase Hosting
+
+## Security Notes
+
+- This repo is public for portfolio visibility
+- Internal contracts and private services stay in private repos
+- Real credentials or secrets are never committed
+
+## Additional Docs
+
+- Contribution guide: `CONTRIBUTING.md`
+- Security policy: `SECURITY.md`
+
+## Troubleshooting Private Contracts
+
+If `npm install` fails for `@kronos/contracts`:
+
+1. `Permission denied (publickey)`
+- Your current shell does not have a usable SSH key for GitHub.
+- Fix:
+  - `eval "$(ssh-agent -s)"`
+  - `ssh-add ~/.ssh/id_ed25519`
+  - `ssh -T git@github.com`
+  - `git ls-remote git@github.com:MinhTuann/kronos-packages.git`
+
+2. `The git reference could not be found` with `checkout null`
+- This often means npm could not resolve the remote git ref because repository access failed.
+- Validate SSH/repo access first with the two commands above.
+
+## License
+
+Private use only unless explicitly authorized.
