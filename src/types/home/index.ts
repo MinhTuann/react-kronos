@@ -1,6 +1,7 @@
 export interface VideoSlide {
   id: number;
   url: string;
+  thumbnail_url?: string;
   title: string;
   description: string;
 }
@@ -15,4 +16,10 @@ export interface Watch {
   image: string;
   color: string;
   description: string;
+  size?: string;
+  material?: string;
+  movement?: string;
+  strap?: string;
+  dial?: string;
+  condition?: string;
 }

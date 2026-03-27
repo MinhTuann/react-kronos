@@ -58,8 +58,8 @@ export const WatchItem = ({ watch }: { watch: Watch }) => {
                     ${isInView ? 'h-6 opacity-100' : 'h-0 opacity-0'} 
                     md:h-0 md:opacity-0 md:group-hover:h-6 md:group-hover:opacity-100`}
                 >
-                    <p className='text-[12px] text-gunmetal font-semibold mt-2'>
-                        {watch.color}
+                    <p className='text-[12px] text-gunmetal font-branding mt-2'>
+                        REF. {watch.ref}
                     </p>
                 </div>
             </div>
