@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-
 const OurStory = ({ data }: { data?: any }) => {
     // Fallback to existing mock data if no data provided
     const content = data || {
@@ -71,7 +70,9 @@ const OurStory = ({ data }: { data?: any }) => {
                         className='order-2 space-y-8'
                     >
                         <div className='space-y-4'>
-                            <motion.h2 variants={itemVariants} className='font-branding text-4xl md:text-5xl text-gunmetal leading-tight'>{content.title}</motion.h2>
+                            <motion.h2 variants={itemVariants} className='font-branding text-4xl md:text-5xl text-gunmetal leading-tight'>
+                                {content.title}
+                            </motion.h2>
                             <motion.div variants={itemVariants} className='w-20 h-1 bg-stormy' />
                         </div>
                         <motion.p variants={itemVariants} className='text-lg text-bone leading-relaxed italic'>

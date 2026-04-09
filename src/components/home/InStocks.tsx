@@ -3,6 +3,7 @@ import type { Watch } from '@/types'
 import { Link } from 'react-router-dom'
 import { motion, useInView } from 'framer-motion'
 import type { Easing, Variants } from 'framer-motion'
+import { useTranslation } from 'react-i18next'
 
 export const WatchItem = ({ watch }: { watch: Watch }) => {
     // 1. Create a reference to the watch card
@@ -68,6 +69,7 @@ export const WatchItem = ({ watch }: { watch: Watch }) => {
 }
 
 const InStocks = ({ watches }: { watches: Watch[] }) => {
+    const { t } = useTranslation();
     // --- Animation Configurations ---
     const customEase: Easing = [0.16, 1, 0.3, 1];
 
@@ -97,8 +99,8 @@ const InStocks = ({ watches }: { watches: Watch[] }) => {
                     transition={{ duration: 0.8, ease: customEase }}
                     className='border-l border-golden pl-4 space-y-2 mb-6 md:mb-10'
                 >
-                    <h2 className='font-branding text-lg tracking-widest uppercase text-golden'>In Stock</h2>
-                    <p className='italic tracking-tight text-bone'>Discover our collection of watches in stock and ready to ship.</p>
+                    <h2 className='font-branding text-lg tracking-widest uppercase text-golden'>{t('home.inStockTitle')}</h2>
+                    <p className='italic tracking-tight text-bone'>{t('home.inStockSubtitle')}</p>
                 </motion.div>
 
                 {/* --- Animated Watch Grid --- */}
@@ -127,7 +129,7 @@ const InStocks = ({ watches }: { watches: Watch[] }) => {
                 >
                     <Link to='/collections' className='group relative inline-flex justify-center items-center pb-2 text-xs tracking-[0.4em] uppercase text-bone font-semibold transition-colors duration-500 hover:text-bone'>
                         {/* The Button Text */}
-                        <span>Find Your Watch</span>
+                        <span>{t('home.findYourWatch')}</span>
 
                         {/* The Animated Underline */}
                         <span className='absolute bottom-0 left-1/2 h-[1px] w-0 -translate-x-1/2 bg-bone transition-all duration-[600ms] ease-out group-hover:w-full group-hover:bg-bone' />

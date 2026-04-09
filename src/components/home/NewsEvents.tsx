@@ -48,9 +48,15 @@ const NewsEvents = ({ news }: { news?: any[] }) => {
                                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                                     src={item.image_url} />
                             </div>
-                            <p className="text-[9px] uppercase tracking-widest text-bone mb-3 font-semibold">{item.category}</p>
-                            <h3 className="text-xl  mb-4 group-hover:text-gunmetal transition-colors">{item.title}</h3>
-                            <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 line-clamp-3">{item.description}</p>
+                            <p className="text-[9px] uppercase tracking-widest text-bone mb-3 font-semibold">
+                                {item.category}
+                            </p>
+                            <h3 className="text-xl  mb-4 group-hover:text-gunmetal transition-colors">
+                                {item.title}
+                            </h3>
+                            <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 line-clamp-3">
+                                {item.description}
+                            </p>
                             <a className="text-[10px] uppercase tracking-widest font-bold text-stormy flex items-center gap-2 group-hover:gap-4 transition-all"
                                 href={item.link_url}>Read Article <span className="material-icons-outlined text-sm">east</span></a>
                         </div>

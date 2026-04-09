@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import IconButton from './IconButton'
 import { WatchIcon, SearchIcon, XIcon, ChevronLeft } from 'lucide-react'
 import { useMotionValueEvent, MotionValue } from 'motion/react'
+import { useTranslation } from 'react-i18next'
 import { publicApi, type PublicBrand, type PublicCollection } from '@/lib/api'
 
 interface Props {
@@ -13,6 +14,7 @@ interface Props {
 const Header = ({ scrollY }: Props) => {
     const viewRef = useRef<HTMLDivElement>(null)
     const navigate = useNavigate()
+    const { t, i18n } = useTranslation()
     const isHomePage = useLocation().pathname === '/'
     const [isScrolledOutOfVideo, setIsScrolledOutOfVideo] = useState(false)
     // 1. State to manage the menu open/close status
@@ -30,17 +32,23 @@ const Header = ({ scrollY }: Props) => {
 
     // Fetch Brands when menu opens
     useEffect(() => {
+        const controller = new AbortController();
+
         const fetchBrands = async () => {
             try {
-                const data = await publicApi.getBrands();
+                const data = await publicApi.getBrands({ signal: controller.signal });
+                if (controller.signal.aborted) return;
                 setBrands(data);
             } catch (err) {
+                if (controller.signal.aborted) return;
                 console.error("Failed to fetch brands in Header:", err);
             }
         }
         if (isMenuOpen && brands.length === 0) {
             fetchBrands();
         }
+
+        return () => controller.abort();
     }, [isMenuOpen, brands.length]);
 
     // Handle Brand Selection
@@ -108,6 +116,32 @@ const Header = ({ scrollY }: Props) => {
 
                     <div className='flex justify-end'>
                         <div className='flex gap-2 md:gap-6 items-center'>
+                            {/* Language Switcher */}
+                            <div className="hidden sm:flex items-center gap-1 bg-gray-100/10 backdrop-blur-sm p-1 rounded-full border border-white/10">
+                                <button
+                                    onClick={() => i18n.changeLanguage('vi')}
+                                    className={`flex items-center gap-1.5 px-3 py-1 rounded-full transition-all duration-300 text-[10px] font-bold ${
+                                        i18n.language.startsWith('vi')
+                                            ? 'bg-white text-black shadow-sm'
+                                            : `text-white/60 hover:text-white`
+                                    }`}
+                                >
+                                    <span>🇻🇳</span>
+                                    <span>VI</span>
+                                </button>
+                                <button
+                                    onClick={() => i18n.changeLanguage('en')}
+                                    className={`flex items-center gap-1.5 px-3 py-1 rounded-full transition-all duration-300 text-[10px] font-bold ${
+                                        i18n.language.startsWith('en')
+                                            ? 'bg-white text-black shadow-sm'
+                                            : `text-white/60 hover:text-white`
+                                    }`}
+                                >
+                                    <span>🇺🇸</span>
+                                    <span>EN</span>
+                                </button>
+                            </div>
+
                             {/* Watches Listing Button */}
                             <IconButton
                                 onClick={() => {
@@ -116,7 +150,7 @@ const Header = ({ scrollY }: Props) => {
                                     navigate('/collections');
                                 }}
                                 icon={<WatchIcon strokeWidth={1.5} />}
-                                label={'Brands'}
+                                label={t('header.brands')}
                                 className={iconColorClass}
                             />
 
@@ -167,7 +201,7 @@ const Header = ({ scrollY }: Props) => {
                         >
                             <div className="flex flex-col h-full px-12">
                                 <span className="font-branding text-[10px] tracking-[0.4em] uppercase text-gunmetal/50 mb-8 border-b border-gunmetal/20 pb-4 block">
-                                    Kronos Luxury Timepieces
+                                    {t('menu.title')}
                                 </span>
 
                                 <div className="flex-1 overflow-hidden">
@@ -185,15 +219,15 @@ const Header = ({ scrollY }: Props) => {
                                                     onClick={() => setMenuDepth('brands')}
                                                     className="text-left text-3xl md:text-4xl italic text-gunmetal hover:text-black transition-colors flex items-center justify-between group"
                                                 >
-                                                    The Brands
-                                                    <span className="text-[10px] tracking-[0.2em] font-branding opacity-0 group-hover:opacity-100 transition-all -translate-x-4 group-hover:translate-x-0">DISCOVER</span>
+                                                    {t('menu.theBrands')}
+                                                    <span className="text-[10px] tracking-[0.2em] font-branding opacity-0 group-hover:opacity-100 transition-all -translate-x-4 group-hover:translate-x-0">{t('menu.discover')}</span>
                                                 </button>
                                                 <Link
                                                     to="/about-us"
                                                     onClick={() => setIsMenuOpen(false)}
                                                     className="text-3xl md:text-4xl italic text-gunmetal hover:text-black transition-colors"
                                                 >
-                                                    The Company
+                                                    {t('menu.theCompany')}
                                                 </Link>
                                             </motion.div>
                                         )}
@@ -211,7 +245,7 @@ const Header = ({ scrollY }: Props) => {
                                                     onClick={() => setMenuDepth('main')}
                                                     className="flex items-center gap-2 text-gunmetal/50 hover:text-gunmetal mb-10 transition-colors uppercase tracking-[0.2em] text-[10px] font-branding"
                                                 >
-                                                    <ChevronLeft size={16} /> Back to menu
+                                                    <ChevronLeft size={16} /> {t('menu.backToMenu')}
                                                 </button>
                                                 <div className="flex flex-col gap-6 overflow-y-auto pr-4 pb-12 scrollbar-hide">
                                                     {brands.length > 0 ? (
@@ -222,7 +256,7 @@ const Header = ({ scrollY }: Props) => {
                                                                 className="text-left text-2xl md:text-3xl italic text-gunmetal hover:text-black transition-colors flex items-center justify-between group"
                                                             >
                                                                 {brand.name}
-                                                                <span className="text-[10px] tracking-[0.2em] font-branding opacity-0 group-hover:opacity-100 transition-all -translate-x-4 group-hover:translate-x-0">VIEW</span>
+                                                                <span className="text-[10px] tracking-[0.2em] font-branding opacity-0 group-hover:opacity-100 transition-all -translate-x-4 group-hover:translate-x-0">{t('menu.view')}</span>
                                                             </button>
                                                         ))
                                                     ) : (
@@ -247,7 +281,7 @@ const Header = ({ scrollY }: Props) => {
                                                     onClick={() => setMenuDepth('brands')}
                                                     className="flex items-center gap-2 text-gunmetal/50 hover:text-gunmetal mb-2 transition-colors uppercase tracking-[0.2em] text-[10px] font-branding"
                                                 >
-                                                    <ChevronLeft size={16} /> Back to brands
+                                                    <ChevronLeft size={16} /> {t('menu.backToBrands')}
                                                 </button>
                                                 <h3 className="text-3xl italic text-black mb-8 border-b border-gunmetal/5 pb-4">{selectedBrand?.name}</h3>
                                                 <div className="flex flex-col gap-6 overflow-y-auto pr-4 pb-12 scrollbar-hide">
@@ -258,7 +292,7 @@ const Header = ({ scrollY }: Props) => {
                                                         }}
                                                         className="text-left text-2xl md:text-3xl italic text-stormy hover:text-black transition-colors"
                                                     >
-                                                        All {selectedBrand?.name}
+                                                        {t('menu.all')} {selectedBrand?.name}
                                                     </button>
                                                     {collections.map((collection) => (
                                                         <button
@@ -280,7 +314,7 @@ const Header = ({ scrollY }: Props) => {
 
                                 {/* Drawer Footer */}
                                 <div className="mt-auto py-12 border-t border-gray-100">
-                                    <p className="text-[10px] uppercase tracking-widest text-bone mb-4">Contact Us</p>
+                                    <p className="text-[10px] uppercase tracking-widest text-bone mb-4">{t('common.contactUs')}</p>
                                     <a href="mailto:kronos.timepieces08@gmail.com" className="text-sm text-gunmetal border-b border-gunmetal pb-1 hover:text-black hover:border-black transition-colors">
                                         kronos.timepieces08@gmail.com
                                     </a>
@@ -304,19 +338,19 @@ const Header = ({ scrollY }: Props) => {
                         <div className="max-w-4xl mx-auto w-full w-full mt-12 md:mt-24">
 
                             {/* Search Input Animation */}
-                            <motion.div
+                             <motion.div
                                 initial={{ y: 30, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
                                 transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
                                 className="relative group"
                             >
                                 <span className="font-branding text-[10px] tracking-[0.4em] uppercase text-gunmetal/50 block mb-6">
-                                    Discover
+                                    {t('search.discover')}
                                 </span>
 
                                 <input
                                     type="text"
-                                    placeholder="Search collections, models, or materials..."
+                                    placeholder={t('search.placeholder')}
                                     autoFocus
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
@@ -346,7 +380,7 @@ const Header = ({ scrollY }: Props) => {
                                 className="mt-16"
                             >
                                 <span className="font-branding text-[10px] tracking-[0.4em] uppercase text-gunmetal/50 block mb-6">
-                                    Trending Now
+                                    {t('search.trending')}
                                 </span>
                                 <ul className="flex flex-col gap-4">
                                     {['Grand Complications', 'Rose Gold Calatrava', 'Nautilus 5711', 'Perpetual Calendar'].map((suggestion) => (
@@ -417,4 +451,3 @@ const AnimatedMenuIcon = ({ isOpen }: { isOpen: boolean }) => (
         />
     </motion.svg>
 );
-

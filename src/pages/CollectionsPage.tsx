@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Filter, ArrowUp, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import type { Watch } from '@/types';
 import { WatchItem } from '@/components/home/InStocks';
 // import { Dropdown } from '@/components/app';
@@ -28,6 +29,7 @@ const CollectionsPage: React.FC = () => {
     const [watches, setWatches] = useState<Watch[]>([]);
     // const [originalWatches, setOriginalWatches] = useState<Watch[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const { t } = useTranslation();
     const [currentPage, setCurrentPage] = useState(1);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     // const [sortMethod, setSortMethod] = useState<'recommended' | 'price-asc' | 'price-desc'>('recommended');
@@ -67,41 +69,54 @@ const CollectionsPage: React.FC = () => {
 
     // Initial Filters Fetch (Runs Once)
     useEffect(() => {
+        const controller = new AbortController();
+
         const fetchFilters = async () => {
             try {
                 const [bData, cData] = await Promise.all([
-                    publicApi.getBrands(),
-                    publicApi.getCollections()
+                    publicApi.getBrands({ signal: controller.signal }),
+                    publicApi.getCollections(undefined, { signal: controller.signal })
                 ]);
+                if (controller.signal.aborted) return;
                 setBrands(bData);
                 setCollections(cData);
             } catch (err) {
+                if (controller.signal.aborted) return;
                 console.error("Failed to fetch filters:", err);
             }
         };
         fetchFilters();
+
+        return () => controller.abort();
     }, []);
 
     // Fetch Watches (Runs on mount and when filters/search changes)
     useEffect(() => {
+        const controller = new AbortController();
+
         const fetchWatches = async () => {
             try {
                 setIsLoading(true);
                 // Pass the first selected brand ID (if any) and all selected collection IDs
                 const brandId = selectedBrands.length > 0 ? selectedBrands[0] : undefined;
                 const collectionIds = selectedCollections.length > 0 ? selectedCollections : undefined;
-                
-                const data = await publicApi.getWatches(brandId, collectionIds, searchQuery);
+
+                const data = await publicApi.getWatches(brandId, collectionIds, searchQuery, { signal: controller.signal });
+                if (controller.signal.aborted) return;
                 // setOriginalWatches(data);
                 setWatches(data);
-                setCurrentPage(1); 
+                setCurrentPage(1);
             } catch (err) {
+                if (controller.signal.aborted) return;
                 console.error("Failed to fetch public watches:", err);
             } finally {
+                if (controller.signal.aborted) return;
                 setIsLoading(false);
             }
         };
         fetchWatches();
+
+        return () => controller.abort();
     }, [searchQuery, selectedBrands, selectedCollections]);
 
     // Scroll Listener for "Go to Top" button
@@ -155,7 +170,7 @@ const CollectionsPage: React.FC = () => {
             <div className='pr-4 lg:pr-8 space-y-10 lg:space-y-12'>
                 {brands.length > 0 && (
                     <div>
-                        <h4 className='text-[10px] tracking-[0.3em] uppercase font-bold border-b border-gunmetal/10 pb-4 mb-4'>Brands</h4>
+                        <h4 className='text-[10px] tracking-[0.3em] uppercase font-bold border-b border-gunmetal/10 pb-4 mb-4'>{t('header.brands')}</h4>
                         <ul className='space-y-4 lg:space-y-3 text-sm font-light max-h-48 overflow-y-auto pr-2 custom-scrollbar'>
                             {brands.map(brand => {
                                 const isSelected = selectedBrands.includes(brand.id);
@@ -196,7 +211,7 @@ const CollectionsPage: React.FC = () => {
 
                 {selectedBrands.length > 0 && visibleCollections.length > 0 && (
                     <div>
-                        <h4 className='text-[10px] tracking-[0.3em] uppercase font-bold border-b border-gunmetal/10 pb-4 mb-4'>Collections</h4>
+                        <h4 className='text-[10px] tracking-[0.3em] uppercase font-bold border-b border-gunmetal/10 pb-4 mb-4'>{t('header.brands')}</h4>
                         <ul className='space-y-4 lg:space-y-3 text-sm font-light text-gunmetal/80 max-h-48 overflow-y-auto pr-2 custom-scrollbar'>
                             {visibleCollections.map(collection => (
                                 <li key={collection.id}>
@@ -220,7 +235,7 @@ const CollectionsPage: React.FC = () => {
                         onClick={() => setIsFilterOpen(false)}
                         className="w-full bg-gunmetal text-white text-xs uppercase tracking-widest py-4 rounded hover:bg-black transition-colors"
                     >
-                        Apply Filters ({selectedBrands.length + selectedCollections.length})
+                        {t('collections.applyFilters')} ({selectedBrands.length + selectedCollections.length})
                     </button>
                 </div>
             </div>
@@ -237,15 +252,15 @@ const CollectionsPage: React.FC = () => {
                     {/* The Header now spans full width on mobile so the text centers properly */}
                     <div className="flex flex-col items-center lg:items-start">
                         <span className='font-branding text-[10px] tracking-[0.4em] uppercase text-gunmetal/50 block mb-2 md:mb-4'>
-                            Masterpieces
+                            {t('collections.subtitle')}
                         </span>
                         <h1 className='text-4xl md:text-5xl italic text-gunmetal tracking-tight'>
-                            The Collection
+                            {t('collections.title')}
                         </h1>
                     </div>
                 </div>
                 <p className='text-sm font-light text-gunmetal/60 max-w-md leading-relaxed hidden lg:block'>
-                    Explore our exquisite range of timepieces, each representing the pinnacle of horological craftsmanship and timeless design.
+                    {t('collections.description')}
                 </p>
             </div>
 
@@ -256,8 +271,8 @@ const CollectionsPage: React.FC = () => {
                     className='flex items-center gap-2 text-[10px] md:text-xs uppercase tracking-[0.2em] font-medium hover:text-black transition-colors'
                 >
                     <Filter size={16} strokeWidth={1.5} />
-                    <span className="hidden sm:inline">{isFilterOpen ? 'Hide Filters' : 'Show Filters'}</span>
-                    <span className="sm:hidden">Filter</span>
+                    <span className="hidden sm:inline">{isFilterOpen ? t('collections.hideFilters') : t('collections.showFilters')}</span>
+                    <span className="sm:hidden">{t('collections.filter')}</span>
                 </button>
 
                 {/* Temporarily hide sort UI */}
@@ -328,7 +343,7 @@ const CollectionsPage: React.FC = () => {
                             onClick={() => { setCurrentPage(prev => prev - 1); scrollToTop(); }}
                             className='text-[10px] uppercase tracking-[0.2em] font-semibold text-gunmetal/60 hover:text-black disabled:opacity-30 transition-colors'
                         >
-                            Prev<span className="hidden sm:inline">ious</span>
+                            {t('collections.previous')}
                         </button>
 
                         <div className='flex gap-3 md:gap-4 font-serif italic text-base md:text-lg'>
@@ -348,7 +363,7 @@ const CollectionsPage: React.FC = () => {
                             onClick={() => { setCurrentPage(prev => prev + 1); scrollToTop(); }}
                             className='text-[10px] uppercase tracking-[0.2em] font-semibold text-gunmetal/60 hover:text-black disabled:opacity-30 transition-colors'
                         >
-                            Next
+                            {t('collections.next')}
                         </button>
                     </motion.div>
                 </div>
@@ -376,7 +391,7 @@ const CollectionsPage: React.FC = () => {
                             className="fixed top-0 left-0 w-[85vw] sm:w-[320px] h-[100dvh] bg-white z-50 p-6 sm:p-8 overflow-y-auto flex flex-col"
                         >
                             <div className="flex justify-between items-center mb-10 pb-4 border-b border-gunmetal/10">
-                                <span className="font-branding text-[12px] tracking-[0.3em] uppercase text-gunmetal">Filters</span>
+                                <span className="font-branding text-[12px] tracking-[0.3em] uppercase text-gunmetal">{t('collections.filter')}</span>
                                 <button onClick={() => setIsFilterOpen(false)} className="p-2 -mr-2 text-gunmetal/60 hover:text-black">
                                     <X size={20} strokeWidth={1.5} />
                                 </button>

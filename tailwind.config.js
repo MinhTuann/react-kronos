@@ -17,10 +17,9 @@ export default {
         'gunmetal': '#2C3032',
       },
       fontFamily: {
-        branding: ['"Krona One"', 'sans-serif'],
+        branding: ['"Exo 2"', 'sans-serif'],
       }
     }
   },
   plugins: []
 }
-

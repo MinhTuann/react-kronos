@@ -1,6 +1,6 @@
 import { Outlet } from 'react-router-dom';
 import { useScroll } from 'motion/react';
-import { Footer, Header } from '@/components';
+import { Footer, Header } from '@/components/app';
 
 const MainLayout = () => {
     const { scrollY } = useScroll();

@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { ChevronLeft, ChevronRight, Play, Pause } from 'lucide-react';
 import { motion, AnimatePresence, useMotionValue, useSpring, type PanInfo } from 'motion/react';
+import { useTranslation } from 'react-i18next';
 import type { VideoSlide } from '@/types';
 
 interface Props {
@@ -109,6 +110,8 @@ const VideoCarousel = ({ videos }: Props) => {
   const [[page, direction], setPage] = useState([0, 0]);
   const [hoverSide, setHoverSide] = useState<'left' | 'right' | null>(null);
   const [isPlaying, setIsPlaying] = useState(true);
+  const { t, i18n } = useTranslation();
+  const currentLang = i18n.language;
   
   // Safely wrap the index so it doesn't break if it goes out of bounds
   // (Though our boundaries prevent this, it's a good safety net)
@@ -224,18 +227,20 @@ const VideoCarousel = ({ videos }: Props) => {
               onMouseMove={(e) => e.stopPropagation()}
               onClick={(e) => e.stopPropagation()}
             >
-              {video.title.split('\\n').map(
+              {((currentLang === 'en' && video.title_en) ? video.title_en : video.title).split('\\n').map(
                 (title, idx) => 
                   <h1 className={`font-branding text-2xl md:text-4xl ${idx === 0 ? 'text-white' : 'text-vanilla'}`} key={`video-${idx}-title`}>
                     {title}
                   </h1>
               )}
-              <p className='italic text-sm text-white my-4 md:my-6 max-w-md border-l border-white pl-2 md:pl-4'>{video.description}</p>
+              <p className='italic text-sm text-white my-4 md:my-6 max-w-md border-l border-white pl-2 md:pl-4'>
+                {(currentLang === 'en' && video.description_en) ? video.description_en : video.description}
+              </p>
               <button
                 className='font-branding bg-stormy hover:bg-opacity-90 text-[10px] md:text-[11px] text-white uppercase tracking-widest font-medium px-6 py-3 rounded-lg'
                 onClick={(e) => { e.preventDefault(); console.log('press'); }}
               >
-                Discover More
+                {t('common.exploreMore')}
               </button>
             </div>
           </div>
