@@ -70,6 +70,24 @@ const getJson = async <T>({ url, params, signal, cache = false }: GetOptions & {
   return request;
 };
 
+export interface PublicArticle {
+  id: string;
+  title: string;
+  title_en?: string;
+  slug: string;
+  category: string;
+  category_en?: string;
+  image_url?: string;
+  summary?: string;
+  summary_en?: string;
+  content?: string;
+  content_en?: string;
+  status: string;
+  display_order: number;
+  date: string;
+  created_at: string;
+}
+
 export type { PublicBrand, PublicCollection };
 export type { RequestOptions };
 
@@ -115,5 +133,15 @@ export const publicApi = {
   // Fetch Home Page Dynamic Content
   getHomePageData: async (options?: RequestOptions): Promise<any> => {
     return getJson<any>({ url: '/homepage', signal: options?.signal, cache: true });
+  },
+
+  // Fetch Articles
+  getArticles: async (options?: RequestOptions): Promise<PublicArticle[]> => {
+    return getJson<PublicArticle[]>({ url: '/articles', signal: options?.signal, cache: false });
+  },
+
+  // Fetch Single Article
+  getArticleBySlug: async (slug: string, options?: RequestOptions): Promise<PublicArticle> => {
+    return getJson<PublicArticle>({ url: `/articles/${slug}`, signal: options?.signal, cache: false });
   }
 };

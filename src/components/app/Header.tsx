@@ -229,6 +229,13 @@ const Header = ({ scrollY }: Props) => {
                                                 >
                                                     {t('menu.theCompany')}
                                                 </Link>
+                                                <Link
+                                                    to="/news-events"
+                                                    onClick={() => setIsMenuOpen(false)}
+                                                    className="text-3xl md:text-4xl italic text-gunmetal hover:text-black transition-colors"
+                                                >
+                                                    {t('menu.newsEvents')}
+                                                </Link>
                                             </motion.div>
                                         )}
 

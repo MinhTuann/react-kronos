@@ -23,6 +23,7 @@ const resources = {
         backToBrands: "Back to brands",
         theBrands: "The Brands",
         theCompany: "The Company",
+        newsEvents: "News & Events",
         all: "All"
       },
       search: {
@@ -85,6 +86,11 @@ const resources = {
         previous: "Previous",
         next: "Next",
         watch_not_found: "Watch Not Found"
+      },
+      news: {
+        title: "News & Events",
+        subtitle: "The world’s premium brands in one place",
+        viewAll: "View All News"
       }
     }
   },
@@ -108,6 +114,7 @@ const resources = {
         backToBrands: "Quay lại thương hiệu",
         theBrands: "Thương hiệu",
         theCompany: "Về chúng tôi",
+        newsEvents: "Tin tức & Sự kiện",
         all: "Tất cả"
       },
       search: {
@@ -171,6 +178,11 @@ const resources = {
         previous: "Trước",
         next: "Tiếp",
         watch_not_found: "Không tìm thấy đồng hồ"
+      },
+      news: {
+        title: "Tin tức & Sự kiện",
+        subtitle: "Những thương hiệu cao cấp nhất thế giới tụ hội",
+        viewAll: "Xem tất cả tin tức"
       }
     }
   }

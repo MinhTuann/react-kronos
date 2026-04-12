@@ -5,6 +5,8 @@ import CollectionsPage from '@/pages/CollectionsPage';
 import WatchDetailsPage from '@/pages/WatchDetailsPage';
 import AboutUsPage from '@/pages/AboutUsPage';
 import ContactUsPage from '@/pages/ContactUsPage';
+import NewsEventsPage from '@/pages/NewsEventsPage';
+import NewsEventDetailsPage from '@/pages/NewsEventDetailsPage';
 
 export const router = createBrowserRouter([
     {
@@ -30,6 +32,14 @@ export const router = createBrowserRouter([
             {
                 path: 'contact-us',
                 element: <ContactUsPage />,
+            },
+            {
+                path: 'news-events',
+                element: <NewsEventsPage />,
+            },
+            {
+                path: 'news-events/:slug',
+                element: <NewsEventDetailsPage />,
             },
         ],
     },

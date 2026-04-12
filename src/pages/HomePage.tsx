@@ -18,6 +18,13 @@ const HomePage = () => {
                     publicApi.getHomePageData({ signal: controller.signal })
                 ]);
 
+                let news = home.news || [];
+                // If homepage didn't return news, fetch latest articles
+                if (news.length === 0) {
+                    const articles = await publicApi.getArticles({ signal: controller.signal });
+                    news = articles.slice(0, 3);
+                }
+
                 // Map backend video_url to url for VideoCarousel
                 const mappedSlides = home.slides?.map((slide: any) => ({
                     ...slide,
@@ -28,7 +35,7 @@ const HomePage = () => {
                 if (controller.signal.aborted) return;
 
                 setInStockWatches(inStock);
-                setHomeData({ ...home, slides: mappedSlides });
+                setHomeData({ ...home, slides: mappedSlides, news });
             } catch (error) {
                 if (controller.signal.aborted) return;
                 console.error('Failed to fetch home page data:', error);

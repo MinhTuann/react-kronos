@@ -1,3 +1,39 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer utilities {
+  .prose .ql-align-center {
+    text-align: center;
+  }
+  .prose .ql-align-right {
+    text-align: right;
+  }
+  .prose .ql-align-justify {
+    text-align: justify;
+  }
+  .prose img {
+    @apply rounded-sm mx-auto shadow-md transition-all duration-700 hover:shadow-xl;
+    max-width: 100%;
+    height: auto;
+  }
+  .prose iframe {
+    @apply mx-auto rounded-lg shadow-lg aspect-video w-full max-w-2xl;
+  }
+  .prose blockquote {
+    @apply border-l-4 border-golden pl-6 italic text-stone-600 my-8;
+  }
+}
+
+/* Quill specific classes for full feature support */
+.prose .ql-size-small { font-size: 0.75em; }
+.prose .ql-size-large { font-size: 1.5em; }
+.prose .ql-size-huge { font-size: 2.5em; }
+.prose .ql-direction-rtl { direction: rtl; }
+.prose .ql-font-serif { font-family: serif; }
+.prose .ql-font-monospace { font-family: monospace; }
+
+/* Existing alignments */
+.ql-align-center { text-align: center; }
+.ql-align-right { text-align: right; }
+.ql-align-justify { text-align: justify; }
