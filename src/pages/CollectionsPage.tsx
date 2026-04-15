@@ -10,6 +10,7 @@ import { WatchItem } from '@/components/home/InStocks';
 
 import { publicApi } from '@/lib/api';
 import type { PublicBrand, PublicCollection } from '@/lib/api';
+import { createBreadcrumbJsonLd, useSeo } from '@/seo';
 
 const readMultiValueParam = (params: URLSearchParams, key: string): string[] => {
     const repeated = params.getAll(key).filter(Boolean);
@@ -30,7 +31,7 @@ const CollectionsPage: React.FC = () => {
     const [watches, setWatches] = useState<Watch[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const [hasNextPage, setHasNextPage] = useState(false);
     const [lastCursor, setLastCursor] = useState<string | null>(null);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -46,6 +47,60 @@ const CollectionsPage: React.FC = () => {
     const [collections, setCollections] = useState<PublicCollection[]>([]);
     const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
     const [selectedCollections, setSelectedCollections] = useState<string[]>([]);
+    const currentLang = i18n.language.split('-')[0];
+    const origin = import.meta.env.VITE_SITE_URL || window.location.origin;
+    const selectedBrandName = brands.find((brand) => brand.id === selectedBrands[0])?.name;
+    const selectedCollectionNames = collections
+        .filter((collection) => selectedCollections.includes(collection.id))
+        .map((collection) => collection.name);
+    const hasFacetFilters = selectedBrands.length > 0 || selectedCollections.length > 0;
+    const shouldNoindex = Boolean(searchQuery) || hasFacetFilters;
+    const dynamicFacetLabel = searchQuery
+        ? (currentLang === 'en' ? `Search: ${searchQuery}` : `Tim kiem: ${searchQuery}`)
+        : selectedCollectionNames.length > 0
+            ? selectedCollectionNames.join(', ')
+            : selectedBrandName;
+    const seoTitle = searchQuery
+        ? (currentLang === 'en'
+            ? `Search results for "${searchQuery}" watches`
+            : `Ket qua tim kiem dong ho cho "${searchQuery}"`)
+        : selectedCollectionNames.length > 0
+            ? (currentLang === 'en'
+                ? `${selectedCollectionNames.join(', ')} watches`
+                : `Dong ho ${selectedCollectionNames.join(', ')}`)
+            : selectedBrandName
+                ? (currentLang === 'en'
+                    ? `${selectedBrandName} watches`
+                    : `Dong ho ${selectedBrandName}`)
+                : undefined;
+    const seoDescription = searchQuery
+        ? (currentLang === 'en'
+            ? `Browse Kronos watch search results for ${searchQuery}, including curated luxury timepieces and available inventory.`
+            : `Xem ket qua tim kiem tai Kronos cho tu khoa ${searchQuery}, bao gom nhung mau dong ho cao cap dang san co.`)
+        : selectedCollectionNames.length > 0
+            ? (currentLang === 'en'
+                ? `Explore ${selectedCollectionNames.join(', ')} watches at Kronos, with refined selection details and current availability.`
+                : `Kham pha dong ho ${selectedCollectionNames.join(', ')} tai Kronos voi tuyen chon tinh te va tinh trang san co hien tai.`)
+            : selectedBrandName
+                ? (currentLang === 'en'
+                    ? `Discover ${selectedBrandName} watches curated by Kronos, from iconic references to available collector pieces.`
+                    : `Kham pha dong ho ${selectedBrandName} duoc Kronos tuyen chon, tu nhung mau bieu tuong den cac chiec danh cho nha suu tap.`)
+                : undefined;
+    const breadcrumbItems = [
+        { name: currentLang === 'en' ? 'Home' : 'Trang chu', path: '/' },
+        { name: currentLang === 'en' ? 'Collections' : 'Bo suu tap', path: '/collections' },
+        ...(dynamicFacetLabel ? [{ name: dynamicFacetLabel, path: `${location.pathname}${location.search}` }] : []),
+    ];
+
+    useSeo({
+        pageKey: 'collections',
+        lang: currentLang,
+        title: seoTitle,
+        description: seoDescription,
+        canonicalPath: '/collections',
+        noindex: shouldNoindex,
+        structuredData: createBreadcrumbJsonLd(origin, breadcrumbItems),
+    });
 
     useEffect(() => {
         const params = new URLSearchParams(location.search);

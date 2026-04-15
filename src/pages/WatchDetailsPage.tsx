@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import type { Watch } from '@/types';
 
 import { publicApi } from '@/lib/api';
+import { createBreadcrumbJsonLd, useSeo } from '@/seo';
 
 const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -22,6 +23,50 @@ const WatchDetailsPage: React.FC = () => {
     const [isLoading, setIsLoading] = useState(true);
     const { t, i18n } = useTranslation();
     const currentLang = i18n.language;
+    const origin = import.meta.env.VITE_SITE_URL || window.location.origin;
+
+    useSeo({
+        pageKey: 'collections',
+        lang: currentLang.split('-')[0],
+        title: watch
+            ? ((currentLang.startsWith('en') && watch.seo_title_en) ? watch.seo_title_en : watch.seo_title || `${watch.brand} ${watch.name}`)
+            : (currentLang.startsWith('en') ? 'Watch Details' : 'Chi tiet dong ho'),
+        description: watch
+            ? ((currentLang.startsWith('en') && watch.seo_description_en)
+                ? watch.seo_description_en
+                : watch.seo_description || ((currentLang.startsWith('en') && watch.description_en) ? watch.description_en : watch.description))
+            : '',
+        image: watch?.seo_image_url || watch?.image,
+        canonicalUrl: watch?.canonical_url,
+        canonicalPath: watch?.canonical_url ? undefined : (id ? `/watch/${id}` : '/collections'),
+        noindex: watch ? watch.noindex : (!watch && !isLoading),
+        type: 'product',
+        structuredData: watch ? [
+            {
+                '@context': 'https://schema.org',
+                '@type': 'Product',
+                name: watch.name,
+                description: (currentLang.startsWith('en') && watch.seo_description_en)
+                    ? watch.seo_description_en
+                    : watch.seo_description || ((currentLang.startsWith('en') && watch.description_en) ? watch.description_en : watch.description),
+                image: watch.seo_image_url || watch.image,
+                brand: watch.brand,
+                sku: watch.ref,
+                offers: watch.price ? {
+                    '@type': 'Offer',
+                    priceCurrency: 'USD',
+                    price: watch.price,
+                    availability: 'https://schema.org/InStock',
+                    url: watch.canonical_url || `${origin}/watch/${id}`,
+                } : undefined,
+            },
+            createBreadcrumbJsonLd(origin, [
+                { name: currentLang.startsWith('en') ? 'Home' : 'Trang chu', path: '/' },
+                { name: currentLang.startsWith('en') ? 'Collections' : 'Bo suu tap', path: '/collections' },
+                { name: watch.name, path: `/watch/${id}` },
+            ]),
+        ] : undefined,
+    });
 
     useEffect(() => {
         const controller = new AbortController();
@@ -70,6 +115,18 @@ const WatchDetailsPage: React.FC = () => {
             </div>
         );
     }
+
+    /*
+    const rawViewMoreHtml = ((currentLang === 'en' && watch.view_more_content_en) ? watch.view_more_content_en : watch.view_more_content) ?? '';
+    const sanitizeQuillHtml = (html: string): string => {
+        let clean = html.normalize('NFC');
+        clean = clean.replace(/&nbsp;/g, ' ');
+        clean = clean.replace(/(\S)\n(\S)/g, '$1$2');
+        return clean;
+    };
+    const viewMoreHtml = sanitizeQuillHtml(rawViewMoreHtml);
+    const hasViewMore = viewMoreHtml.replace(/<[^>]+>/g, '').trim().length > 0;
+    */
 
     return (
         <div className="pt-24 md:pt-32 pb-24 min-h-screen bg-white">
@@ -238,6 +295,39 @@ const WatchDetailsPage: React.FC = () => {
                     </motion.div>
                 </div>
             </div>
+
+            {/*
+            {hasViewMore && (
+                <section className="max-w-[1200px] mx-auto px-6 lg:px-12 mt-24 border-t border-gunmetal/10 pt-20">
+                    <motion.div
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, margin: '-100px' }}
+                        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                        className="grid grid-cols-1 lg:grid-cols-[220px_minmax(0,1fr)] gap-10 lg:gap-16 items-start"
+                    >
+                        <div className="lg:sticky lg:top-32">
+                            <p className="text-[10px] tracking-[0.35em] uppercase text-golden font-semibold mb-4">
+                                View More
+                            </p>
+                            <h2 className="text-2xl md:text-3xl font-serif italic text-gunmetal leading-tight">
+                                {(currentLang === 'en' ? 'Editorial Details' : 'Thong tin chi tiet')}
+                            </h2>
+                        </div>
+
+                        <article
+                            lang={currentLang}
+                            className="prose prose-stone prose-lg md:prose-xl max-w-none
+                            prose-headings:font-serif prose-headings:italic prose-headings:font-light prose-headings:tracking-tight
+                            prose-p:font-light prose-p:leading-relaxed prose-p:text-stone-600
+                            prose-li:text-stone-600 prose-strong:text-gunmetal
+                            prose-a:text-golden prose-a:no-underline hover:prose-a:text-gunmetal"
+                            dangerouslySetInnerHTML={{ __html: viewMoreHtml }}
+                        />
+                    </motion.div>
+                </section>
+            )}
+            */}
 
             <div className="max-w-[1600px] mx-auto px-6 lg:px-12 mt-24">
                 <Link to="/collections" className="inline-flex items-center gap-3 text-xs uppercase tracking-[0.2em] font-semibold text-gunmetal/60 hover:text-black transition-colors group">

@@ -2,8 +2,20 @@ import React, { useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import type { Variants, Easing } from 'framer-motion';
 import { YEAR_OF_FOUNDATION } from '@/utils';
+import { createBreadcrumbJsonLd, useSeo } from '@/seo';
 
 const AboutUsPage: React.FC = () => {
+    const origin = import.meta.env.VITE_SITE_URL || window.location.origin;
+
+    useSeo({
+        pageKey: 'about-us',
+        canonicalPath: '/about-us',
+        structuredData: createBreadcrumbJsonLd(origin, [
+            { name: 'Home', path: '/' },
+            { name: 'About Us', path: '/about-us' },
+        ]),
+    });
+
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);

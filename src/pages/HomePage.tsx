@@ -2,11 +2,23 @@ import { useState, useEffect } from 'react';
 import type { Watch } from '@/types';
 import { BestBrand, InStocks, NewsEvents, OurStory, SecondBrand, ThirdBrand, VideoCarousel } from '@/components/home';
 import { publicApi } from '@/lib/api';
+import { useTranslation } from 'react-i18next';
+import { createOrganizationJsonLd, useSeo } from '@/seo';
 
 const HomePage = () => {
     const [inStockWatches, setInStockWatches] = useState<Watch[]>([]);
     const [homeData, setHomeData] = useState<any>({ slides: [], news: [], sections: {} });
     const [isLoading, setIsLoading] = useState(true);
+    const { i18n } = useTranslation();
+    const currentLang = i18n.language.split('-')[0];
+    const origin = import.meta.env.VITE_SITE_URL || window.location.origin;
+
+    useSeo({
+        pageKey: 'home',
+        lang: currentLang,
+        type: 'website',
+        structuredData: createOrganizationJsonLd(null, currentLang, origin),
+    });
 
     useEffect(() => {
         const controller = new AbortController();

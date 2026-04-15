@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { publicApi } from '../lib/api';
 import type { PublicArticle } from '../lib/api';
 import { GoToTop, LoadMore } from '@/components/app';
+import { createBreadcrumbJsonLd, useSeo } from '@/seo';
 
 const NewsEventsPage: React.FC = () => {
     const [articles, setArticles] = useState<PublicArticle[]>([]);
@@ -48,6 +49,17 @@ const NewsEventsPage: React.FC = () => {
 
     const { t, i18n } = useTranslation();
     const currentLang = i18n.language.split('-')[0];
+    const origin = import.meta.env.VITE_SITE_URL || window.location.origin;
+
+    useSeo({
+        pageKey: 'news-events',
+        lang: currentLang,
+        canonicalPath: '/news-events',
+        structuredData: createBreadcrumbJsonLd(origin, [
+            { name: currentLang === 'en' ? 'Home' : 'Trang chu', path: '/' },
+            { name: currentLang === 'en' ? 'News & Events' : 'Tin tuc & Su kien', path: '/news-events' },
+        ]),
+    });
 
     const customEase: Easing = [0.16, 1, 0.3, 1];
 

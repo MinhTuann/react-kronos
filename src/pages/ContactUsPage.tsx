@@ -3,8 +3,20 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { MapPin, Phone, Mail, Clock, ArrowRight } from 'lucide-react';
 import type { Variants, Easing } from 'framer-motion';
 import { CONTACT_ADDRESS, CONTACT_EMAIL, CONTACT_PHONE } from '@/utils';
+import { createBreadcrumbJsonLd, useSeo } from '@/seo';
 
 const ContactUsPage: React.FC = () => {
+    const origin = import.meta.env.VITE_SITE_URL || window.location.origin;
+
+    useSeo({
+        pageKey: 'contact-us',
+        canonicalPath: '/contact-us',
+        structuredData: createBreadcrumbJsonLd(origin, [
+            { name: 'Home', path: '/' },
+            { name: 'Contact Us', path: '/contact-us' },
+        ]),
+    });
+
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);

@@ -5,6 +5,7 @@ import { ChevronRight, ArrowLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { publicApi } from '../lib/api';
 import type { PublicArticle } from '../lib/api';
+import { createBreadcrumbJsonLd, useSeo } from '@/seo';
 
 const NewsEventDetailsPage: React.FC = () => {
     const { slug } = useParams<{ slug: string }>();
@@ -12,6 +13,7 @@ const NewsEventDetailsPage: React.FC = () => {
     const [isLoading, setIsLoading] = useState(true);
     const { t, i18n } = useTranslation();
     const currentLang = i18n.language.split('-')[0];
+    const origin = import.meta.env.VITE_SITE_URL || window.location.origin;
 
     useEffect(() => {
         const controller = new AbortController();
@@ -46,6 +48,46 @@ const NewsEventDetailsPage: React.FC = () => {
     });
     const heroY = useTransform(scrollYProgress, [0, 1], [0, 200]);
     const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
+    const displayTitle = article
+        ? ((currentLang === 'en' && article.title_en) ? article.title_en : article.title)
+        : (currentLang === 'en' ? 'Article Not Found' : 'Khong tim thay bai viet');
+    const displayDescription = article
+        ? ((currentLang === 'en' && article.seo_description_en)
+            ? article.seo_description_en
+            : (currentLang === 'en' && article.summary_en)
+                ? article.summary_en
+                : article.seo_description || article.summary || '')
+        : '';
+
+    useSeo({
+        pageKey: 'news-events',
+        lang: currentLang,
+        title: article
+            ? ((currentLang === 'en' && article.seo_title_en) ? article.seo_title_en : article.seo_title || displayTitle)
+            : displayTitle,
+        description: displayDescription,
+        image: article?.seo_image_url || article?.image_url,
+        canonicalUrl: article ? (article.canonical_url || `${origin}/news-events/${slug}`) : undefined,
+        canonicalPath: article ? undefined : '/news-events',
+        noindex: article ? article.noindex : true,
+        type: article ? 'article' : 'website',
+        structuredData: article ? [
+            {
+                '@context': 'https://schema.org',
+                '@type': 'Article',
+                headline: displayTitle,
+                description: displayDescription,
+                image: article.seo_image_url || article.image_url,
+                datePublished: article.date,
+                mainEntityOfPage: article.canonical_url || `${origin}/news-events/${slug}`,
+            },
+            createBreadcrumbJsonLd(origin, [
+                { name: currentLang === 'en' ? 'Home' : 'Trang chu', path: '/' },
+                { name: currentLang === 'en' ? 'News & Events' : 'Tin tuc & Su kien', path: '/news-events' },
+                { name: displayTitle, path: `/news-events/${slug}` },
+            ]),
+        ] : undefined,
+    });
 
     if (isLoading) {
         return (
@@ -66,7 +108,6 @@ const NewsEventDetailsPage: React.FC = () => {
         );
     }
 
-    const displayTitle = (currentLang === 'en' && article.title_en) ? article.title_en : article.title;
     const displayCategory = (currentLang === 'en' && article.category_en) ? article.category_en : article.category;
     const rawHtml = ((currentLang === 'en' && article.content_en) ? article.content_en : article.content) ?? '';
 

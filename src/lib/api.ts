@@ -82,10 +82,44 @@ export interface PublicArticle {
   summary_en?: string;
   content?: string;
   content_en?: string;
+  seo_title?: string;
+  seo_title_en?: string;
+  seo_description?: string;
+  seo_description_en?: string;
+  seo_image_url?: string;
+  canonical_url?: string;
+  noindex?: boolean;
   status: string;
   display_order: number;
   date: string;
   created_at: string;
+}
+
+export type PublicSeoPageKey = 'home' | 'collections' | 'about-us' | 'contact-us' | 'news-events';
+
+export interface PublicSeoPageEntry {
+  meta_title?: string;
+  meta_title_en?: string;
+  meta_description?: string;
+  meta_description_en?: string;
+  og_image_url?: string;
+  canonical_path?: string;
+  noindex?: boolean;
+}
+
+export interface PublicSeoSettings {
+  site_name?: string;
+  site_name_en?: string;
+  default_title?: string;
+  default_title_en?: string;
+  default_description?: string;
+  default_description_en?: string;
+  default_og_image_url?: string;
+  site_url?: string;
+  organization_name?: string;
+  organization_name_en?: string;
+  logo_url?: string;
+  pages?: Record<PublicSeoPageKey, PublicSeoPageEntry>;
 }
   
 export interface PaginatedResponse<T> {
@@ -150,6 +184,10 @@ export const publicApi = {
   // Fetch Home Page Dynamic Content
   getHomePageData: async (options?: RequestOptions): Promise<any> => {
     return getJson<any>({ url: '/homepage', signal: options?.signal, cache: true });
+  },
+
+  getSeoSettings: async (options?: RequestOptions): Promise<PublicSeoSettings> => {
+    return getJson<PublicSeoSettings>({ url: '/seo', signal: options?.signal, cache: true });
   },
 
   // Fetch Articles (Paginated)

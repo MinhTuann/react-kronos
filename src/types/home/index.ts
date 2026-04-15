@@ -19,6 +19,8 @@ export interface Watch {
   color: string;
   description: string;
   description_en?: string;
+  view_more_content?: string;
+  view_more_content_en?: string;
   size?: string;
   material?: string;
   material_en?: string;
@@ -30,4 +32,11 @@ export interface Watch {
   dial_en?: string;
   condition?: string;
   condition_en?: string;
+  seo_title?: string;
+  seo_title_en?: string;
+  seo_description?: string;
+  seo_description_en?: string;
+  seo_image_url?: string;
+  canonical_url?: string;
+  noindex?: boolean;
 }
