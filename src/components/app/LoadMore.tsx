@@ -16,7 +16,6 @@ const LoadMore: React.FC<LoadMoreProps> = ({
     isLoadingMore,
     onLoadMore,
     className = '',
-    loadingText,
     buttonText
 }) => {
     const { t } = useTranslation();

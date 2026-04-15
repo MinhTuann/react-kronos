@@ -131,9 +131,7 @@ const CollectionsPage: React.FC = () => {
 
     // Scroll Listener removed for reusable GoToTop component
 
-    const scrollToTop = () => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
+    // Scroll Listener removed for reusable GoToTop component
 
     // Sorting Logic (Client-side)
     // useEffect(() => {
