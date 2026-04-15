@@ -66,7 +66,9 @@ const resources = {
         authenticity: "Authenticity Guaranteed",
         secure_payment: "Secure Payment",
         back_to_collections: "Back to Collections",
-        delivery_time: "3-5 Business Days"
+        delivery_time: "3-5 Business Days",
+        load_more: "Load More",
+        syncing: "SYNCING"
       },
       home: {
         latestArrivals: "Latest Arrivals",
@@ -90,7 +92,8 @@ const resources = {
       news: {
         title: "News & Events",
         subtitle: "The world’s premium brands in one place",
-        viewAll: "View All News"
+        viewAll: "View All News",
+        readArticle: "Read Article"
       }
     }
   },
@@ -158,7 +161,9 @@ const resources = {
         secure_payment: "Thanh toán an toàn",
         back_to_collections: "Quay lại bộ sưu tập",
         delivery_time: "3-5 ngày làm việc",
-        watch_not_found: "Không tìm thấy đồng hồ"
+        watch_not_found: "Không tìm thấy đồng hồ",
+        load_more: "Xem Thêm",
+        syncing: "ĐANG TẢI"
       },
       home: {
         latestArrivals: "Sản phẩm mới nhất",
@@ -182,7 +187,8 @@ const resources = {
       news: {
         title: "Tin tức & Sự kiện",
         subtitle: "Những thương hiệu cao cấp nhất thế giới tụ hội",
-        viewAll: "Xem tất cả tin tức"
+        viewAll: "Xem tất cả tin tức",
+        readArticle: "Đọc bài viết"
       }
     }
   }

@@ -1,21 +1,49 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import type { Variants, Easing } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { publicApi } from '../lib/api';
 import type { PublicArticle } from '../lib/api';
+import { GoToTop, LoadMore } from '@/components/app';
 
 const NewsEventsPage: React.FC = () => {
     const [articles, setArticles] = useState<PublicArticle[]>([]);
     const [loading, setLoading] = useState(true);
-    
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
+    const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+    const [hasNextPage, setHasNextPage] = useState(false);
+    const [lastCursor, setLastCursor] = useState<string | null>(null);
+    const itemsPerPage = 12;
+
+    const fetchArticles = async (reset = false) => {
+        try {
+            if (reset) setLoading(true);
+            else setIsLoadingMore(true);
+
+            const currentCursor = reset ? undefined : (lastCursor || undefined);
+            
+            const response = await publicApi.getArticles(currentCursor, itemsPerPage);
+            
+            if (reset) {
+                setArticles(response.data);
+            } else {
+                setArticles(prev => [...prev, ...response.data]);
+            }
+            
+            setHasNextPage(response.meta.hasNextPage);
+            setLastCursor(response.meta.lastCursor);
+        } catch (err) {
+            console.error("Failed to fetch articles:", err);
+        } finally {
+            setLoading(false);
+            setIsLoadingMore(false);
+        }
+    };
+
     useEffect(() => {
         window.scrollTo(0, 0);
-        publicApi.getArticles()
-            .then(data => setArticles(data))
-            .catch(err => console.error("Failed to fetch articles:", err))
-            .finally(() => setLoading(false));
+        fetchArticles(true);
     }, []);
 
     const { t, i18n } = useTranslation();
@@ -44,8 +72,20 @@ const NewsEventsPage: React.FC = () => {
     const heroY = useTransform(heroScroll, [0, 1], [0, 150]);
     const heroOpacity = useTransform(heroScroll, [0, 0.8], [1, 0]);
 
+    // Extract categories based on current language
+    const categories = Array.from(new Set(articles.map(article =>
+        currentLang === 'en' ? (article.category_en || article.category) : article.category
+    ))).filter(Boolean).sort();
+
+    const filteredArticles = selectedCategory
+        ? articles.filter(article => {
+            const cat = currentLang === 'en' ? (article.category_en || article.category) : article.category;
+            return cat === selectedCategory;
+        })
+        : articles;
+
     return (
-        <div className="bg-white text-gunmetal overflow-hidden selection:bg-gunmetal selection:text-white">
+        <div className="bg-white text-gunmetal selection:bg-gunmetal selection:text-white">
 
             {/* Hero Section */}
             <section ref={heroRef} className="relative min-h-[60vh] flex items-center justify-center pt-32 pb-20">
@@ -74,20 +114,59 @@ const NewsEventsPage: React.FC = () => {
                 </motion.div>
             </section>
 
+            {/* Category Filters Toolbar */}
+            {!loading && articles.length > 0 && (
+                <div className="sticky top-20 md:top-24 z-30 bg-white/95 backdrop-blur-md py-4 border-b border-gunmetal/10 mb-8 md:mb-12">
+                    <div className="max-w-[1600px] mx-auto px-6 lg:px-12">
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.8, delay: 0.2, ease: customEase }}
+                            className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4"
+                        >
+                            <button
+                                onClick={() => setSelectedCategory(null)}
+                                className={`font-branding text-[10px] tracking-[0.3em] uppercase transition-all duration-500 relative py-2 ${selectedCategory === null ? 'text-gunmetal font-bold' : 'text-stone-400 hover:text-gunmetal'
+                                    }`}
+                            >
+                                {currentLang === 'en' ? 'ALL' : 'TẤT CẢ'}
+                                {selectedCategory === null && (
+                                    <motion.div layoutId="activeCat" className="absolute bottom-0 left-0 right-0 h-[1px] bg-gunmetal" />
+                                )}
+                            </button>
+                            {categories.map((cat) => (
+                                <button
+                                    key={cat}
+                                    onClick={() => setSelectedCategory(cat)}
+                                    className={`font-branding text-[10px] tracking-[0.3em] uppercase transition-all duration-500 relative py-2 ${selectedCategory === cat ? 'text-gunmetal font-bold' : 'text-stone-400 hover:text-gunmetal'
+                                        }`}
+                                >
+                                    {cat}
+                                    {selectedCategory === cat && (
+                                        <motion.div layoutId="activeCat" className="absolute bottom-0 left-0 right-0 h-[1px] bg-gunmetal" />
+                                    )}
+                                </button>
+                            ))}
+                        </motion.div>
+                    </div>
+                </div>
+            )}
+
             {/* News & Events Grid */}
-            <section className="py-20 md:py-32 px-6 lg:px-12 max-w-[1600px] mx-auto z-10 relative bg-white min-h-[40vh]">
+            <section className="pb-20 md:pb-32 px-6 lg:px-12 max-w-[1600px] mx-auto z-10 relative bg-white min-h-[40vh]">
+
                 {loading ? (
                     <div className="flex justify-center items-center py-20">
                         <div className="w-8 h-8 rounded-full border-b-2 border-gunmetal animate-spin"></div>
                     </div>
-                ) : articles.length === 0 ? (
+                ) : filteredArticles.length === 0 ? (
                     <div className="text-center text-stone-400 py-20 font-serif italic text-xl">
-                        No articles published yet.
+                        {selectedCategory ? t('articles.noResultsForCategory', { category: selectedCategory }) : 'No articles published yet.'}
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-24">
-                        {articles.map((item, index) => (
-                            <motion.div 
+                        {filteredArticles.map((item, index) => (
+                            <motion.div
                                 key={item.slug || item.id}
                                 initial={{ opacity: 0, y: 40 }}
                                 whileInView={{ opacity: 1, y: 0 }}
@@ -97,9 +176,9 @@ const NewsEventsPage: React.FC = () => {
                                 <Link to={`/news-events/${item.slug || item.id}`} className="group cursor-pointer flex flex-col h-full">
                                     <div className="w-full aspect-[4/3] mb-8 overflow-hidden bg-stone-100 rounded-sm">
                                         {item.image_url ? (
-                                            <img 
-                                                src={item.image_url} 
-                                                alt={currentLang === 'en' && item.title_en ? item.title_en : item.title} 
+                                            <img
+                                                src={item.image_url}
+                                                alt={currentLang === 'en' && item.title_en ? item.title_en : item.title}
                                                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[2.5s] ease-out"
                                             />
                                         ) : (
@@ -123,7 +202,7 @@ const NewsEventsPage: React.FC = () => {
                                     </p>
                                     <div className="mt-auto">
                                         <span className="flex items-center gap-4 text-[10px] tracking-[0.3em] uppercase font-branding text-gunmetal group-hover:text-black transition-colors">
-                                            Read Article
+                                            {t('news.readArticle')}
                                             <span className="h-[1px] w-6 bg-gunmetal/30 group-hover:bg-gunmetal group-hover:w-10 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"></span>
                                         </span>
                                     </div>
@@ -132,8 +211,17 @@ const NewsEventsPage: React.FC = () => {
                         ))}
                     </div>
                 )}
+
+                {/* --- Pagination (Load More) --- */}
+                <LoadMore
+                    hasNextPage={hasNextPage}
+                    isLoadingMore={isLoadingMore}
+                    onLoadMore={() => fetchArticles(false)}
+                />
             </section>
 
+            {/* Go to Top Button */}
+            <GoToTop />
         </div>
     );
 };

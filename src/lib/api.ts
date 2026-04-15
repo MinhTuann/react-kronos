@@ -87,6 +87,14 @@ export interface PublicArticle {
   date: string;
   created_at: string;
 }
+  
+export interface PaginatedResponse<T> {
+  data: T[];
+  meta: {
+    hasNextPage: boolean;
+    lastCursor: string | null;
+  };
+}
 
 export type { PublicBrand, PublicCollection };
 export type { RequestOptions };
@@ -107,14 +115,23 @@ export const publicApi = {
     });
   },
 
-  // Fetch Public Watches (Array)
-  getWatches: async (brandId?: string, collectionIds?: string | string[], search?: string, options?: RequestOptions): Promise<Watch[]> => {
-    return getJson<Watch[]>({
+  // Fetch Public Watches (Paginated)
+  getWatches: async (
+    brandId?: string, 
+    collectionIds?: string | string[], 
+    search?: string, 
+    cursor?: string, 
+    limit?: number, 
+    options?: RequestOptions
+  ): Promise<PaginatedResponse<Watch>> => {
+    return getJson<PaginatedResponse<Watch>>({
       url: '/watches',
       params: {
         brand_id: brandId,
         collection_ids: collectionIds,
         search,
+        cursor,
+        limit,
       },
       signal: options?.signal,
     });
@@ -135,9 +152,14 @@ export const publicApi = {
     return getJson<any>({ url: '/homepage', signal: options?.signal, cache: true });
   },
 
-  // Fetch Articles
-  getArticles: async (options?: RequestOptions): Promise<PublicArticle[]> => {
-    return getJson<PublicArticle[]>({ url: '/articles', signal: options?.signal, cache: false });
+  // Fetch Articles (Paginated)
+  getArticles: async (cursor?: string, limit?: number, options?: RequestOptions): Promise<PaginatedResponse<PublicArticle>> => {
+    return getJson<PaginatedResponse<PublicArticle>>({ 
+        url: '/articles', 
+        params: { cursor, limit },
+        signal: options?.signal, 
+        cache: false 
+    });
   },
 
   // Fetch Single Article

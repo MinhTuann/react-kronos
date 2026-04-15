@@ -117,13 +117,15 @@ const Header = ({ scrollY }: Props) => {
                     <div className='flex justify-end'>
                         <div className='flex gap-2 md:gap-6 items-center'>
                             {/* Language Switcher */}
-                            <div className="hidden sm:flex items-center gap-1 bg-gray-100/10 backdrop-blur-sm p-1 rounded-full border border-white/10">
+                            <div className={`hidden sm:flex items-center gap-1 bg-gray-100/10 backdrop-blur-sm p-1 rounded-full border transition-colors duration-500 ${
+                                useDarkTheme ? 'border-black/20' : 'border-white/20'
+                            }`}>
                                 <button
                                     onClick={() => i18n.changeLanguage('vi')}
                                     className={`flex items-center gap-1.5 px-3 py-1 rounded-full transition-all duration-300 text-[10px] font-bold ${
                                         i18n.language.startsWith('vi')
-                                            ? 'bg-white text-black shadow-sm'
-                                            : `text-white/60 hover:text-white`
+                                            ? useDarkTheme ? 'bg-black text-white shadow-sm' : 'bg-white text-black shadow-sm'
+                                            : useDarkTheme ? 'text-black/50 hover:text-black' : 'text-white/60 hover:text-white'
                                     }`}
                                 >
                                     <span>🇻🇳</span>
@@ -133,8 +135,8 @@ const Header = ({ scrollY }: Props) => {
                                     onClick={() => i18n.changeLanguage('en')}
                                     className={`flex items-center gap-1.5 px-3 py-1 rounded-full transition-all duration-300 text-[10px] font-bold ${
                                         i18n.language.startsWith('en')
-                                            ? 'bg-white text-black shadow-sm'
-                                            : `text-white/60 hover:text-white`
+                                            ? useDarkTheme ? 'bg-black text-white shadow-sm' : 'bg-white text-black shadow-sm'
+                                            : useDarkTheme ? 'text-black/50 hover:text-black' : 'text-white/60 hover:text-white'
                                     }`}
                                 >
                                     <span>🇺🇸</span>

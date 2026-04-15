@@ -50,7 +50,7 @@ const NewsEvents = ({ news }: { news?: PublicArticle[] }) => {
                                         {summary}
                                     </p>
                                     <span className="inline-flex items-center gap-4 text-[10px] uppercase tracking-[0.2em] font-bold text-gunmetal group-hover:text-golden transition-colors">
-                                        Read Article
+                                        {t('news.readArticle')}
                                         <span className="h-[1px] w-8 bg-gunmetal transition-all duration-500 group-hover:w-12 group-hover:bg-golden" />
                                     </span>
                                 </div>

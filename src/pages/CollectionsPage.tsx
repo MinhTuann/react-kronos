@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Filter, ArrowUp, X } from 'lucide-react';
+import { Filter, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { GoToTop, LoadMore } from '@/components/app';
 import type { Watch } from '@/types';
 import { WatchItem } from '@/components/home/InStocks';
 // import { Dropdown } from '@/components/app';
@@ -27,13 +28,13 @@ const readMultiValueParam = (params: URLSearchParams, key: string): string[] => 
 const CollectionsPage: React.FC = () => {
     // States
     const [watches, setWatches] = useState<Watch[]>([]);
-    // const [originalWatches, setOriginalWatches] = useState<Watch[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
     const { t } = useTranslation();
-    const [currentPage, setCurrentPage] = useState(1);
+    const [hasNextPage, setHasNextPage] = useState(false);
+    const [lastCursor, setLastCursor] = useState<string | null>(null);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     // const [sortMethod, setSortMethod] = useState<'recommended' | 'price-asc' | 'price-desc'>('recommended');
-    const [showGoTop, setShowGoTop] = useState(false);
 
     // Search Query parsing
     const location = useLocation();
@@ -59,13 +60,8 @@ const CollectionsPage: React.FC = () => {
         setSelectedCollections(Array.from(new Set(collectionIds)));
     }, [location.search]);
 
-    const itemsPerPage = 9;
-
-    // Derived State for Pagination
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentWatches = watches.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = Math.ceil(watches.length / itemsPerPage);
+    const itemsPerPage = 12; // Adjusted to a better grid number
+    const currentWatches = watches;
 
     // Initial Filters Fetch (Runs Once)
     useEffect(() => {
@@ -90,43 +86,50 @@ const CollectionsPage: React.FC = () => {
         return () => controller.abort();
     }, []);
 
-    // Fetch Watches (Runs on mount and when filters/search changes)
-    useEffect(() => {
-        const controller = new AbortController();
-
-        const fetchWatches = async () => {
-            try {
+    const fetchWatches = async (reset = false) => {
+        try {
+            if (reset) {
                 setIsLoading(true);
-                // Pass the first selected brand ID (if any) and all selected collection IDs
-                const brandId = selectedBrands.length > 0 ? selectedBrands[0] : undefined;
-                const collectionIds = selectedCollections.length > 0 ? selectedCollections : undefined;
-
-                const data = await publicApi.getWatches(brandId, collectionIds, searchQuery, { signal: controller.signal });
-                if (controller.signal.aborted) return;
-                // setOriginalWatches(data);
-                setWatches(data);
-                setCurrentPage(1);
-            } catch (err) {
-                if (controller.signal.aborted) return;
-                console.error("Failed to fetch public watches:", err);
-            } finally {
-                if (controller.signal.aborted) return;
-                setIsLoading(false);
+            } else {
+                setIsLoadingMore(true);
             }
-        };
-        fetchWatches();
 
-        return () => controller.abort();
+            const currentCursor = reset ? undefined : (lastCursor || undefined);
+            
+            const brandId = selectedBrands.length > 0 ? selectedBrands[0] : undefined;
+            const collectionIds = selectedCollections.length > 0 ? selectedCollections : undefined;
+
+            const response = await publicApi.getWatches(
+                brandId, 
+                collectionIds, 
+                searchQuery, 
+                currentCursor, 
+                itemsPerPage
+            );
+            
+            if (reset) {
+                setWatches(response.data);
+            } else {
+                setWatches(prev => [...prev, ...response.data]);
+            }
+            
+            setHasNextPage(response.meta.hasNextPage);
+            setLastCursor(response.meta.lastCursor);
+
+        } catch (err) {
+            console.error("Failed to fetch public watches:", err);
+        } finally {
+            setIsLoading(false);
+            setIsLoadingMore(false);
+        }
+    };
+
+    // Run fetch on mount and whenever filters/search change
+    useEffect(() => {
+        fetchWatches(true);
     }, [searchQuery, selectedBrands, selectedCollections]);
 
-    // Scroll Listener for "Go to Top" button
-    useEffect(() => {
-        const handleScroll = () => {
-            setShowGoTop(window.scrollY > 500);
-        };
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
+    // Scroll Listener removed for reusable GoToTop component
 
     const scrollToTop = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -312,7 +315,7 @@ const CollectionsPage: React.FC = () => {
                         </div>
                     ) : (
                         <motion.div
-                            key={`${currentPage}-${'sortMethod'}-${selectedBrands.join(',')}-${selectedCollections.join(',')}`}
+                            key={`${'sortMethod'}-${selectedBrands.join(',')}-${selectedCollections.join(',')}`}
                             initial='hidden'
                             animate='visible'
                             variants={{
@@ -335,37 +338,12 @@ const CollectionsPage: React.FC = () => {
                         </motion.div>
                     )}
 
-                    {/* --- Pagination --- */}
-                    <motion.div layout className='mt-16 md:mt-24 border-t border-gunmetal/10 pt-8 md:pt-10 flex justify-between md:justify-center items-center gap-4 md:gap-8'>
-                        {/* ... Pagination buttons stay exactly the same ... */}
-                        <button
-                            disabled={currentPage === 1}
-                            onClick={() => { setCurrentPage(prev => prev - 1); scrollToTop(); }}
-                            className='text-[10px] uppercase tracking-[0.2em] font-semibold text-gunmetal/60 hover:text-black disabled:opacity-30 transition-colors'
-                        >
-                            {t('collections.previous')}
-                        </button>
-
-                        <div className='flex gap-3 md:gap-4 font-serif italic text-base md:text-lg'>
-                            {Array.from({ length: totalPages }).map((_, i) => (
-                                <button
-                                    key={i}
-                                    onClick={() => { setCurrentPage(i + 1); scrollToTop(); }}
-                                    className={`transition-colors duration-300 ${currentPage === i + 1 ? 'text-black' : 'text-gunmetal/30 hover:text-gunmetal/70'}`}
-                                >
-                                    {i + 1}
-                                </button>
-                            ))}
-                        </div>
-
-                        <button
-                            disabled={currentPage === totalPages}
-                            onClick={() => { setCurrentPage(prev => prev + 1); scrollToTop(); }}
-                            className='text-[10px] uppercase tracking-[0.2em] font-semibold text-gunmetal/60 hover:text-black disabled:opacity-30 transition-colors'
-                        >
-                            {t('collections.next')}
-                        </button>
-                    </motion.div>
+                    {/* --- Pagination (Load More) --- */}
+                    <LoadMore
+                        hasNextPage={hasNextPage}
+                        isLoadingMore={isLoadingMore}
+                        onLoadMore={() => fetchWatches(false)}
+                    />
                 </div>
             </div>
 
@@ -406,23 +384,8 @@ const CollectionsPage: React.FC = () => {
                 )}
             </AnimatePresence>
 
-            {/* --- Go to Top Button --- */}
-            <AnimatePresence>
-                {showGoTop && (
-                    <motion.button
-                        initial={{ opacity: 0, y: 20, scale: 0.8 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 20, scale: 0.8 }}
-                        transition={{ duration: 0.4 }}
-                        onClick={scrollToTop}
-                        /* Adjusted position slightly for mobile to avoid native browser UI */
-                        className='fixed bottom-6 md:bottom-8 right-6 md:right-8 z-50 p-3 md:p-4 bg-gunmetal/90 text-white rounded-full backdrop-blur-md shadow-2xl hover:bg-black hover:-translate-y-1 transition-all duration-300'
-                    >
-                        <ArrowUp size={20} strokeWidth={1.5} />
-                    </motion.button>
-                )}
-            </AnimatePresence>
-
+            {/* Go to Top Button */}
+            <GoToTop />
         </div>
     );
 };

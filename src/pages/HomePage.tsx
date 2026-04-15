@@ -21,8 +21,8 @@ const HomePage = () => {
                 let news = home.news || [];
                 // If homepage didn't return news, fetch latest articles
                 if (news.length === 0) {
-                    const articles = await publicApi.getArticles({ signal: controller.signal });
-                    news = articles.slice(0, 3);
+                    const articles = await publicApi.getArticles(undefined, undefined, { signal: controller.signal });
+                    news = articles.data.slice(0, 3);
                 }
 
                 // Map backend video_url to url for VideoCarousel
