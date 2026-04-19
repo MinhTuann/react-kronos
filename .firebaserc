@@ -12,7 +12,7 @@
         ]
       }
     },
-    "kronos-prod": {
+    "kronos-prod-2b5dd": {
       "hosting": {
         "storefront": [
           "kronos-storefront-prod"
