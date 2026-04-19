@@ -2,7 +2,7 @@
   "projects": {
     "dev": "kronos-dev-c8fba",
     "uat": "kronos-uat",
-    "prod": "kronos-prod"
+    "prod": "kronos-prod-2b5dd"
   },
   "targets": {
     "kronos-uat": {
