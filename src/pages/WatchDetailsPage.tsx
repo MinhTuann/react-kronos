@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { ChevronRight, ShieldCheck, ArrowLeft } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronRight, ShieldCheck, ArrowLeft, Plus, Minus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { Watch } from '@/types';
 
@@ -24,6 +24,7 @@ const WatchDetailsPage: React.FC = () => {
     const { t, i18n } = useTranslation();
     const currentLang = i18n.language;
     const origin = import.meta.env.VITE_SITE_URL || window.location.origin;
+    const [isEditorialExpanded, setIsEditorialExpanded] = useState(false);
 
     useSeo({
         pageKey: 'collections',
@@ -116,7 +117,6 @@ const WatchDetailsPage: React.FC = () => {
         );
     }
 
-    /*
     const rawViewMoreHtml = ((currentLang === 'en' && watch.view_more_content_en) ? watch.view_more_content_en : watch.view_more_content) ?? '';
     const sanitizeQuillHtml = (html: string): string => {
         let clean = html.normalize('NFC');
@@ -126,7 +126,6 @@ const WatchDetailsPage: React.FC = () => {
     };
     const viewMoreHtml = sanitizeQuillHtml(rawViewMoreHtml);
     const hasViewMore = viewMoreHtml.replace(/<[^>]+>/g, '').trim().length > 0;
-    */
 
     return (
         <div className="pt-24 md:pt-32 pb-24 min-h-screen bg-white">
@@ -296,38 +295,50 @@ const WatchDetailsPage: React.FC = () => {
                 </div>
             </div>
 
-            {/*
             {hasViewMore && (
-                <section className="max-w-[1200px] mx-auto px-6 lg:px-12 mt-24 border-t border-gunmetal/10 pt-20">
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true, margin: '-100px' }}
-                        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                        className="grid grid-cols-1 lg:grid-cols-[220px_minmax(0,1fr)] gap-10 lg:gap-16 items-start"
-                    >
-                        <div className="lg:sticky lg:top-32">
-                            <p className="text-[10px] tracking-[0.35em] uppercase text-golden font-semibold mb-4">
-                                View More
-                            </p>
-                            <h2 className="text-2xl md:text-3xl font-serif italic text-gunmetal leading-tight">
-                                {(currentLang === 'en' ? 'Editorial Details' : 'Thong tin chi tiet')}
-                            </h2>
-                        </div>
+                <section className="max-w-[1200px] mx-auto px-6 lg:px-12 mt-24 pt-16">
+                    <div className="text-center mb-8 relative">
+                        <div className="absolute left-0 top-1/2 -mt-px w-full h-px bg-gunmetal/10 -z-10"></div>
+                        <button
+                            onClick={() => setIsEditorialExpanded(!isEditorialExpanded)}
+                            className="bg-white px-8 uppercase tracking-[0.3em] text-[10px] sm:text-xs font-semibold text-gunmetal hover:text-golden transition-colors inline-flex items-center gap-3 group"
+                        >
+                            <motion.div
+                                animate={{ rotate: isEditorialExpanded ? 180 : 0 }}
+                                transition={{ duration: 0.4, ease: "easeInOut" }}
+                                className="w-6 h-6 sm:w-8 sm:h-8 rounded-full border border-gunmetal/20 flex items-center justify-center group-hover:border-golden transition-colors"
+                            >
+                                {isEditorialExpanded ? <Minus size={12} /> : <Plus size={12} />}
+                            </motion.div>
+                            {isEditorialExpanded ? t('common.view_less', 'View Less') : t('common.view_more', 'View More')}
+                        </button>
+                    </div>
 
-                        <article
-                            lang={currentLang}
-                            className="prose prose-stone prose-lg md:prose-xl max-w-none
-                            prose-headings:font-serif prose-headings:italic prose-headings:font-light prose-headings:tracking-tight
-                            prose-p:font-light prose-p:leading-relaxed prose-p:text-stone-600
-                            prose-li:text-stone-600 prose-strong:text-gunmetal
-                            prose-a:text-golden prose-a:no-underline hover:prose-a:text-gunmetal"
-                            dangerouslySetInnerHTML={{ __html: viewMoreHtml }}
-                        />
-                    </motion.div>
+                    <AnimatePresence>
+                        {isEditorialExpanded && (
+                            <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: 'auto', opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                                className="overflow-hidden"
+                            >
+                                <div className="pb-16 pt-8 flex justify-center border-b border-gunmetal/10">
+                                    <article
+                                        lang={currentLang}
+                                        className="prose prose-stone prose-lg md:prose-xl max-w-[800px] w-full
+                                        prose-headings:font-serif prose-headings:italic prose-headings:font-light prose-headings:tracking-tight
+                                        prose-p:font-light prose-p:leading-relaxed prose-p:text-stone-600
+                                        prose-li:text-stone-600 prose-strong:text-gunmetal
+                                        prose-a:text-golden prose-a:no-underline hover:prose-a:text-gunmetal"
+                                        dangerouslySetInnerHTML={{ __html: viewMoreHtml }}
+                                    />
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </section>
             )}
-            */}
 
             <div className="max-w-[1600px] mx-auto px-6 lg:px-12 mt-24">
                 <Link to="/collections" className="inline-flex items-center gap-3 text-xs uppercase tracking-[0.2em] font-semibold text-gunmetal/60 hover:text-black transition-colors group">
