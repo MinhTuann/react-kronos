@@ -1,4 +1,4 @@
-import { promises as fs } from 'node:fs'
+import { existsSync, promises as fs } from 'node:fs'
 import { defineConfig, loadEnv, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
@@ -458,7 +458,17 @@ const resolveHostingSiteUrl = async (rootDir: string, mode: string): Promise<str
   }
 
   try {
-    const raw = await fs.readFile(path.resolve(rootDir, '.firebaserc'), 'utf8')
+    const firebaseRcCandidates = [
+      path.resolve(rootDir, '.firebaserc'),
+      path.resolve(rootDir, '../../.firebaserc'),
+    ]
+    const firebaseRcPath = firebaseRcCandidates.find((candidate) => existsSync(candidate))
+
+    if (!firebaseRcPath) {
+      return ''
+    }
+
+    const raw = await fs.readFile(firebaseRcPath, 'utf8')
     const config = JSON.parse(raw) as {
       projects?: Record<string, string>
       targets?: Record<string, { hosting?: Record<string, string[]> }>
@@ -802,6 +812,7 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      '@kronos/contracts-public': path.resolve(__dirname, '../../packages/contracts-public/src/index.ts'),
     },
   },
   server: {

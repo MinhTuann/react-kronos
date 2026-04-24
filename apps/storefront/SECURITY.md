@@ -5,7 +5,7 @@ This project is part of a real client deployment. Security and data protection a
 ## Supported Deployment Model
 
 - Public repo: `react-kronos` (storefront UI)
-- Private repos: backend, CMS, shared contracts
+- Private repos: backend, CMS, internal contracts
 - Firebase projects: `dev`, `uat`, `prod`
 
 ## Reporting a Security Issue
@@ -21,7 +21,8 @@ Report privately to the maintainer with:
 
 ## Security Boundaries
 
-- `@kronos/contracts` remains private
+- `@kronos/contracts-public` is safe for the storefront
+- Internal admin/backend contracts remain private
 - Admin APIs are private and protected
 - Public storefront consumes only public API routes
 
@@ -33,8 +34,7 @@ Report privately to the maintainer with:
 
 ## Dependency and Supply Chain Guidance
 
-- Prefer pinned versions for internal/private packages
-- Use read-only tokens or read-only deploy keys for CI access
+- Prefer pinned versions for exported shared packages
 - Rotate credentials on compromise or role changes
 
 ## Operational Recommendations

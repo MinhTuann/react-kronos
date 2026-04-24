@@ -1,5 +1,6 @@
 import js from '@eslint/js'
 import globals from 'globals'
+import reactPlugin from 'eslint-plugin-react'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
 import tseslint from 'typescript-eslint'
@@ -19,13 +20,17 @@ export default defineConfig([
       ecmaVersion: 2020,
       globals: globals.browser,
     },
+    plugins: {
+      react: reactPlugin,
+    },
+    settings: {
+      react: {
+        version: 'detect',
+      },
+    },
     rules: {
-      ...react.configs.recommended.rules,
-      // A. Turn off the base JS quote rule
-      'quotes': 'off',
-
-      // B. Enforce Single Quotes in TypeScript/JS
-      '@typescript-eslint/quotes': [
+      ...reactPlugin.configs.recommended.rules,
+      'quotes': [
         'error',
         'single',
         {
@@ -33,11 +38,7 @@ export default defineConfig([
           'allowTemplateLiterals': true
         }
       ],
-
-      // C. Enforce Double Quotes for JSX Attributes (React Standard)
       'jsx-quotes': ['error', 'prefer-double'],
-
-      // Optional: React 17+ doesn't need React in scope
       'react/react-in-jsx-scope': 'off',
     }
   },
