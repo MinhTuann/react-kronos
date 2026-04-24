@@ -802,6 +802,7 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      '@kronos/contracts-public': path.resolve(__dirname, '../packages/contracts-public/src/index.ts'),
     },
   },
   server: {
