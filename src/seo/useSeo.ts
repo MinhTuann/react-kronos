@@ -125,7 +125,7 @@ export const useSeo = ({
     const defaultDescription = readLocalizedValue(lang, settings?.default_description, settings?.default_description_en);
     const pageTitle = readLocalizedValue(lang, pageSettings?.meta_title, pageSettings?.meta_title_en);
     const pageDescription = readLocalizedValue(lang, pageSettings?.meta_description, pageSettings?.meta_description_en);
-    const origin = settings?.site_url || import.meta.env.VITE_SITE_URL || window.location.origin;
+    const origin = import.meta.env.VITE_SITE_URL || window.location.origin || settings?.site_url;
 
     const resolvedTitleBase = title || pageTitle || defaultTitle;
     const resolvedTitle = resolvedTitleBase === siteName ? resolvedTitleBase : `${resolvedTitleBase} | ${siteName}`;
