@@ -116,7 +116,7 @@ const CollectionsPage: React.FC = () => {
     }, [location.search]);
 
     const itemsPerPage = 12; // Adjusted to a better grid number
-    const currentWatches = watches;
+    const currentWatches = Array.isArray(watches) ? watches : [];
 
     // Initial Filters Fetch (Runs Once)
     useEffect(() => {
@@ -129,8 +129,8 @@ const CollectionsPage: React.FC = () => {
                     publicApi.getCollections(undefined, { signal: controller.signal })
                 ]);
                 if (controller.signal.aborted) return;
-                setBrands(bData);
-                setCollections(cData);
+                setBrands(Array.isArray(bData) ? bData : []);
+                setCollections(Array.isArray(cData) ? cData : []);
             } catch (err) {
                 if (controller.signal.aborted) return;
                 console.error("Failed to fetch filters:", err);
@@ -162,14 +162,17 @@ const CollectionsPage: React.FC = () => {
                 itemsPerPage
             );
             
+            const nextWatches = Array.isArray(response?.data) ? response.data : [];
+            const nextMeta = response?.meta ?? { hasNextPage: false, lastCursor: null };
+
             if (reset) {
-                setWatches(response.data);
+                setWatches(nextWatches);
             } else {
-                setWatches(prev => [...prev, ...response.data]);
+                setWatches(prev => [...prev, ...nextWatches]);
             }
             
-            setHasNextPage(response.meta.hasNextPage);
-            setLastCursor(response.meta.lastCursor);
+            setHasNextPage(Boolean(nextMeta.hasNextPage));
+            setLastCursor(nextMeta.lastCursor ?? null);
 
         } catch (err) {
             console.error("Failed to fetch public watches:", err);
