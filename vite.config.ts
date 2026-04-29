@@ -117,6 +117,8 @@ const STATIC_ROUTES: StaticRoute[] = [
 ]
 
 const DEFAULT_DEV_SITE_URL = 'http://localhost:5175'
+const DEFAULT_UAT_SITE_URL = 'https://kronos-storefront-uat.web.app'
+const DEFAULT_PROD_SITE_URL = 'https://thekronos.vn'
 const SITEMAP_PAGE_SIZE = 100
 const PRERENDER_SNIPPET_LENGTH = 420
 
@@ -457,6 +459,14 @@ const resolveHostingSiteUrl = async (rootDir: string, mode: string): Promise<str
     return DEFAULT_DEV_SITE_URL
   }
 
+  if (mode === 'uat') {
+    return DEFAULT_UAT_SITE_URL
+  }
+
+  if (mode === 'prod') {
+    return DEFAULT_PROD_SITE_URL
+  }
+
   try {
     const raw = await fs.readFile(path.resolve(rootDir, '.firebaserc'), 'utf8')
     const config = JSON.parse(raw) as {
@@ -496,8 +506,8 @@ const createSeoAssetsPlugin = (mode: string): Plugin => {
         ? await fetchJson<PublicSeoSettings>(`${apiUrl}/seo`)
         : null
       const siteUrl =
-        normalizeSiteUrl(seoSettings?.site_url)
-        || normalizeSiteUrl(env.VITE_SITE_URL)
+        normalizeSiteUrl(env.VITE_SITE_URL)
+        || normalizeSiteUrl(seoSettings?.site_url)
         || await resolveHostingSiteUrl(rootDir, mode)
 
       if (!siteUrl) {
