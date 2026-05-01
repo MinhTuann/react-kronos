@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
+import SpecValue from "@/components/common/SpecValue";
 import type { Watch } from "@/types";
 
 const SpecItem = ({ label, value, index }: { label: string; value: string; index: number }) => (
@@ -12,7 +13,9 @@ const SpecItem = ({ label, value, index }: { label: string; value: string; index
         className='flex flex-col space-y-1 md:items-end'
     >
         <h1 className='font-branding text-vanilla text-[10px] tracking-[0.3em] uppercase'>{label}</h1>
-        <p className='text-white text-[15px] font-light md:text-right'>{value}</p>
+        <div className='text-white text-[15px] font-light md:text-right'>
+            <SpecValue value={value} className='md:inline-block md:text-left' bulletClassName='pl-1' />
+        </div>
     </motion.div>
 );
 

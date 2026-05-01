@@ -37,6 +37,7 @@ export interface Watch {
   seo_description?: string | null;
   seo_description_en?: string | null;
   seo_image_url?: string | null;
+  featured_avatar_url?: string | null;
   canonical_url?: string | null;
   noindex?: boolean;
 }

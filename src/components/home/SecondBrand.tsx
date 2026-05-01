@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import SpecValue from '@/components/common/SpecValue';
 import type { Watch } from '@/types';
 
 const SpecItem = ({ label, value, index }: { label: string; value: string; index: number }) => (
@@ -11,7 +12,9 @@ const SpecItem = ({ label, value, index }: { label: string; value: string; index
         transition={{ duration: 0.8, delay: 0.4 + index * 0.1, ease: [0.16, 1, 0.3, 1] as const }}
     >
         <p className="font-branding text-[9px] uppercase tracking-widest text-bone mb-1">{label}</p>
-        <p>{value}</p>
+        <div>
+            <SpecValue value={value} />
+        </div>
     </motion.div>
 );
 
