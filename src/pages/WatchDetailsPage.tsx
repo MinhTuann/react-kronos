@@ -38,7 +38,7 @@ const WatchDetailsPage: React.FC = () => {
                 : watch.seo_description || ((currentLang.startsWith('en') && watch.description_en) ? watch.description_en : watch.description))
             : '',
         image: watch?.seo_image_url || watch?.image,
-        canonicalUrl: watch?.canonical_url,
+        canonicalUrl: watch?.canonical_url || undefined,
         canonicalPath: watch?.canonical_url ? undefined : (id ? `/watch/${id}` : '/collections'),
         noindex: watch ? watch.noindex : (!watch && !isLoading),
         type: 'product',

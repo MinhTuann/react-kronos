@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
+import type { Watch } from "@/types";
 
 const SpecItem = ({ label, value, index }: { label: string; value: string; index: number }) => (
     <motion.div
@@ -14,7 +16,18 @@ const SpecItem = ({ label, value, index }: { label: string; value: string; index
     </motion.div>
 );
 
-const BestBrand = () => {
+const BestBrand = ({ watch }: { watch?: Watch }) => {
+    const { t, i18n } = useTranslation();
+    const lang = i18n.language.split('-')[0];
+    const getLocalized = (baseValue?: string, enValue?: string | null) => lang === 'en' ? (enValue || baseValue || '') : (baseValue || enValue || '');
+
+    if (!watch) return null;
+
+    const description = getLocalized(watch.description, watch.description_en);
+    const material = getLocalized(watch.material, watch.material_en);
+    const movement = getLocalized(watch.movement, watch.movement_en);
+    const strap = getLocalized(watch.strap, watch.strap_en);
+
     // Stagger container variants
     const containerVariants = {
         hidden: { opacity: 0 },
@@ -44,9 +57,9 @@ const BestBrand = () => {
                 whileInView={{ scale: 1, opacity: 0.8 }}
                 viewport={{ once: true }}
                 transition={{ duration: 2, ease: "easeOut" }}
-                alt='Best Seller Watch Close-up'
+                alt={watch.name}
                 className='absolute inset-0 w-full h-full object-cover'
-                src={`${import.meta.env.BASE_URL}patek_philippe_7140G001.jpeg`}
+                src={watch.image}
             />
             <div className='absolute inset-0 bg-black/70'></div>
 
@@ -61,20 +74,20 @@ const BestBrand = () => {
                     variants={containerVariants}
                     className='flex flex-col space-y-8 md:justify-between h-full'
                 >
-                    <motion.span variants={itemVariants} className='font-branding text-[11px] tracking-[0.4em] uppercase text-vanilla font-semibold'>Patek Philippe</motion.span>
+                    <motion.span variants={itemVariants} className='font-branding text-[11px] tracking-[0.4em] uppercase text-vanilla font-semibold'>{watch.brand}</motion.span>
 
                     <motion.div variants={itemVariants} className='space-y-2'>
-                        <h2 className='text-3xl md:text-4xl text-white border-l-2 border-vanilla pl-4 leading-tight'>GRAND COMPLICATIONS</h2>
-                        <h4 className='text-lg md:text-xl text-white/70 pl-4 font-branding'>REF. 7140G-001</h4>
+                        <h2 className='text-3xl md:text-4xl text-white border-l-2 border-vanilla pl-4 leading-tight uppercase'>{watch.collection || watch.name}</h2>
+                        <h4 className='text-lg md:text-xl text-white/70 pl-4 font-branding'>REF. {watch.ref}</h4>
                     </motion.div>
 
                     <motion.p variants={itemVariants} className='text-white/80 leading-relaxed max-w-lg'>
-                        Patek Philippe pays tribute to women's increased interest in beautiful, complicated watches with a perpetual calendar associating technical refinement...
+                        {description}
                     </motion.p>
 
                     <motion.div variants={itemVariants}>
-                        <Link to='/watch/1' className='inline-block w-full md:w-auto text-center px-6 py-3 bg-white text-stormy text-[8px] tracking-widest uppercase font-branding hover:bg-opacity-90 transition-all rounded-lg'>
-                            Explore the Icon
+                        <Link to={`/watch/${watch.id}`} className='inline-block w-full md:w-auto text-center px-6 py-3 bg-white text-stormy text-[8px] tracking-widest uppercase font-branding hover:bg-opacity-90 transition-all rounded-lg'>
+                            {t('home.featured.exploreIcon', 'Explore the Icon')}
                         </Link>
                     </motion.div>
                 </motion.div>
@@ -82,10 +95,10 @@ const BestBrand = () => {
                 {/* Right Column: Specifications */}
                 <div className='flex flex-col justify-end md:items-end'>
                     <div className='grid grid-cols-2 gap-x-4 gap-y-8 md:ml-0 lg:ml-32'>
-                        <SpecItem label='Size' value='35.1 mm' index={0} />
-                        <SpecItem label='Material' value='White Gold' index={1} />
-                        <SpecItem label='Movement' value='Automatic (240 Q)' index={2} />
-                        <SpecItem label='Strap' value='Alligator Leather' index={3} />
+                        {watch.size && <SpecItem label={t('watch.specs.size', 'Size')} value={watch.size} index={0} />}
+                        {material && <SpecItem label={t('watch.specs.material', 'Material')} value={material} index={1} />}
+                        {movement && <SpecItem label={t('watch.specs.movement', 'Movement')} value={movement} index={2} />}
+                        {strap && <SpecItem label={t('watch.specs.strap', 'Strap')} value={strap} index={3} />}
                     </div>
                 </div>
             </div>
