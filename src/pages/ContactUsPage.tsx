@@ -2,14 +2,34 @@ import React, { useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { MapPin, Phone, Mail, Clock, ArrowRight } from 'lucide-react';
 import type { Variants, Easing } from 'framer-motion';
-import { CONTACT_ADDRESS, CONTACT_EMAIL, CONTACT_PHONE } from '@/utils';
+import { CONTACT_ADDRESS, CONTACT_EMAIL, CONTACT_PHONE, MAP_URL } from '@/utils';
 import { createBreadcrumbJsonLd, useSeo } from '@/seo';
+import { useTranslation } from 'react-i18next';
+
+// --- Animation Configurations ---
+const customEase: Easing = [0.16, 1, 0.3, 1];
+
+const fadeUp: Variants = {
+    hidden: { opacity: 0, y: 40 },
+    visible: { opacity: 1, y: 0, transition: { duration: 1, ease: customEase } }
+};
+
+const staggerContainer: Variants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: { staggerChildren: 0.15 }
+    }
+};
 
 const ContactUsPage: React.FC = () => {
+    const { i18n } = useTranslation();
+    const currentLang = i18n.language.split('-')[0];
     const origin = import.meta.env.VITE_SITE_URL || window.location.origin;
 
     useSeo({
         pageKey: 'contact-us',
+        lang: currentLang,
         canonicalPath: '/contact-us',
         structuredData: createBreadcrumbJsonLd(origin, [
             { name: 'Home', path: '/' },
@@ -20,22 +40,6 @@ const ContactUsPage: React.FC = () => {
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);
-
-    // --- Animation Configurations ---
-    const customEase: Easing = [0.16, 1, 0.3, 1];
-    
-    const fadeUp: Variants = {
-        hidden: { opacity: 0, y: 40 },
-        visible: { opacity: 1, y: 0, transition: { duration: 1, ease: customEase } }
-    };
-
-    const staggerContainer: Variants = {
-        hidden: { opacity: 0 },
-        visible: {
-            opacity: 1,
-            transition: { staggerChildren: 0.15 }
-        }
-    };
 
     // Parallax hook for the hero text
     const heroRef = useRef(null);
@@ -220,12 +224,18 @@ const ContactUsPage: React.FC = () => {
                                 Kronos Luxury Timepieces
                             </motion.h2>
 
-                            <motion.div variants={fadeUp} className="flex items-start gap-4 mb-8">
-                                <MapPin size={20} className="text-gunmetal/40 shrink-0 mt-1" strokeWidth={1.5} />
-                                <p className="text-[14px] md:text-[15px] font-light text-stone-500 leading-relaxed">
+                            <motion.a 
+                                href={MAP_URL}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                variants={fadeUp} 
+                                className="flex items-start gap-4 mb-8 group cursor-pointer"
+                            >
+                                <MapPin size={20} className="text-gunmetal/40 group-hover:text-gunmetal shrink-0 mt-1 transition-colors" strokeWidth={1.5} />
+                                <p className="text-[14px] md:text-[15px] font-light text-stone-500 group-hover:text-gunmetal leading-relaxed transition-colors">
                                     {CONTACT_ADDRESS}
                                 </p>
-                            </motion.div>
+                            </motion.a>
 
                             <motion.div variants={fadeUp} className="flex items-start gap-4 mb-12 pb-12 border-b border-gunmetal/10">
                                 <Clock size={20} className="text-gunmetal/40 shrink-0 mt-1" strokeWidth={1.5} />
@@ -236,10 +246,16 @@ const ContactUsPage: React.FC = () => {
                                 </div>
                             </motion.div>
 
-                            <motion.button variants={fadeUp} className="group flex items-center gap-4 text-[10px] uppercase tracking-[0.3em] font-bold text-gunmetal">
+                            <motion.a 
+                                href={MAP_URL}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                variants={fadeUp} 
+                                className="group flex items-center gap-4 text-[10px] uppercase tracking-[0.3em] font-bold text-gunmetal"
+                            >
                                 <span className="h-[1px] w-8 bg-gunmetal/30 group-hover:w-16 group-hover:bg-gunmetal transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"></span>
                                 Get Directions
-                            </motion.button>
+                            </motion.a>
                         </motion.div>
                     </div>
 

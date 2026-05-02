@@ -1,14 +1,104 @@
 import React, { useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import type { Variants, Easing } from 'framer-motion';
-import { YEAR_OF_FOUNDATION } from '@/utils';
+import { useTranslation } from 'react-i18next';
+import { YEAR_OF_FOUNDATION, MAP_URL, CONTACT_ADDRESS } from '@/utils';
 import { createBreadcrumbJsonLd, useSeo } from '@/seo';
 
+const aboutContent = {
+    en: {
+        heroKicker: 'Ho Chi Minh City',
+        heroTitle: <>The Philosophy of <br className="hidden md:block" /> Immortal Value.</>,
+        heroLead: 'To own a luxury timepiece is not merely to track the passing minutes; it is to hold a legacy in the palm of your hand. At Kronos, we believe a watch is the only heartbeat you can wear on your wrist, a silent witness to your triumphs, passed down from one generation to the next. We don’t just sell watches, we curate "Immortal Values".',
+        discover: 'Discover',
+        chapterOneLabel: 'Chapter I',
+        chapterOneTitle: <>The Genesis of Kronos — <span className="italic font-serif">The Sovereign of Time.</span></>,
+        chapterOneParagraphs: [
+            'Inspired by Kronos, the King of the Titans, sovereign of the Golden Age, and the personification of eternal Time.',
+            'We chose this name out of a core conviction: In an era where all things eventually fade, a horological masterpiece is the only thing that defies the erosion of time. Kronos Luxury Timepieces was established to unite Vietnam’s elite collectors with the world’s most illustrious watch empires: Rolex, Patek Philippe, Audemars Piguet, and Richard Mille.'
+        ],
+        chapterTwoTitle: 'A Sanctuary for Connoisseurs.',
+        chapterTwoParagraphs: [
+            'Located in the heart of Ho Chi Minh City, Kronos Luxury Timepieces is far more than a mere retail space; it is a sanctuary of sophistication.',
+            'From the ambient glow dancing on sapphire crystals to our private consultation suites, every detail is meticulously curated to international standards. Here, we ensure that every guest immerses themselves in the essence of prestige from the very first moment of their presence.'
+        ],
+        atmosphereLabel: 'Atmosphere',
+        atmosphereValue: 'Sanctuary of Sophistication',
+        locationLabel: 'Location',
+        locationValue: CONTACT_ADDRESS,
+        visitStore: 'Visit the Store',
+        pillarsLabel: 'The Pillars',
+        pillarsTitle: 'Our Core Values',
+        pillars: [
+            { title: 'Genuine Authenticity', desc: 'Committed to delivering 100% genuine luxury timepieces, complete with original boxes, paperwork, and manufacturer warranties.' },
+            { title: 'Enduring Legacy', desc: 'Offering timepieces that are precious, durable, and capable of holding their value across time, space, and generations.' },
+            { title: 'Exclusive Experience', desc: 'Providing highly trained ambassadors who deliver world-class, personalized care and long-term after-sales service.' }
+        ],
+        epilogueLabel: 'The Epilogue',
+        epilogueQuote: '"More than a transaction—a commitment to prestige and immortal value."',
+        founders: 'The Founders',
+        city: 'Ho Chi Minh City, Vietnam'
+    },
+    vi: {
+        heroKicker: 'TP. Hồ Chí Minh',
+        heroTitle: <>Triết lý về <br className="hidden md:block" /> Giá trị Bất biến.</>,
+        heroLead: 'Sở hữu một cỗ máy thời gian xa xỉ không chỉ đơn thuần là việc xem giờ, mà là nắm giữ một di sản trong lòng bàn tay. Tại Kronos, chúng tôi tin rằng mỗi chiếc đồng hồ là một "nhịp đập" có thể đeo trên cổ tay, một nhân chứng thầm lặng cho những thành tựu đời người, được truyền thừa qua nhiều thế hệ. Chúng tôi không chỉ mang đến những chiếc đồng hồ; chúng tôi trao gửi những "Giá trị Bất tử".',
+        discover: 'Khám phá',
+        chapterOneLabel: 'Chương I',
+        chapterOneTitle: <>Khởi nguồn của <span className="italic font-serif">Kronos.</span></>,
+        chapterOneParagraphs: [
+            'Lấy cảm hứng từ Kronos, vị vua của các Titan, người cai trị Thời đại Hoàng kim và là hiện thân của Thời gian vĩnh hằng.',
+            'Chúng tôi chọn cái tên này xuất phát từ một niềm tin cốt lõi: Trong thời đại mà mọi thứ cuối cùng đều phai tàn, một kiệt tác chế tác đồng hồ là thứ duy nhất thách thức sự bào mòn của thời gian. Kronos được thành lập để kết nối những nhà sưu tập đồng hồ tinh hoa của Việt Nam với những đế chế đồng hồ danh tiếng nhất thế giới: Rolex, Patek Philippe, Audemars Piguet và Richard Mille.'
+        ],
+        chapterTwoTitle: 'Thánh đường của những tâm hồn mộ điệu.',
+        chapterTwoParagraphs: [
+            'Tọa lạc tại trung tâm TP. Hồ Chí Minh, Kronos không phải là nơi diễn ra các giao dịch thông thường, mà là một thánh đường của sự tinh xảo.',
+            'Từ ánh sáng dịu nhẹ phản chiếu trên kính Sapphire đến không gian tư vấn riêng biệt, mọi chi tiết đều được thiết lập theo tiêu chuẩn quốc tế để mỗi vị khách đều cảm nhận được sự thượng lưu trong từng phút giây hiện diện.'
+        ],
+        atmosphereLabel: 'Không gian',
+        atmosphereValue: 'Thánh đường của sự tinh xảo',
+        locationLabel: 'Vị trí',
+        locationValue: CONTACT_ADDRESS,
+        visitStore: 'Ghé thăm boutique',
+        pillarsLabel: 'Giá trị cốt lõi',
+        pillarsTitle: 'Những trụ cột của Kronos',
+        pillars: [
+            { title: 'Tính xác thực tuyệt đối', desc: 'Cam kết mang đến những cỗ máy thời gian xa xỉ chính hãng 100%, đầy đủ hộp, giấy tờ và bảo chứng từ nhà sản xuất.' },
+            { title: 'Di sản bền vững', desc: 'Tuyển chọn những tuyệt phẩm quý giá, bền bỉ và có khả năng lưu giữ giá trị xuyên suốt thời gian, không gian và thế hệ.' },
+            { title: 'Trải nghiệm độc quyền', desc: 'Đội ngũ đại sứ được đào tạo chuyên sâu, mang đến dịch vụ tư vấn cá nhân hóa và chăm sóc hậu mãi chuẩn quốc tế.' }
+        ],
+        epilogueLabel: 'Lời kết',
+        epilogueQuote: '"Hơn cả một giao dịch — đó là cam kết về uy tín và giá trị bất tử."',
+        founders: 'Những người sáng lập',
+        city: 'TP. Hồ Chí Minh, Việt Nam'
+    }
+};
+
+// --- Animation Configurations ---
+const customEase: Easing = [0.16, 1, 0.3, 1];
+
+const fadeUp: Variants = {
+    hidden: { opacity: 0, y: 40 },
+    visible: { opacity: 1, y: 0, transition: { duration: 1, ease: customEase } }
+};
+
+const staggerContainer: Variants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: { staggerChildren: 0.15 }
+    }
+};
+
 const AboutUsPage: React.FC = () => {
+    const { i18n } = useTranslation();
+    const lang = i18n.language.split('-')[0] === 'en' ? 'en' : 'vi';
+    const content = aboutContent[lang];
     const origin = import.meta.env.VITE_SITE_URL || window.location.origin;
 
     useSeo({
         pageKey: 'about-us',
+        lang: lang,
         canonicalPath: '/about-us',
         structuredData: createBreadcrumbJsonLd(origin, [
             { name: 'Home', path: '/' },
@@ -19,22 +109,6 @@ const AboutUsPage: React.FC = () => {
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);
-
-    // --- Animation Configurations ---
-    const customEase: Easing = [0.16, 1, 0.3, 1];
-
-    const fadeUp: Variants = {
-        hidden: { opacity: 0, y: 40 },
-        visible: { opacity: 1, y: 0, transition: { duration: 1, ease: customEase } }
-    };
-
-    const staggerContainer: Variants = {
-        hidden: { opacity: 0 },
-        visible: {
-            opacity: 1,
-            transition: { staggerChildren: 0.15 }
-        }
-    };
 
     // Parallax hook for the main hero text
     const heroRef = useRef(null);
@@ -64,14 +138,22 @@ const AboutUsPage: React.FC = () => {
                     variants={staggerContainer}
                     className="relative z-10 flex flex-col items-center text-center max-w-5xl mx-auto px-6"
                 >
-                    <motion.span variants={fadeUp} className="font-branding text-[10px] md:text-[11px] tracking-[0.4em] uppercase text-gunmetal/60 mb-8 block">
-                        Ho Chi Minh City
+                    <motion.span
+                        key={`${lang}-kicker`}
+                        variants={fadeUp}
+                        className="font-branding text-[10px] md:text-[11px] tracking-[0.4em] uppercase text-gunmetal/60 mb-8 block"
+                    >
+                        {content.heroKicker}
                     </motion.span>
-                    <motion.h1 variants={fadeUp} className="text-5xl md:text-7xl lg:text-8xl italic font-serif tracking-tight mb-10 leading-[1.1] text-gunmetal">
-                        Immortal Value <br className="hidden md:block" /> Across Generations.
+                    <motion.h1
+                        key={`${lang}-title`}
+                        variants={fadeUp}
+                        className="text-5xl md:text-7xl lg:text-8xl italic font-serif tracking-tight mb-10 leading-[1.1] text-gunmetal"
+                    >
+                        {content.heroTitle}
                     </motion.h1>
-                    <motion.p variants={fadeUp} className="text-base md:text-lg font-light text-stone-500 leading-relaxed max-w-xl">
-                        To possess a luxury timepiece is not merely to keep time, but to hold a legacy. We are dedicated to bringing the world's most precious, rare, and exclusive horological masterpieces to Vietnam.
+                    <motion.p variants={fadeUp} className="text-base md:text-lg font-light text-stone-500 leading-relaxed max-w-3xl">
+                        {content.heroLead}
                     </motion.p>
                 </motion.div>
 
@@ -82,7 +164,7 @@ const AboutUsPage: React.FC = () => {
                     transition={{ delay: 1.5, duration: 1 }}
                     className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4"
                 >
-                    <span className="font-branding text-[9px] tracking-[0.3em] uppercase text-gunmetal/40">Discover</span>
+                    <span className="font-branding text-[9px] tracking-[0.3em] uppercase text-gunmetal/40">{content.discover}</span>
                     <div className="w-[1px] h-12 bg-gunmetal/20 overflow-hidden">
                         <motion.div
                             animate={{ y: [0, 48, 0] }}
@@ -101,30 +183,32 @@ const AboutUsPage: React.FC = () => {
                     <div className="lg:col-span-5 relative h-full">
                         <div className="lg:sticky lg:top-1/3 flex flex-col pb-12">
                             <motion.span
+                                key={`${lang}-chapter-label`}
                                 initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeUp}
                                 className="font-branding text-[10px] tracking-[0.4em] uppercase text-gunmetal/40 font-bold mb-8 flex items-center gap-4"
                             >
-                                Chapter I
+                                {content.chapterOneLabel}
                                 <span className="h-[1px] w-8 bg-gunmetal/20"></span>
                             </motion.span>
 
                             <motion.h2
+                                key={`${lang}-chapter-title`}
                                 initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeUp}
                                 className="text-3xl md:text-5xl font-light text-gunmetal mb-8 leading-tight"
                             >
-                                The Story of <span className="italic font-serif">Kronos Luxury Timepieces.</span>
+                                {content.chapterOneTitle}
                             </motion.h2>
 
                             <motion.div
+                                key={`${lang}-chapter-paragraphs`}
                                 initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}
                                 className="space-y-6 text-[14px] md:text-[15px] font-light text-stone-500 leading-relaxed"
                             >
-                                <motion.p variants={fadeUp}>
-                                    In ancient mythology, Kronos is the personification of time itself—an unstoppable force that shapes the universe. We adopted this name because true luxury timepieces transcend their mechanical purpose; they become immortal values that endure through generations.
-                                </motion.p>
-                                <motion.p variants={fadeUp}>
-                                    Kronos Luxury Timepieces was established to be the premier destination for high-end, genuine watches in Ho Chi Minh City. We bridge the gap between Vietnamese collectors and the world's most illustrious brands, including Rolex, Patek Philippe, Hublot, and Richard Mille, etc.
-                                </motion.p>
+                                {content.chapterOneParagraphs.map((paragraph) => (
+                                    <motion.p key={paragraph} variants={fadeUp}>
+                                        {paragraph}
+                                    </motion.p>
+                                ))}
                             </motion.div>
                         </div>
                     </div>
@@ -204,35 +288,41 @@ const AboutUsPage: React.FC = () => {
                     {/* --- Left: Text & Architectural Specs (5 Columns) --- */}
                     <div className="lg:col-span-5 flex flex-col">
                         <motion.div
+                            key={`${lang}-boutique-text`}
                             initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}
                             className="max-w-lg"
                         >
                             <motion.h2 variants={fadeUp} className="text-4xl md:text-5xl lg:text-6xl font-serif italic mb-8 leading-tight">
-                                The Boutique Space.
+                                {content.chapterTwoTitle}
                             </motion.h2>
-                            <motion.p variants={fadeUp} className="text-stone-400 font-light leading-relaxed mb-6 text-[15px]">
-                                Step into a space designed to meet modern, world-class standards right in the heart of Vietnam. The interior decor of Kronos Luxury Timepieces reflects the very watches we carry: precise, elegant, and uncompromising.
-                            </motion.p>
-                            <motion.p variants={fadeUp} className="text-stone-400 font-light leading-relaxed mb-12 text-[15px]">
-                                We have cultivated a private, highly personalized shopping environment. From the ambient lighting that catches the gleam of a sapphire crystal, to the tailored consultation areas, the boutique ensures an exclusive care experience.
-                            </motion.p>
+                            {content.chapterTwoParagraphs.map((paragraph) => (
+                                <motion.p key={paragraph} variants={fadeUp} className="text-stone-400 font-light leading-relaxed mb-6 text-[15px]">
+                                    {paragraph}
+                                </motion.p>
+                            ))}
 
                             {/* Architectural Spec Sheet */}
                             <motion.div variants={fadeUp} className="grid grid-cols-2 gap-8 pt-10 border-t border-white/10 mb-12">
                                 <div>
-                                    <span className="block font-branding text-[9px] uppercase tracking-[0.3em] text-white/40 mb-3">Atmosphere</span>
-                                    <span className="block text-sm font-light text-white">Private & Personalized</span>
+                                    <span className="block font-branding text-[9px] uppercase tracking-[0.3em] text-white/40 mb-3">{content.atmosphereLabel}</span>
+                                    <span className="block text-sm font-light text-white">{content.atmosphereValue}</span>
                                 </div>
                                 <div>
-                                    <span className="block font-branding text-[9px] uppercase tracking-[0.3em] text-white/40 mb-3">Location</span>
-                                    <span className="block text-sm font-light text-white">Ho Chi Minh City</span>
+                                    <span className="block font-branding text-[9px] uppercase tracking-[0.3em] text-white/40 mb-3">{content.locationLabel}</span>
+                                    <span className="block text-sm font-light text-white">{content.locationValue}</span>
                                 </div>
                             </motion.div>
 
-                            <motion.button variants={fadeUp} className="group flex items-center gap-4 text-[11px] uppercase tracking-[0.3em] font-branding hover:text-white transition-colors">
+                            <motion.a
+                                href={MAP_URL}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                variants={fadeUp}
+                                className="group flex items-center gap-4 text-[11px] uppercase tracking-[0.3em] font-branding hover:text-white transition-colors"
+                            >
                                 <span className="h-[1px] w-8 bg-white/30 group-hover:w-16 group-hover:bg-white transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"></span>
-                                Visit the Store
-                            </motion.button>
+                                {content.visitStore}
+                            </motion.a>
                         </motion.div>
                     </div>
 
@@ -249,6 +339,7 @@ const AboutUsPage: React.FC = () => {
 
                             {/* Image 1: The Wide Shot (Lounge) - Anchors the background */}
                             <motion.div
+                                key={`${lang}-boutique-img-wide`}
                                 initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 1, ease: customEase }}
                                 className="absolute top-0 right-0 w-[65%] aspect-[4/5] overflow-hidden rounded-lg bg-gunmetal"
                             >
@@ -257,6 +348,7 @@ const AboutUsPage: React.FC = () => {
 
                             {/* Image 2: The Medium Shot (Consultation Desk) - Overlaps bottom left */}
                             <motion.div
+                                key={`${lang}-boutique-img-medium`}
                                 initial={{ opacity: 0, x: -40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 1.2, delay: 0.2, ease: customEase }}
                                 className="absolute bottom-10 left-[10%] w-[45%] aspect-[3/4] overflow-hidden rounded-lg border-[8px] border-gunmetal shadow-2xl z-20"
                             >
@@ -265,6 +357,7 @@ const AboutUsPage: React.FC = () => {
 
                             {/* Image 3: The Macro Detail (Candle/Frame) - Overlaps top left */}
                             <motion.div
+                                key={`${lang}-boutique-img-macro`}
                                 initial={{ opacity: 0, scale: 0.9, y: 20 }} whileInView={{ opacity: 1, scale: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 1, delay: 0.4, ease: customEase }}
                                 className="absolute top-16 left-0 w-[30%] aspect-square overflow-hidden rounded-lg border-[6px] border-gunmetal shadow-[0_30px_60px_rgba(0,0,0,0.5)] z-30"
                             >
@@ -280,23 +373,20 @@ const AboutUsPage: React.FC = () => {
             {/* --- 4. The Pillars (Editorial List Layout) --- */}
             <section className="py-24 md:py-40 max-w-[1200px] mx-auto px-6 lg:px-12">
                 <motion.div
+                    key={`${lang}-pillars-header`}
                     initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}
                     className="mb-16 md:mb-24 flex flex-col items-center text-center"
                 >
                     <span className="font-branding text-[10px] tracking-[0.4em] uppercase text-gunmetal/40 font-bold mb-6 flex items-center gap-4">
-                        The Pillars
+                        {content.pillarsLabel}
                     </span>
-                    <h2 className="text-3xl md:text-4xl italic font-serif text-gunmetal">Our Core Values</h2>
+                    <h2 className="text-3xl md:text-4xl italic font-serif text-gunmetal">{content.pillarsTitle}</h2>
                 </motion.div>
 
                 <div className="flex flex-col">
-                    {[
-                        { title: 'Genuine Authenticity', desc: 'Committed to delivering 100% genuine luxury timepieces, complete with original boxes, paperwork, and manufacturer warranties.' },
-                        { title: 'Enduring Legacy', desc: 'Offering timepieces that are precious, durable, and capable of holding their value across time, space, and generations.' },
-                        { title: 'Exclusive Experience', desc: 'Providing highly trained ambassadors who deliver world-class, personalized care and long-term after-sales service.' }
-                    ].map((value, idx) => (
+                    {content.pillars.map((value, idx) => (
                         <motion.div
-                            key={idx}
+                            key={`${lang}-pillar-${idx}`}
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true, margin: "-50px" }}
@@ -325,6 +415,7 @@ const AboutUsPage: React.FC = () => {
 
                 {/* Left: The Moody Lifestyle Image (Full Bleed) */}
                 <motion.div
+                    key={`${lang}-epilogue-img`}
                     initial={{ opacity: 0 }}
                     whileInView={{ opacity: 1 }}
                     viewport={{ once: true }}
@@ -341,6 +432,7 @@ const AboutUsPage: React.FC = () => {
                 {/* Right: The Final Quote (High Negative Space) */}
                 <div className="w-full lg:w-1/2 flex items-center justify-center p-12 lg:p-24 xl:p-32 bg-stone-50">
                     <motion.div
+                        key={`${lang}-epilogue-text`}
                         initial={{ opacity: 0, y: 40 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true, margin: "-100px" }}
@@ -349,19 +441,19 @@ const AboutUsPage: React.FC = () => {
                     >
                         <span className="font-branding text-[10px] tracking-[0.5em] uppercase text-gunmetal/40 font-bold mb-10 flex items-center gap-4">
                             <span className="h-[1px] w-8 bg-gunmetal/20"></span>
-                            The Epilogue
+                            {content.epilogueLabel}
                         </span>
 
                         <h2 className="text-4xl md:text-5xl lg:text-6xl italic font-serif text-gunmetal leading-[1.15] mb-16">
-                            "More than a transaction—a commitment to prestige and immortal value."
+                            {content.epilogueQuote}
                         </h2>
 
                         <div className="flex flex-col gap-3">
                             <span className="text-[11px] font-branding tracking-[0.3em] uppercase text-gunmetal">
-                                The Founders
+                                {content.founders}
                             </span>
                             <span className="text-[13px] font-light text-stone-500">
-                                Ho Chi Minh City, Vietnam
+                                {content.city}
                             </span>
                         </div>
                     </motion.div>

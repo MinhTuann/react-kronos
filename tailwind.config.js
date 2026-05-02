@@ -17,7 +17,10 @@ export default {
         'gunmetal': '#2C3032',
       },
       fontFamily: {
-        branding: ['"Exo 2"', 'sans-serif'],
+        sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'Arial', 'sans-serif'],
+        serif: ['Georgia', 'Cambria', '"Times New Roman"', 'Times', 'serif'],
+        mono: ['"SFMono-Regular"', 'Consolas', '"Liberation Mono"', 'Menlo', 'monospace'],
+        branding: ['"Exo 2"', 'Inter', '"Segoe UI"', 'Arial', 'sans-serif'],
       }
     }
   },

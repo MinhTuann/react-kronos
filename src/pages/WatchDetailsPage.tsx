@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, ShieldCheck, ArrowLeft, Plus, Minus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import SpecValue from '@/components/common/SpecValue';
 import type { Watch } from '@/types';
 
 import { publicApi } from '@/lib/api';
@@ -38,7 +39,7 @@ const WatchDetailsPage: React.FC = () => {
                 : watch.seo_description || ((currentLang.startsWith('en') && watch.description_en) ? watch.description_en : watch.description))
             : '',
         image: watch?.seo_image_url || watch?.image,
-        canonicalUrl: watch?.canonical_url,
+        canonicalUrl: watch?.canonical_url || undefined,
         canonicalPath: watch?.canonical_url ? undefined : (id ? `/watch/${id}` : '/collections'),
         noindex: watch ? watch.noindex : (!watch && !isLoading),
         type: 'product',
@@ -218,33 +219,33 @@ const WatchDetailsPage: React.FC = () => {
                                 {(watch.material || watch.color) && (
                                     <div>
                                         <p className="text-[10px] tracking-[0.2em] uppercase text-gunmetal/50 mb-1">{t('common.material')}</p>
-                                        <p className="text-sm font-medium text-gunmetal">
-                                            {(watch.material || watch.color) ? ((currentLang === 'en' && watch.material_en) ? watch.material_en : watch.material || watch.color) : ''}
-                                        </p>
+                                        <div className="text-sm font-medium text-gunmetal">
+                                            <SpecValue value={(watch.material || watch.color) ? ((currentLang === 'en' && watch.material_en) ? watch.material_en : watch.material || watch.color) : ''} />
+                                        </div>
                                     </div>
                                 )}
                                 {watch.movement && (
                                     <div>
                                         <p className="text-[10px] tracking-[0.2em] uppercase text-gunmetal/50 mb-1">{t('common.movement')}</p>
-                                        <p className="text-sm font-medium text-gunmetal">
-                                            {(currentLang === 'en' && watch.movement_en) ? watch.movement_en : watch.movement}
-                                        </p>
+                                        <div className="text-sm font-medium text-gunmetal">
+                                            <SpecValue value={(currentLang === 'en' && watch.movement_en) ? watch.movement_en : watch.movement} />
+                                        </div>
                                     </div>
                                 )}
                                 {watch.strap && (
                                     <div>
                                         <p className="text-[10px] tracking-[0.2em] uppercase text-gunmetal/50 mb-1">{t('common.strap')}</p>
-                                        <p className="text-sm font-medium text-gunmetal">
-                                            {(currentLang === 'en' && watch.strap_en) ? watch.strap_en : watch.strap}
-                                        </p>
+                                        <div className="text-sm font-medium text-gunmetal">
+                                            <SpecValue value={(currentLang === 'en' && watch.strap_en) ? watch.strap_en : watch.strap} />
+                                        </div>
                                     </div>
                                 )}
                                 {watch.dial && (
                                     <div>
                                         <p className="text-[10px] tracking-[0.2em] uppercase text-gunmetal/50 mb-1">{t('common.dial')}</p>
-                                        <p className="text-sm font-medium text-gunmetal">
-                                            {(currentLang === 'en' && watch.dial_en) ? watch.dial_en : watch.dial}
-                                        </p>
+                                        <div className="text-sm font-medium text-gunmetal">
+                                            <SpecValue value={(currentLang === 'en' && watch.dial_en) ? watch.dial_en : watch.dial} />
+                                        </div>
                                     </div>
                                 )}
                                 {watch.condition && (

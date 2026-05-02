@@ -8,6 +8,22 @@ import type { PublicArticle } from '../lib/api';
 import { GoToTop, LoadMore } from '@/components/app';
 import { createBreadcrumbJsonLd, useSeo } from '@/seo';
 
+// --- Animation Configurations ---
+const customEase: Easing = [0.16, 1, 0.3, 1];
+
+const fadeUp: Variants = {
+    hidden: { opacity: 0, y: 40 },
+    visible: { opacity: 1, y: 0, transition: { duration: 1, ease: customEase } }
+};
+
+const staggerContainer: Variants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: { staggerChildren: 0.15 }
+    }
+};
+
 const NewsEventsPage: React.FC = () => {
     const [articles, setArticles] = useState<PublicArticle[]>([]);
     const [loading, setLoading] = useState(true);
@@ -61,21 +77,6 @@ const NewsEventsPage: React.FC = () => {
         ]),
     });
 
-    const customEase: Easing = [0.16, 1, 0.3, 1];
-
-    const fadeUp: Variants = {
-        hidden: { opacity: 0, y: 40 },
-        visible: { opacity: 1, y: 0, transition: { duration: 1, ease: customEase } }
-    };
-
-    const staggerContainer: Variants = {
-        hidden: { opacity: 0 },
-        visible: {
-            opacity: 1,
-            transition: { staggerChildren: 0.15 }
-        }
-    };
-
     const heroRef = useRef(null);
     const { scrollYProgress: heroScroll } = useScroll({
         target: heroRef,
@@ -108,6 +109,7 @@ const NewsEventsPage: React.FC = () => {
                 </div>
 
                 <motion.div
+                    key={`${currentLang}-hero`}
                     style={{ y: heroY, opacity: heroOpacity }}
                     initial="hidden"
                     animate="visible"
@@ -137,6 +139,7 @@ const NewsEventsPage: React.FC = () => {
                             className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4"
                         >
                             <button
+                                key={`${currentLang}-cat-all`}
                                 onClick={() => setSelectedCategory(null)}
                                 className={`font-branding text-[10px] tracking-[0.3em] uppercase transition-all duration-500 relative py-2 ${selectedCategory === null ? 'text-gunmetal font-bold' : 'text-stone-400 hover:text-gunmetal'
                                     }`}
