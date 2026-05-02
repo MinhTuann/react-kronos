@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import type { Variants, Easing } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { YEAR_OF_FOUNDATION } from '@/utils';
+import { YEAR_OF_FOUNDATION, MAP_URL, CONTACT_ADDRESS } from '@/utils';
 import { createBreadcrumbJsonLd, useSeo } from '@/seo';
 
 const aboutContent = {
@@ -25,7 +25,7 @@ const aboutContent = {
         atmosphereLabel: 'Atmosphere',
         atmosphereValue: 'Sanctuary of Sophistication',
         locationLabel: 'Location',
-        locationValue: 'Ho Chi Minh City',
+        locationValue: CONTACT_ADDRESS,
         visitStore: 'Visit the Store',
         pillarsLabel: 'The Pillars',
         pillarsTitle: 'Our Core Values',
@@ -58,7 +58,7 @@ const aboutContent = {
         atmosphereLabel: 'Không gian',
         atmosphereValue: 'Thánh đường của sự tinh xảo',
         locationLabel: 'Vị trí',
-        locationValue: 'TP. Hồ Chí Minh',
+        locationValue: CONTACT_ADDRESS,
         visitStore: 'Ghé thăm boutique',
         pillarsLabel: 'Giá trị cốt lõi',
         pillarsTitle: 'Những trụ cột của Kronos',
@@ -138,16 +138,16 @@ const AboutUsPage: React.FC = () => {
                     variants={staggerContainer}
                     className="relative z-10 flex flex-col items-center text-center max-w-5xl mx-auto px-6"
                 >
-                    <motion.span 
+                    <motion.span
                         key={`${lang}-kicker`}
-                        variants={fadeUp} 
+                        variants={fadeUp}
                         className="font-branding text-[10px] md:text-[11px] tracking-[0.4em] uppercase text-gunmetal/60 mb-8 block"
                     >
                         {content.heroKicker}
                     </motion.span>
-                    <motion.h1 
+                    <motion.h1
                         key={`${lang}-title`}
-                        variants={fadeUp} 
+                        variants={fadeUp}
                         className="text-5xl md:text-7xl lg:text-8xl italic font-serif tracking-tight mb-10 leading-[1.1] text-gunmetal"
                     >
                         {content.heroTitle}
@@ -313,10 +313,16 @@ const AboutUsPage: React.FC = () => {
                                 </div>
                             </motion.div>
 
-                            <motion.button variants={fadeUp} className="group flex items-center gap-4 text-[11px] uppercase tracking-[0.3em] font-branding hover:text-white transition-colors">
+                            <motion.a
+                                href={MAP_URL}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                variants={fadeUp}
+                                className="group flex items-center gap-4 text-[11px] uppercase tracking-[0.3em] font-branding hover:text-white transition-colors"
+                            >
                                 <span className="h-[1px] w-8 bg-white/30 group-hover:w-16 group-hover:bg-white transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"></span>
                                 {content.visitStore}
-                            </motion.button>
+                            </motion.a>
                         </motion.div>
                     </div>
 
