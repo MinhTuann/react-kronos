@@ -4,12 +4,32 @@ import { MapPin, Phone, Mail, Clock, ArrowRight } from 'lucide-react';
 import type { Variants, Easing } from 'framer-motion';
 import { CONTACT_ADDRESS, CONTACT_EMAIL, CONTACT_PHONE } from '@/utils';
 import { createBreadcrumbJsonLd, useSeo } from '@/seo';
+import { useTranslation } from 'react-i18next';
+
+// --- Animation Configurations ---
+const customEase: Easing = [0.16, 1, 0.3, 1];
+
+const fadeUp: Variants = {
+    hidden: { opacity: 0, y: 40 },
+    visible: { opacity: 1, y: 0, transition: { duration: 1, ease: customEase } }
+};
+
+const staggerContainer: Variants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: { staggerChildren: 0.15 }
+    }
+};
 
 const ContactUsPage: React.FC = () => {
+    const { i18n } = useTranslation();
+    const currentLang = i18n.language.split('-')[0];
     const origin = import.meta.env.VITE_SITE_URL || window.location.origin;
 
     useSeo({
         pageKey: 'contact-us',
+        lang: currentLang,
         canonicalPath: '/contact-us',
         structuredData: createBreadcrumbJsonLd(origin, [
             { name: 'Home', path: '/' },
@@ -20,22 +40,6 @@ const ContactUsPage: React.FC = () => {
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);
-
-    // --- Animation Configurations ---
-    const customEase: Easing = [0.16, 1, 0.3, 1];
-    
-    const fadeUp: Variants = {
-        hidden: { opacity: 0, y: 40 },
-        visible: { opacity: 1, y: 0, transition: { duration: 1, ease: customEase } }
-    };
-
-    const staggerContainer: Variants = {
-        hidden: { opacity: 0 },
-        visible: {
-            opacity: 1,
-            transition: { staggerChildren: 0.15 }
-        }
-    };
 
     // Parallax hook for the hero text
     const heroRef = useRef(null);
