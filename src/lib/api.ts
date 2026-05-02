@@ -1,6 +1,6 @@
 import axios from 'axios';
 import type { Watch } from '../types';
-import type { PublicBrand, PublicCollection } from '@kronos/contracts';
+import type { PublicBrand, PublicCollection } from '@kronos/contracts-public';
 
 const API_URL = import.meta.env.VITE_API_URL;
 const apiClient = axios.create({ baseURL: API_URL });

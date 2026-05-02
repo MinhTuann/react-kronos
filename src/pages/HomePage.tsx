@@ -67,9 +67,9 @@ const HomePage = () => {
         <div>
             {homeData.slides?.length > 0 && <VideoCarousel videos={homeData.slides} />}
             <InStocks watches={inStockWatches} />
-            <BestBrand />
-            <SecondBrand />
-            <ThirdBrand />
+            <BestBrand watch={homeData.sections?.best_brand} />
+            <SecondBrand watch={homeData.sections?.second_brand} />
+            <ThirdBrand watch={homeData.sections?.third_brand} />
             <OurStory data={homeData.sections?.our_story} />
             <NewsEvents news={homeData.news} />
         </div>

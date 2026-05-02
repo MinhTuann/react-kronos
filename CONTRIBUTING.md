@@ -2,41 +2,26 @@
 
 Thanks for your interest in contributing.
 
-This repository is public for portfolio transparency, but it is part of a production system with private services and private shared contracts.
+This repository is public for portfolio transparency, but it is part of a production system with private services and a public-safe shared contracts package.
 
 ## Prerequisites
 
 - Node.js 20+
 - npm 10+
-- Access to private `@kronos/contracts` dependency
-
-Without access to private contracts, `npm install` will fail by design.
+- Access to the exported `@kronos/contracts-public` package when working outside the private monorepo
 
 ## Local Setup
 
-1. Verify SSH access to GitHub:
-
-```bash
-ssh -T git@github.com
-```
-
-2. Install dependencies:
+1. Install dependencies:
 
 ```bash
 npm install
 ```
 
-3. Start local dev:
+2. Start local dev:
 
 ```bash
 npm run dev
-```
-
-If `npm install` fails with `Permission denied (publickey)` or `checkout null`, verify:
-
-```bash
-ssh -T git@github.com
-git ls-remote git@github.com:MinhTuann/kronos-packages.git
 ```
 
 ## Environment Files
@@ -49,7 +34,7 @@ git ls-remote git@github.com:MinhTuann/kronos-packages.git
 ## Security Rules for Contributors
 
 - Do not commit credentials, API keys, or private hostnames.
-- Do not expose private contracts in this public repository.
+- Do not expose internal admin/backend contracts in this public repository.
 - Do not hardcode any environment URLs in source files.
 
 ## Pull Request Guidance
