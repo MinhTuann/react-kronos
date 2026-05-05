@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import SpecValue from "@/components/common/SpecValue";
 import type { Watch } from "@/types";
+import { getWatchUrl } from "@/utils";
 
 const SpecItem = ({ label, value, index }: { label: string; value: string; index: number }) => (
     <motion.div
@@ -73,7 +74,7 @@ const ThirdBrand = ({ watch }: { watch?: Watch }) => {
                         {strap && <SpecItem label={t('watch.specs.strap', 'Strap')} value={strap} index={3} />}
                     </div>
                     <motion.div variants={itemVariants}>
-                        <Link to={`/watch/${watch.id}`} className="inline-block px-6 py-3 font-branding bg-stormy text-white text-[11px] tracking-widest uppercase hover:bg-opacity-90 transition-all rounded-lg">
+                        <Link to={getWatchUrl(watch)} className="inline-block px-6 py-3 font-branding bg-stormy text-white text-[11px] tracking-widest uppercase hover:bg-opacity-90 transition-all rounded-lg">
                             {t('home.featured.discoverModel', 'Discover the Model')}
                         </Link>
                     </motion.div>

@@ -11,7 +11,9 @@ export interface VideoSlide {
 export interface Watch {
   id: string | number;
   brand: string;
+  brand_slug?: string;
   collection: string;
+  collection_slug?: string;
   name: string;
   ref: string;
   price?: number;

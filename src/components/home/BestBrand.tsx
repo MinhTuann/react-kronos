@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import SpecValue from "@/components/common/SpecValue";
 import type { Watch } from "@/types";
+import { getWatchUrl } from "@/utils";
 
 const SpecItem = ({ label, value, index }: { label: string; value: string; index: number }) => (
     <motion.div
@@ -89,7 +90,7 @@ const BestBrand = ({ watch }: { watch?: Watch }) => {
                     </motion.p>
 
                     <motion.div variants={itemVariants}>
-                        <Link to={`/watch/${watch.id}`} className='inline-block w-full md:w-auto text-center px-6 py-3 bg-white text-stormy text-[8px] tracking-widest uppercase font-branding hover:bg-opacity-90 transition-all rounded-lg'>
+                        <Link to={getWatchUrl(watch)} className='inline-block w-full md:w-auto text-center px-6 py-3 bg-white text-stormy text-[8px] tracking-widest uppercase font-branding hover:bg-opacity-90 transition-all rounded-lg'>
                             {t('home.featured.exploreIcon', 'Explore the Icon')}
                         </Link>
                     </motion.div>

@@ -19,7 +19,12 @@ const formatPrice = (price: number) => {
 };
 
 const WatchDetailsPage: React.FC = () => {
-    const { id } = useParams<{ id: string }>();
+    const { id, brand_slug, collection_slug, ref } = useParams<{ 
+        id?: string; 
+        brand_slug?: string; 
+        collection_slug?: string; 
+        ref?: string 
+    }>();
     const [watch, setWatch] = useState<Watch | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const { t, i18n } = useTranslation();
@@ -40,7 +45,7 @@ const WatchDetailsPage: React.FC = () => {
             : '',
         image: watch?.seo_image_url || watch?.image,
         canonicalUrl: watch?.canonical_url || undefined,
-        canonicalPath: watch?.canonical_url ? undefined : (id ? `/watch/${id}` : '/collections'),
+        canonicalPath: watch?.canonical_url ? undefined : (id ? `/watch/${id}` : (brand_slug && ref ? `/watch/${brand_slug}/${collection_slug ? collection_slug + '/' : ''}${ref}` : '/collections')),
         noindex: watch ? watch.noindex : (!watch && !isLoading),
         type: 'product',
         structuredData: watch ? [
@@ -65,7 +70,10 @@ const WatchDetailsPage: React.FC = () => {
             createBreadcrumbJsonLd(origin, [
                 { name: currentLang.startsWith('en') ? 'Home' : 'Trang chu', path: '/' },
                 { name: currentLang.startsWith('en') ? 'Collections' : 'Bo suu tap', path: '/collections' },
-                { name: watch.name, path: `/watch/${id}` },
+                { 
+                    name: watch.name, 
+                    path: id ? `/watch/${id}` : `/watch/${brand_slug}/${collection_slug ? collection_slug + '/' : ''}${ref}` 
+                },
             ]),
         ] : undefined,
     });
@@ -78,10 +86,13 @@ const WatchDetailsPage: React.FC = () => {
 
         // Fetch watch details from public API
         const fetchDetails = async () => {
-            if (!id) return;
+            if (!id && !(brand_slug && ref)) return;
             try {
                 setIsLoading(true);
-                const data = await publicApi.getWatchById(id, { signal: controller.signal });
+                const data = id 
+                    ? await publicApi.getWatchById(id, { signal: controller.signal })
+                    : await publicApi.getWatchBySlug(brand_slug!, ref!, collection_slug, { signal: controller.signal });
+                
                 if (controller.signal.aborted) return;
                 setWatch(data);
             } catch (err) {
@@ -97,7 +108,7 @@ const WatchDetailsPage: React.FC = () => {
         fetchDetails();
 
         return () => controller.abort();
-    }, [id]);
+    }, [id, brand_slug, collection_slug, ref]);
 
     if (isLoading) {
         return (

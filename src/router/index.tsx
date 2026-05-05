@@ -26,6 +26,14 @@ export const router = createBrowserRouter([
                 element: <WatchDetailsPage />,
             },
             {
+                path: 'watch/:brand_slug/:ref',
+                element: <WatchDetailsPage />,
+            },
+            {
+                path: 'watch/:brand_slug/:collection_slug/:ref',
+                element: <WatchDetailsPage />,
+            },
+            {
                 path: 'about-us',
                 element: <AboutUsPage />,
             },

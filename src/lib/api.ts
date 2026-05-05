@@ -176,6 +176,13 @@ export const publicApi = {
     return getJson<Watch>({ url: `/watches/${id}`, signal: options?.signal });
   },
 
+  getWatchBySlug: async (brand: string, ref: string, collection?: string, options?: RequestOptions): Promise<Watch> => {
+    const url = collection 
+        ? `/watch-by-slug/${brand}/${collection}/${ref}`
+        : `/watch-by-slug/${brand}/${ref}`;
+    return getJson<Watch>({ url, signal: options?.signal });
+  },
+
   // Fetch In-Stock Watches (Random 8)
   getInStockWatches: async (options?: RequestOptions): Promise<Watch[]> => {
     return getJson<Watch[]>({ url: '/in-stock', signal: options?.signal, cache: true });
