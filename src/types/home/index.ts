@@ -42,4 +42,5 @@ export interface Watch {
   featured_avatar_url?: string | null;
   canonical_url?: string | null;
   noindex?: boolean;
+  images?: string[];
 }

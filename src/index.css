@@ -23,6 +23,13 @@
   .prose blockquote {
     @apply border-l-4 border-golden pl-6 italic text-stone-600 my-8;
   }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 /* Quill specific classes for full feature support */

@@ -31,6 +31,8 @@ const WatchDetailsPage: React.FC = () => {
     const currentLang = i18n.language;
     const origin = import.meta.env.VITE_SITE_URL || window.location.origin;
     const [isEditorialExpanded, setIsEditorialExpanded] = useState(false);
+    const [activeImageIndex, setActiveImageIndex] = useState(0);
+    const [direction, setDirection] = useState(0);
 
     useSeo({
         pageKey: 'collections',
@@ -157,22 +159,74 @@ const WatchDetailsPage: React.FC = () => {
             <div className="max-w-[1600px] mx-auto px-6 lg:px-12 flex flex-col lg:flex-row gap-12 lg:gap-24">
 
                 {/* Left Column - Image Gallery */}
-                <div className="w-full lg:w-1/2 flex flex-col md:flex-row gap-6">
-                    {/* Main Image */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                        className="w-full flex-1 bg-stone-50 rounded-lg p-12 md:p-24 flex items-center justify-center relative group"
-                    >
-                        <img
-                            src={watch.image}
-                            alt={watch.name}
-                            className="w-full max-w-[400px] h-auto object-contain drop-shadow-2xl transition-transform duration-[1.5s] ease-out group-hover:scale-105"
-                        />
+                <div className="w-full lg:w-1/2 flex flex-col gap-6">
+                    {/* Main Image Stage */}
+                    <div className="relative aspect-square md:aspect-[4/5] bg-stone-50 rounded-lg overflow-hidden flex items-center justify-center p-8 md:p-16">
+                        <AnimatePresence initial={false} custom={direction} mode="wait">
+                            <motion.div
+                                key={activeImageIndex}
+                                custom={direction}
+                                initial={{ opacity: 0, x: direction > 0 ? 50 : -50 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: direction > 0 ? -50 : 50 }}
+                                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                                className="w-full h-full flex items-center justify-center"
+                            >
+                                <img
+                                    src={watch.images && watch.images.length > 0 ? watch.images[activeImageIndex] : watch.image}
+                                    alt={`${watch.name} - View ${activeImageIndex + 1}`}
+                                    className="w-full h-full object-contain drop-shadow-2xl"
+                                />
+                            </motion.div>
+                        </AnimatePresence>
+
+                        {/* Navigation Arrows (Only if more than 1 image) */}
+                        {watch.images && watch.images.length > 1 && (
+                            <>
+                                <button
+                                    onClick={() => {
+                                        setDirection(-1);
+                                        setActiveImageIndex((prev) => (prev === 0 ? watch.images!.length - 1 : prev - 1));
+                                    }}
+                                    className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center text-gunmetal hover:bg-white transition-colors z-10 shadow-sm"
+                                >
+                                    <ChevronRight className="rotate-180" size={20} />
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        setDirection(1);
+                                        setActiveImageIndex((prev) => (prev === watch.images!.length - 1 ? 0 : prev + 1));
+                                    }}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center text-gunmetal hover:bg-white transition-colors z-10 shadow-sm"
+                                >
+                                    <ChevronRight size={20} />
+                                </button>
+                            </>
+                        )}
+                        
                         {/* Subtle Reflection Effect */}
-                        <div className="absolute -bottom-8 w-3/4 h-8 bg-gradient-to-t from-transparent to-black/5 blur-xl rounded-full opacity-50" />
-                    </motion.div>
+                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-3/4 h-8 bg-gradient-to-t from-transparent to-black/5 blur-xl rounded-full opacity-50" />
+                    </div>
+
+                    {/* Thumbnails Row */}
+                    {watch.images && watch.images.length > 1 && (
+                        <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+                            {watch.images.map((img, idx) => (
+                                <button
+                                    key={idx}
+                                    onClick={() => {
+                                        setDirection(idx > activeImageIndex ? 1 : -1);
+                                        setActiveImageIndex(idx);
+                                    }}
+                                    className={`relative flex-shrink-0 w-20 h-20 rounded-md overflow-hidden bg-stone-50 border-2 transition-all ${
+                                        idx === activeImageIndex ? 'border-golden shadow-md' : 'border-transparent opacity-60 hover:opacity-100'
+                                    }`}
+                                >
+                                    <img src={img} alt={`${watch.name} thumbnail ${idx}`} className="w-full h-full object-contain p-2" />
+                                </button>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 {/* Right Column - Watch Information */}
