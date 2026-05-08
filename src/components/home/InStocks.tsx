@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import type { Watch } from '@/types'
 import { Link } from 'react-router-dom'
 import { motion, useInView } from 'framer-motion'
