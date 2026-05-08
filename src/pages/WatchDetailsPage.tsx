@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, ShieldCheck, ArrowLeft, Plus, Minus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import SpecValue from '@/components/common/SpecValue';
+import { Skeleton, TextSkeleton } from '@/components/common/Skeleton';
 import type { Watch } from '@/types';
 
 import { publicApi } from '@/lib/api';
@@ -114,8 +115,53 @@ const WatchDetailsPage: React.FC = () => {
 
     if (isLoading) {
         return (
-            <div className="pt-32 pb-24 min-h-[60vh] flex flex-col items-center justify-center">
-                 <div className="w-8 h-8 border-2 border-gunmetal/20 border-t-gunmetal rounded-full animate-spin" />
+            <div className="pt-24 md:pt-32 pb-24 min-h-screen bg-white">
+                <div className="max-w-[1600px] mx-auto px-6 lg:px-12 mb-8 md:mb-12">
+                    <div className="flex items-center gap-2">
+                        <Skeleton width={40} height={10} />
+                        <Skeleton width={10} height={10} variant="circle" />
+                        <Skeleton width={60} height={10} />
+                        <Skeleton width={10} height={10} variant="circle" />
+                        <Skeleton width={100} height={10} />
+                    </div>
+                </div>
+                <div className="max-w-[1600px] mx-auto px-6 lg:px-12 flex flex-col lg:flex-row gap-12 lg:gap-24">
+                    <div className="w-full lg:w-1/2">
+                        <Skeleton className="aspect-square md:aspect-[4/5] w-full rounded-lg" />
+                        <div className="flex gap-4 mt-6">
+                            {Array.from({ length: 4 }).map((_, i) => (
+                                <Skeleton key={i} className="w-20 h-20 rounded-md flex-shrink-0" />
+                            ))}
+                        </div>
+                    </div>
+                    <div className="w-full lg:w-1/2 space-y-8">
+                        <div className="border-b border-gunmetal/10 pb-8 space-y-4">
+                            <Skeleton width={100} height={12} />
+                            <Skeleton width="60%" height={24} />
+                            <Skeleton width="80%" height={48} />
+                            <div className="flex gap-6 mt-6">
+                                <Skeleton width={100} height={28} />
+                                <Skeleton width={120} height={16} />
+                            </div>
+                        </div>
+                        <div className="space-y-4">
+                            <Skeleton width={120} height={12} />
+                            <TextSkeleton lines={4} className="opacity-50" />
+                        </div>
+                        <div className="grid grid-cols-2 gap-y-6 gap-x-12 border-t border-gunmetal/10 pt-6">
+                            {Array.from({ length: 6 }).map((_, i) => (
+                                <div key={i} className="space-y-2">
+                                    <Skeleton width={60} height={10} />
+                                    <Skeleton width={100} height={16} />
+                                </div>
+                            ))}
+                        </div>
+                        <div className="flex gap-4 mt-8">
+                            <Skeleton className="flex-1 h-14 rounded" />
+                            <Skeleton className="flex-1 h-14 rounded" />
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }

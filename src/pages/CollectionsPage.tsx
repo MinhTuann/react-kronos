@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { GoToTop, LoadMore } from '@/components/app';
 import type { Watch } from '@/types';
 import { WatchItem } from '@/components/home/InStocks';
-// import { Dropdown } from '@/components/app';
+import { CollectionsGridSkeleton } from '@/components/common/Skeleton';
 
 import { publicApi } from '@/lib/api';
 import type { PublicBrand, PublicCollection } from '@/lib/api';
@@ -366,9 +366,7 @@ const CollectionsPage: React.FC = () => {
                 {/* 1. Add motion.div and layout here so the container animates its width change smoothly */}
                 <div className='flex-1 relative min-h-[400px]'>
                     {isLoading ? (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="w-8 h-8 border-2 border-gunmetal/20 border-t-gunmetal rounded-full animate-spin" />
-                        </div>
+                        <CollectionsGridSkeleton />
                     ) : (
                         <motion.div
                             key={`${'sortMethod'}-${selectedBrands.join(',')}-${selectedCollections.join(',')}`}

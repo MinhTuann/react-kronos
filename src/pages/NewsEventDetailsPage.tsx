@@ -5,6 +5,7 @@ import { ChevronRight, ArrowLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { publicApi } from '../lib/api';
 import type { PublicArticle } from '../lib/api';
+import { Skeleton, TextSkeleton } from '@/components/common/Skeleton';
 import { createBreadcrumbJsonLd, useSeo } from '@/seo';
 
 const NewsEventDetailsPage: React.FC = () => {
@@ -91,8 +92,17 @@ const NewsEventDetailsPage: React.FC = () => {
 
     if (isLoading) {
         return (
-            <div className="pt-32 pb-24 min-h-screen flex flex-col items-center justify-center bg-white">
-                 <div className="w-8 h-8 border-2 border-gunmetal/20 border-t-gunmetal rounded-full animate-spin" />
+            <div className="bg-white min-h-screen">
+                <Skeleton className="w-full h-[60vh] md:h-[80vh]" />
+                <div className="max-w-3xl mx-auto px-6 py-20 space-y-6">
+                    <div className="flex items-center gap-4 justify-center">
+                        <Skeleton width={80} height={10} />
+                        <Skeleton width={24} height={1} />
+                        <Skeleton width={60} height={10} />
+                    </div>
+                    <TextSkeleton lines={8} className="opacity-40" />
+                    <TextSkeleton lines={6} className="opacity-30 mt-8" />
+                </div>
             </div>
         );
     }

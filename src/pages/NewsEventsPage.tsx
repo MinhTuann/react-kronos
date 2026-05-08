@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { publicApi } from '../lib/api';
 import type { PublicArticle } from '../lib/api';
 import { GoToTop, LoadMore } from '@/components/app';
+import { Skeleton, TextSkeleton } from '@/components/common/Skeleton';
 import { createBreadcrumbJsonLd, useSeo } from '@/seo';
 
 // --- Animation Configurations ---
@@ -171,8 +172,19 @@ const NewsEventsPage: React.FC = () => {
             <section className="pb-20 md:pb-32 px-6 lg:px-12 max-w-[1600px] mx-auto z-10 relative bg-white min-h-[40vh]">
 
                 {loading ? (
-                    <div className="flex justify-center items-center py-20">
-                        <div className="w-8 h-8 rounded-full border-b-2 border-gunmetal animate-spin"></div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-24">
+                        {Array.from({ length: 4 }).map((_, i) => (
+                            <div key={i} className="space-y-6">
+                                <Skeleton className="w-full aspect-[4/3] rounded-sm" />
+                                <div className="flex items-center gap-4">
+                                    <Skeleton width={80} height={10} />
+                                    <Skeleton width={24} height={1} />
+                                    <Skeleton width={60} height={12} />
+                                </div>
+                                <Skeleton width="90%" height={32} />
+                                <TextSkeleton lines={3} className="opacity-40" />
+                            </div>
+                        ))}
                     </div>
                 ) : filteredArticles.length === 0 ? (
                     <div className="text-center text-stone-400 py-20 font-serif italic text-xl">

@@ -1,9 +1,11 @@
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import SpecValue from "@/components/common/SpecValue";
 import type { Watch } from "@/types";
 import { getWatchUrl } from "@/utils";
+import { BrandSectionSkeleton, Skeleton } from '../common/Skeleton';
 
 const SpecItem = ({ label, value, index }: { label: string; value: string; index: number }) => (
     <motion.div
@@ -19,11 +21,13 @@ const SpecItem = ({ label, value, index }: { label: string; value: string; index
     </motion.div>
 );
 
-const ThirdBrand = ({ watch }: { watch?: Watch }) => {
+const ThirdBrand = ({ watch, isLoading = false }: { watch?: Watch, isLoading?: boolean }) => {
     const { t, i18n } = useTranslation();
+    const [imageLoaded, setImageLoaded] = useState(false);
     const lang = i18n.language.split('-')[0];
     const getLocalized = (baseValue?: string, enValue?: string | null) => lang === 'en' ? (enValue || baseValue || '') : (baseValue || enValue || '');
 
+    if (isLoading) return <BrandSectionSkeleton reversed />;
     if (!watch) return null;
 
     const description = getLocalized(watch.description, watch.description_en);
@@ -84,10 +88,15 @@ const ThirdBrand = ({ watch }: { watch?: Watch }) => {
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] as const }}
-                    className="order-2 aspect-square overflow-hidden rounded-2xl"
+                    className="order-2 aspect-square overflow-hidden rounded-2xl relative"
                 >
-                    <img alt={watch.name} className="w-full h-full object-cover shadow-2xl"
-                        src={watch.image} />
+                    {!imageLoaded && <Skeleton className="absolute inset-0 w-full h-full rounded-2xl" />}
+                    <img 
+                        alt={watch.name} 
+                        className={`w-full h-full object-cover shadow-2xl transition-opacity duration-700 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+                        src={watch.image} 
+                        onLoad={() => setImageLoaded(true)}
+                    />
                 </motion.div>
             </div>
         </section>

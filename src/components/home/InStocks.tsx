@@ -1,14 +1,16 @@
-import { useRef } from 'react'
+import React, { useRef, useState } from 'react'
 import type { Watch } from '@/types'
 import { Link } from 'react-router-dom'
 import { motion, useInView } from 'framer-motion'
 import type { Easing, Variants } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import { getWatchUrl } from '@/utils'
+import { WatchCardSkeleton, Skeleton } from '../common/Skeleton'
 
 export const WatchItem = ({ watch }: { watch: Watch }) => {
     // 1. Create a reference to the watch card
     const ref = useRef(null);
+    const [imageLoaded, setImageLoaded] = useState(false);
 
     // 2. The magic: This triggers 'true' ONLY when the item enters the middle 40% of the screen!
     const isInView = useInView(ref, { margin: "-30% 0px -30% 0px" });
@@ -21,11 +23,18 @@ export const WatchItem = ({ watch }: { watch: Watch }) => {
         >
             {/* Image Container */}
             <div className='relative aspect-[4/5] w-full overflow-hidden flex items-center justify-center p-12'>
+                {!imageLoaded && (
+                    <div className="absolute inset-0 p-12">
+                        <Skeleton className="w-full h-full rounded-2xl" />
+                    </div>
+                )}
                 <img
                     src={watch.image}
                     alt={watch.name}
+                    onLoad={() => setImageLoaded(true)}
                     /* On mobile: scales up if in center. On desktop: scales up only on hover. */
-                    className={`w-[85%] h-auto object-contain transition-transform duration-[1.5s] ease-[cubic-bezier(0.2,1,0.3,1)] 
+                    className={`w-[85%] h-auto object-contain transition-all duration-[1.5s] ease-[cubic-bezier(0.2,1,0.3,1)] 
+                        ${imageLoaded ? 'opacity-100' : 'opacity-0'}
                         ${isInView ? 'scale-105' : 'scale-100'} 
                         md:scale-100 md:group-hover:scale-105`}
                 />
@@ -69,7 +78,7 @@ export const WatchItem = ({ watch }: { watch: Watch }) => {
     )
 }
 
-const InStocks = ({ watches }: { watches: Watch[] }) => {
+const InStocks = ({ watches = [], isLoading = false }: { watches?: Watch[], isLoading?: boolean }) => {
     const { t } = useTranslation();
     // --- Animation Configurations ---
     const customEase: Easing = [0.16, 1, 0.3, 1];
@@ -113,29 +122,39 @@ const InStocks = ({ watches }: { watches: Watch[] }) => {
                     viewport={{ once: true, margin: "-50px" }}
                     className='mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8'
                 >
-                    {watches.map((watch) => (
-                        <motion.div key={watch.id} variants={fadeUp}>
-                            <WatchItem watch={watch} />
-                        </motion.div>
-                    ))}
+                    {isLoading ? (
+                        Array.from({ length: 4 }).map((_, i) => (
+                            <motion.div key={i} variants={fadeUp}>
+                                <WatchCardSkeleton />
+                            </motion.div>
+                        ))
+                    ) : (
+                        watches.map((watch) => (
+                            <motion.div key={watch.id} variants={fadeUp}>
+                                <WatchItem watch={watch} />
+                            </motion.div>
+                        ))
+                    )}
                 </motion.div>
 
                 {/* --- Animated Footer Button --- */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-50px" }}
-                    transition={{ duration: 0.8, delay: 0.2, ease: customEase }}
-                    className='flex justify-center mt-12 md:mt-16'
-                >
-                    <Link to='/collections' className='group relative inline-flex justify-center items-center pb-2 text-xs tracking-[0.4em] uppercase text-bone font-semibold transition-colors duration-500 hover:text-bone'>
-                        {/* The Button Text */}
-                        <span>{t('home.findYourWatch')}</span>
+                {!isLoading && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, margin: "-50px" }}
+                        transition={{ duration: 0.8, delay: 0.2, ease: customEase }}
+                        className='flex justify-center mt-12 md:mt-16'
+                    >
+                        <Link to='/collections' className='group relative inline-flex justify-center items-center pb-2 text-xs tracking-[0.4em] uppercase text-bone font-semibold transition-colors duration-500 hover:text-bone'>
+                            {/* The Button Text */}
+                            <span>{t('home.findYourWatch')}</span>
 
-                        {/* The Animated Underline */}
-                        <span className='absolute bottom-0 left-1/2 h-[1px] w-0 -translate-x-1/2 bg-bone transition-all duration-[600ms] ease-out group-hover:w-full group-hover:bg-bone' />
-                    </Link>
-                </motion.div>
+                            {/* The Animated Underline */}
+                            <span className='absolute bottom-0 left-1/2 h-[1px] w-0 -translate-x-1/2 bg-bone transition-all duration-[600ms] ease-out group-hover:w-full group-hover:bg-bone' />
+                        </Link>
+                    </motion.div>
+                )}
 
             </div>
         </div>

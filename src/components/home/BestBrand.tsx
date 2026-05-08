@@ -1,9 +1,11 @@
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import SpecValue from "@/components/common/SpecValue";
 import type { Watch } from "@/types";
 import { getWatchUrl } from "@/utils";
+import { Skeleton, TextSkeleton } from "../common/Skeleton";
 
 const SpecItem = ({ label, value, index }: { label: string; value: string; index: number }) => (
     <motion.div
@@ -20,10 +22,40 @@ const SpecItem = ({ label, value, index }: { label: string; value: string; index
     </motion.div>
 );
 
-const BestBrand = ({ watch }: { watch?: Watch }) => {
+const BestBrand = ({ watch, isLoading = false }: { watch?: Watch, isLoading?: boolean }) => {
     const { t, i18n } = useTranslation();
+    const [imageLoaded, setImageLoaded] = useState(false);
     const lang = i18n.language.split('-')[0];
     const getLocalized = (baseValue?: string, enValue?: string | null) => lang === 'en' ? (enValue || baseValue || '') : (baseValue || enValue || '');
+
+    if (isLoading) {
+        return (
+            <section className='w-full min-h-[600px] md:h-auto md:aspect-[16/6] overflow-hidden relative bg-gunmetal/20'>
+                <Skeleton className="absolute inset-0 w-full h-full" />
+                <div className='relative z-10 w-full h-full px-8 py-16 md:px-32 md:py-32 grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-32'>
+                    <div className='flex flex-col space-y-8 md:justify-between h-full'>
+                        <Skeleton width={100} height={12} />
+                        <div className='space-y-4'>
+                            <Skeleton width="80%" height={40} className="border-l-2 border-vanilla pl-4" />
+                            <Skeleton width={150} height={20} className="ml-4 opacity-60" />
+                        </div>
+                        <TextSkeleton lines={3} className="max-w-lg opacity-40" />
+                        <Skeleton width={180} height={40} className="rounded-lg" />
+                    </div>
+                    <div className='flex flex-col justify-end md:items-end'>
+                        <div className='grid grid-cols-2 gap-x-12 gap-y-8'>
+                            {Array.from({ length: 4 }).map((_, i) => (
+                                <div key={i} className="space-y-2 flex flex-col md:items-end">
+                                    <Skeleton width={60} height={10} />
+                                    <Skeleton width={100} height={18} />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </section>
+        );
+    }
 
     if (!watch) return null;
 
@@ -55,6 +87,7 @@ const BestBrand = ({ watch }: { watch?: Watch }) => {
 
     return (
         <section className='w-full min-h-[600px] md:h-auto md:aspect-[16/6] overflow-hidden relative'>
+            {!imageLoaded && <Skeleton className="absolute inset-0 w-full h-full z-0" />}
             {/* Background Image with Zoom-out Effect */}
             <motion.img
                 initial={{ scale: 1.1, opacity: 0 }}
@@ -62,8 +95,9 @@ const BestBrand = ({ watch }: { watch?: Watch }) => {
                 viewport={{ once: true }}
                 transition={{ duration: 2, ease: "easeOut" }}
                 alt={watch.name}
-                className='absolute inset-0 w-full h-full object-cover'
+                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${imageLoaded ? 'opacity-80' : 'opacity-0'}`}
                 src={watch.image}
+                onLoad={() => setImageLoaded(true)}
             />
             <div className='absolute inset-0 bg-black/70'></div>
 
