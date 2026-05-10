@@ -244,6 +244,13 @@ const Header = ({ scrollY }: Props) => {
                                                     <span className="text-[10px] tracking-[0.2em] font-branding opacity-0 group-hover:opacity-100 transition-all -translate-x-4 group-hover:translate-x-0">{t('menu.discover')}</span>
                                                 </button>
                                                 <Link
+                                                    to="/accessories"
+                                                    onClick={() => setIsMenuOpen(false)}
+                                                    className="text-3xl md:text-4xl italic text-gunmetal hover:text-black transition-colors"
+                                                >
+                                                    {t('menu.accessories', 'The Accessories')}
+                                                </Link>
+                                                <Link
                                                     to="/about-us"
                                                     onClick={() => setIsMenuOpen(false)}
                                                     className="text-3xl md:text-4xl italic text-gunmetal hover:text-black transition-colors"

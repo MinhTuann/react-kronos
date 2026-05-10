@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { Watch } from '../types';
+import type { Watch, Accessory } from '../types';
 import type { PublicBrand, PublicCollection } from '@kronos/contracts-public';
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -210,5 +210,39 @@ export const publicApi = {
   // Fetch Single Article
   getArticleBySlug: async (slug: string, options?: RequestOptions): Promise<PublicArticle> => {
     return getJson<PublicArticle>({ url: `/articles/${slug}`, signal: options?.signal, cache: false });
+  },
+
+  // Fetch Public Accessories (Paginated)
+  getAccessories: async (
+    brandId?: string, 
+    collectionIds?: string | string[], 
+    search?: string, 
+    cursor?: string, 
+    limit?: number, 
+    options?: RequestOptions
+  ): Promise<PaginatedResponse<Accessory>> => {
+    return getJson<PaginatedResponse<Accessory>>({
+      url: '/accessories',
+      params: {
+        brand_id: brandId,
+        collection_ids: collectionIds,
+        search,
+        cursor,
+        limit,
+      },
+      signal: options?.signal,
+    });
+  },
+
+  // Fetch Single Detailed Accessory
+  getAccessoryById: async (id: string | number, options?: RequestOptions): Promise<Accessory> => {
+    return getJson<Accessory>({ url: `/accessories/${id}`, signal: options?.signal });
+  },
+
+  getAccessoryBySlug: async (brand: string, ref: string, collection?: string, options?: RequestOptions): Promise<Accessory> => {
+    const url = collection 
+        ? `/accessory-by-slug/${brand}/${collection}/${ref}`
+        : `/accessory-by-slug/${brand}/${ref}`;
+    return getJson<Accessory>({ url, signal: options?.signal });
   }
 };
