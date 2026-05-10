@@ -217,7 +217,7 @@ const InStocks = ({ watches = [], isLoading = false }: { watches?: Watch[], isLo
                         transition={{ duration: 0.8, delay: 0.2, ease: customEase }}
                         className='flex justify-center mt-12 md:mt-16'
                     >
-                        <Link to='/collections' className='group relative inline-flex justify-center items-center pb-2 text-xs tracking-[0.4em] uppercase text-bone font-semibold transition-colors duration-500 hover:text-bone'>
+                        <Link to='/collections?in_stock=true' className='group relative inline-flex justify-center items-center pb-2 text-xs tracking-[0.4em] uppercase text-bone font-semibold transition-colors duration-500 hover:text-bone'>
                             {/* The Button Text */}
                             <span>{t('home.findYourWatch')}</span>
 

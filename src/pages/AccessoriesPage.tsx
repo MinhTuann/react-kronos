@@ -34,7 +34,7 @@ const AccessoriesPage: React.FC = () => {
     const { t, i18n } = useTranslation();
     const [hasNextPage, setHasNextPage] = useState(false);
     const [lastCursor, setLastCursor] = useState<string | null>(null);
-    const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [isFilterOpen, setIsFilterOpen] = useState(new URLSearchParams(window.location.search).get('in_stock') === 'true');
 
     // Search Query parsing
     const location = useLocation();
@@ -46,6 +46,7 @@ const AccessoriesPage: React.FC = () => {
     const [collections, setCollections] = useState<PublicCollection[]>([]);
     const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
     const [selectedCollections, setSelectedCollections] = useState<string[]>([]);
+    const [isInStockOnly, setIsInStockOnly] = useState(queryParams.get('in_stock') === 'true');
     const currentLang = i18n.language.split('-')[0];
     const origin = import.meta.env.VITE_SITE_URL || window.location.origin;
     const selectedBrandName = brands.find((brand) => brand.id === selectedBrands[0])?.name;
@@ -161,7 +162,8 @@ const AccessoriesPage: React.FC = () => {
                 collectionIds, 
                 searchQuery, 
                 currentCursor, 
-                itemsPerPage
+                itemsPerPage,
+                isInStockOnly
             );
             
             const nextAccessories = Array.isArray(response?.data) ? response.data : [];
@@ -187,7 +189,7 @@ const AccessoriesPage: React.FC = () => {
     // Run fetch on mount and whenever filters/search change
     useEffect(() => {
         fetchAccessories(true);
-    }, [searchQuery, selectedBrands, selectedCollections]);
+    }, [searchQuery, selectedBrands, selectedCollections, isInStockOnly]);
 
     // --- Filter Content Render Function ---
     const renderFilterContent = () => {
@@ -212,6 +214,20 @@ const AccessoriesPage: React.FC = () => {
 
         return (
             <div className='pr-4 lg:pr-8 space-y-10 lg:space-y-12'>
+                {/* In Stock Filter */}
+                <div>
+                    <h4 className='text-[10px] tracking-[0.3em] uppercase font-bold border-b border-gunmetal/10 pb-4 mb-4'>{t('common.availability')}</h4>
+                    <label className="flex items-center gap-3 cursor-pointer group transition-colors text-gunmetal/60 hover:text-black text-sm">
+                        <input
+                            type="checkbox"
+                            className="accent-gunmetal w-4 h-4"
+                            checked={isInStockOnly}
+                            onChange={(e) => setIsInStockOnly(e.target.checked)}
+                        />
+                        {t('common.in_stock')}
+                    </label>
+                </div>
+
                 {brands.length > 0 && (
                     <div>
                         <h4 className='text-[10px] tracking-[0.3em] uppercase font-bold border-b border-gunmetal/10 pb-4 mb-4'>{t('header.brands')}</h4>

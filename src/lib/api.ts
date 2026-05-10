@@ -156,6 +156,7 @@ export const publicApi = {
     search?: string, 
     cursor?: string, 
     limit?: number, 
+    inStock?: boolean,
     options?: RequestOptions
   ): Promise<PaginatedResponse<Watch>> => {
     return getJson<PaginatedResponse<Watch>>({
@@ -166,6 +167,7 @@ export const publicApi = {
         search,
         cursor,
         limit,
+        in_stock: inStock
       },
       signal: options?.signal,
     });
@@ -219,6 +221,7 @@ export const publicApi = {
     search?: string, 
     cursor?: string, 
     limit?: number, 
+    inStock?: boolean,
     options?: RequestOptions
   ): Promise<PaginatedResponse<Accessory>> => {
     return getJson<PaginatedResponse<Accessory>>({
@@ -229,6 +232,7 @@ export const publicApi = {
         search,
         cursor,
         limit,
+        in_stock: inStock
       },
       signal: options?.signal,
     });
