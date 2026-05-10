@@ -20,11 +20,11 @@ const formatPrice = (price: number) => {
 };
 
 const WatchDetailsPage: React.FC = () => {
-    const { id, brand_slug, collection_slug, ref } = useParams<{ 
-        id?: string; 
-        brand_slug?: string; 
-        collection_slug?: string; 
-        ref?: string 
+    const { id, brand_slug, collection_slug, ref } = useParams<{
+        id?: string;
+        brand_slug?: string;
+        collection_slug?: string;
+        ref?: string
     }>();
     const [watch, setWatch] = useState<Watch | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -73,9 +73,9 @@ const WatchDetailsPage: React.FC = () => {
             createBreadcrumbJsonLd(origin, [
                 { name: currentLang.startsWith('en') ? 'Home' : 'Trang chu', path: '/' },
                 { name: currentLang.startsWith('en') ? 'Collections' : 'Bo suu tap', path: '/collections' },
-                { 
-                    name: watch.name, 
-                    path: id ? `/watch/${id}` : `/watch/${brand_slug}/${collection_slug ? collection_slug + '/' : ''}${ref}` 
+                {
+                    name: watch.name,
+                    path: id ? `/watch/${id}` : `/watch/${brand_slug}/${collection_slug ? collection_slug + '/' : ''}${ref}`
                 },
             ]),
         ] : undefined,
@@ -92,10 +92,10 @@ const WatchDetailsPage: React.FC = () => {
             if (!id && !(brand_slug && ref)) return;
             try {
                 setIsLoading(true);
-                const data = id 
+                const data = id
                     ? await publicApi.getWatchById(id, { signal: controller.signal })
                     : await publicApi.getWatchBySlug(brand_slug!, ref!, collection_slug, { signal: controller.signal });
-                
+
                 if (controller.signal.aborted) return;
                 setWatch(data);
             } catch (err) {
@@ -249,7 +249,7 @@ const WatchDetailsPage: React.FC = () => {
                                 </button>
                             </>
                         )}
-                        
+
                         {/* Subtle Reflection Effect */}
                         <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-3/4 h-8 bg-gradient-to-t from-transparent to-black/5 blur-xl rounded-full opacity-50" />
                     </div>
@@ -264,9 +264,8 @@ const WatchDetailsPage: React.FC = () => {
                                         setDirection(idx > activeImageIndex ? 1 : -1);
                                         setActiveImageIndex(idx);
                                     }}
-                                    className={`relative flex-shrink-0 w-20 h-20 rounded-md overflow-hidden bg-stone-50 border-2 transition-all ${
-                                        idx === activeImageIndex ? 'border-golden shadow-md' : 'border-transparent opacity-60 hover:opacity-100'
-                                    }`}
+                                    className={`relative flex-shrink-0 w-20 h-20 rounded-md overflow-hidden bg-stone-50 border-2 transition-all ${idx === activeImageIndex ? 'border-golden shadow-md' : 'border-transparent opacity-60 hover:opacity-100'
+                                        }`}
                                 >
                                     <img src={img} alt={`${watch.name} thumbnail ${idx}`} className="w-full h-full object-contain p-2" />
                                 </button>
@@ -369,10 +368,17 @@ const WatchDetailsPage: React.FC = () => {
                                 )}
                                 <div>
                                     <p className="text-[10px] tracking-[0.2em] uppercase text-gunmetal/50 mb-1">{t('common.availability')}</p>
-                                    <p className="text-sm font-medium text-green-700 flex items-center gap-2">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-green-500 block"></span>
-                                        {t('common.in_stock')}
-                                    </p>
+                                    {(watch.stock_quantity || 0) > (watch.sold_quantity || 0) ? (
+                                        <p className="text-sm font-medium text-green-700 flex items-center gap-2">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-green-500 block"></span>
+                                            {t('common.in_stock')}
+                                        </p>
+                                    ) : (
+                                        <p className="text-sm font-medium text-amber-700 flex items-center gap-2">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 block animate-pulse"></span>
+                                            {t('common.pre_order')}
+                                        </p>
+                                    )}
                                 </div>
                                 <div>
                                     <p className="text-[10px] tracking-[0.2em] uppercase text-gunmetal/50 mb-1">{t('common.delivery')}</p>
@@ -382,11 +388,8 @@ const WatchDetailsPage: React.FC = () => {
                         </div>
 
                         {/* Actions */}
-                        <div className="flex flex-col sm:flex-row gap-4 mt-8">
-                            <button className="flex-1 bg-gunmetal text-white text-xs uppercase tracking-[0.2em] font-semibold py-5 px-8 hover:bg-black transition-colors flex items-center justify-center gap-3">
-                                {t('common.add_to_cart')}
-                            </button>
-                            <button className="flex-1 border border-gunmetal/20 text-gunmetal text-xs uppercase tracking-[0.2em] font-semibold py-5 px-8 hover:bg-stone-50 transition-colors">
+                        <div className="mt-8">
+                            <button className="w-full border border-gunmetal/20 text-gunmetal text-xs uppercase tracking-[0.2em] font-semibold py-5 px-8 hover:bg-stone-50 transition-colors">
                                 {t('common.contact_boutiques')}
                             </button>
                         </div>

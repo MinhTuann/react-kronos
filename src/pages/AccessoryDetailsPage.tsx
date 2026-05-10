@@ -339,19 +339,23 @@ const AccessoryDetailsPage: React.FC = () => {
                                 )}
                                 <div>
                                     <p className="text-[10px] tracking-[0.2em] uppercase text-gunmetal/50 mb-1">{t('common.availability')}</p>
-                                    <p className="text-sm font-medium text-green-700 flex items-center gap-2">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-green-500 block"></span>
-                                        {t('common.in_stock')}
-                                    </p>
+                                    {(accessory.stock_quantity || 0) > (accessory.sold_quantity || 0) ? (
+                                        <p className="text-sm font-medium text-green-700 flex items-center gap-2">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-green-500 block"></span>
+                                            {t('common.in_stock')}
+                                        </p>
+                                    ) : (
+                                        <p className="text-sm font-medium text-amber-700 flex items-center gap-2">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 block animate-pulse"></span>
+                                            {t('common.pre_order')}
+                                        </p>
+                                    )}
                                 </div>
                             </div>
                         </div>
 
-                        <div className="flex flex-col sm:flex-row gap-4 mt-8">
-                            <button className="flex-1 bg-gunmetal text-white text-xs uppercase tracking-[0.2em] font-semibold py-5 px-8 hover:bg-black transition-colors flex items-center justify-center gap-3">
-                                {t('common.add_to_cart')}
-                            </button>
-                            <button className="flex-1 border border-gunmetal/20 text-gunmetal text-xs uppercase tracking-[0.2em] font-semibold py-5 px-8 hover:bg-stone-50 transition-colors">
+                        <div className="mt-8">
+                            <button className="w-full border border-gunmetal/20 text-gunmetal text-xs uppercase tracking-[0.2em] font-semibold py-5 px-8 hover:bg-stone-50 transition-colors">
                                 {t('common.contact_boutiques')}
                             </button>
                         </div>

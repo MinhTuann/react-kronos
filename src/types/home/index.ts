@@ -42,6 +42,8 @@ export interface Watch {
   featured_avatar_url?: string | null;
   canonical_url?: string | null;
   noindex?: boolean;
+  stock_quantity?: number;
+  sold_quantity?: number;
   images?: string[];
 }
 
@@ -73,5 +75,8 @@ export interface Accessory {
   seo_image_url?: string | null;
   canonical_url?: string | null;
   noindex?: boolean;
+  stock_quantity?: number;
+  sold_quantity?: number;
   images?: string[];
 }
+

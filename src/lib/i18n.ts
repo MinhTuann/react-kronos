@@ -70,7 +70,9 @@ const resources = {
         back_to_collections: "Back to Collections",
         delivery_time: "3-5 Business Days",
         load_more: "Load More",
-        syncing: "SYNCING"
+        syncing: "SYNCING",
+        sold_out: "Sold Out",
+        pre_order: "Pre-order"
       },
       home: {
         latestArrivals: "Latest Arrivals",
@@ -167,7 +169,9 @@ const resources = {
         delivery_time: "3-5 ngày làm việc",
         watch_not_found: "Không tìm thấy đồng hồ",
         load_more: "Xem Thêm",
-        syncing: "ĐANG TẢI"
+        syncing: "ĐANG TẢI",
+        sold_out: "Hết hàng",
+        pre_order: "Đặt hàng"
       },
       home: {
         latestArrivals: "Sản phẩm mới nhất",

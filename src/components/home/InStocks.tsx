@@ -59,7 +59,7 @@ export const WatchItem = ({ watch }: { watch: Watch }) => {
                     {/* On mobile: expands if in center. On desktop: expands only on hover. */}
                     <div className={`h-[1px] bg-golden mt-3 transition-all duration-500 
                         ${isInView ? 'w-12' : 'w-4'} 
-                        md:w-4 md:group-hover:w-12`} 
+                        md:w-4 md:group-hover:w-12`}
                     />
                 </div>
 
@@ -130,7 +130,7 @@ export const AccessoryItem = ({ accessory }: { accessory: Accessory }) => {
                     {/* On mobile: expands if in center. On desktop: expands only on hover. */}
                     <div className={`h-[1px] bg-golden mt-3 transition-all duration-500 
                         ${isInView ? 'w-12' : 'w-4'} 
-                        md:w-4 md:group-hover:w-12`} 
+                        md:w-4 md:group-hover:w-12`}
                     />
                 </div>
 
