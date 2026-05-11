@@ -44,8 +44,10 @@ const AccessoriesPage: React.FC = () => {
     // Filter States
     const [brands, setBrands] = useState<PublicBrand[]>([]);
     const [collections, setCollections] = useState<PublicCollection[]>([]);
+    const [accessoryTypes, setAccessoryTypes] = useState<any[]>([]);
     const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
     const [selectedCollections, setSelectedCollections] = useState<string[]>([]);
+    const [selectedAccessoryTypes, setSelectedAccessoryTypes] = useState<string[]>([]);
     const [isInStockOnly, setIsInStockOnly] = useState(queryParams.get('in_stock') === 'true');
     const currentLang = i18n.language.split('-')[0];
     const origin = import.meta.env.VITE_SITE_URL || window.location.origin;
@@ -113,9 +115,15 @@ const AccessoriesPage: React.FC = () => {
             ...readMultiValueParam(params, 'collectionId'),
             ...readMultiValueParam(params, 'collection_ids'),
         ];
+        const typeIds = [
+            ...readMultiValueParam(params, 'types'),
+            ...readMultiValueParam(params, 'typeId'),
+            ...readMultiValueParam(params, 'accessory_type_ids'),
+        ];
 
         setSelectedBrands(brandId ? [brandId] : []);
         setSelectedCollections(Array.from(new Set(collectionIds)));
+        setSelectedAccessoryTypes(Array.from(new Set(typeIds)));
     }, [location.search]);
 
     const itemsPerPage = 12;
@@ -127,13 +135,15 @@ const AccessoriesPage: React.FC = () => {
 
         const fetchFilters = async () => {
             try {
-                const [bData, cData] = await Promise.all([
+                const [bData, cData, tData] = await Promise.all([
                     publicApi.getBrands('accessory', { signal: controller.signal }),
-                    publicApi.getCollections(undefined, 'accessory', { signal: controller.signal })
+                    publicApi.getCollections(undefined, 'accessory', { signal: controller.signal }),
+                    publicApi.getAccessoryTypes({ signal: controller.signal })
                 ]);
                 if (controller.signal.aborted) return;
                 setBrands(Array.isArray(bData) ? bData : []);
                 setCollections(Array.isArray(cData) ? cData : []);
+                setAccessoryTypes(Array.isArray(tData) ? tData : []);
             } catch (err) {
                 if (controller.signal.aborted) return;
                 console.error("Failed to fetch filters:", err);
@@ -156,10 +166,12 @@ const AccessoriesPage: React.FC = () => {
             
             const brandId = selectedBrands.length > 0 ? selectedBrands[0] : undefined;
             const collectionIds = selectedCollections.length > 0 ? selectedCollections : undefined;
+            const typeIds = selectedAccessoryTypes.length > 0 ? selectedAccessoryTypes : undefined;
 
             const response = await publicApi.getAccessories(
                 brandId, 
                 collectionIds, 
+                typeIds,
                 searchQuery, 
                 currentCursor, 
                 itemsPerPage,
@@ -189,7 +201,7 @@ const AccessoriesPage: React.FC = () => {
     // Run fetch on mount and whenever filters/search change
     useEffect(() => {
         fetchAccessories(true);
-    }, [searchQuery, selectedBrands, selectedCollections, isInStockOnly]);
+    }, [searchQuery, selectedBrands, selectedCollections, selectedAccessoryTypes, isInStockOnly]);
 
     // --- Filter Content Render Function ---
     const renderFilterContent = () => {
@@ -210,6 +222,12 @@ const AccessoriesPage: React.FC = () => {
             );
         };
 
+        const toggleType = (typeId: string) => {
+            setSelectedAccessoryTypes(prev =>
+                prev.includes(typeId) ? prev.filter(id => id !== typeId) : [...prev, typeId]
+            );
+        };
+
         const visibleCollections = collections.filter(c => selectedBrands.includes(c.brand_id));
 
         return (
@@ -227,6 +245,27 @@ const AccessoriesPage: React.FC = () => {
                         {t('common.in_stock')}
                     </label>
                 </div>
+
+                {accessoryTypes.length > 0 && (
+                    <div>
+                        <h4 className='text-[10px] tracking-[0.3em] uppercase font-bold border-b border-gunmetal/10 pb-4 mb-4'>{t('collections.accessoryTypes')}</h4>
+                        <ul className='space-y-4 lg:space-y-3 text-sm font-light text-gunmetal/80 max-h-48 overflow-y-auto pr-2 custom-scrollbar'>
+                            {accessoryTypes.map(type => (
+                                <li key={type.id}>
+                                    <label className='flex items-center gap-3 cursor-pointer hover:text-black'>
+                                        <input
+                                            type='checkbox'
+                                            className='accent-gunmetal w-4 h-4'
+                                            checked={selectedAccessoryTypes.includes(type.id)}
+                                            onChange={() => toggleType(type.id)}
+                                        />
+                                        {currentLang === 'en' && type.name_en ? type.name_en : type.name}
+                                    </label>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
 
                 {brands.length > 0 && (
                     <div>
@@ -269,7 +308,7 @@ const AccessoriesPage: React.FC = () => {
 
                 {selectedBrands.length > 0 && visibleCollections.length > 0 && (
                     <div>
-                        <h4 className='text-[10px] tracking-[0.3em] uppercase font-bold border-b border-gunmetal/10 pb-4 mb-4'>{t('header.brands')}</h4>
+                        <h4 className='text-[10px] tracking-[0.3em] uppercase font-bold border-b border-gunmetal/10 pb-4 mb-4'>{t('header.collections')}</h4>
                         <ul className='space-y-4 lg:space-y-3 text-sm font-light text-gunmetal/80 max-h-48 overflow-y-auto pr-2 custom-scrollbar'>
                             {visibleCollections.map(collection => (
                                 <li key={collection.id}>
@@ -292,7 +331,7 @@ const AccessoriesPage: React.FC = () => {
                         onClick={() => setIsFilterOpen(false)}
                         className="w-full bg-gunmetal text-white text-xs uppercase tracking-widest py-4 rounded hover:bg-black transition-colors"
                     >
-                        {t('collections.applyFilters')} ({selectedBrands.length + selectedCollections.length})
+                        {t('collections.applyFilters')} ({selectedBrands.length + selectedCollections.length + selectedAccessoryTypes.length})
                     </button>
                 </div>
             </div>

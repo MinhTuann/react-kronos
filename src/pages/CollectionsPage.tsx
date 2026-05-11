@@ -286,7 +286,7 @@ const CollectionsPage: React.FC = () => {
 
                 {selectedBrands.length > 0 && visibleCollections.length > 0 && (
                     <div>
-                        <h4 className='text-[10px] tracking-[0.3em] uppercase font-bold border-b border-gunmetal/10 pb-4 mb-4'>{t('header.brands')}</h4>
+                        <h4 className='text-[10px] tracking-[0.3em] uppercase font-bold border-b border-gunmetal/10 pb-4 mb-4'>{t('header.collections')}</h4>
                         <ul className='space-y-4 lg:space-y-3 text-sm font-light text-gunmetal/80 max-h-48 overflow-y-auto pr-2 custom-scrollbar'>
                             {visibleCollections.map(collection => (
                                 <li key={collection.id}>

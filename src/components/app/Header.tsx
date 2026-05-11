@@ -251,6 +251,13 @@ const Header = ({ scrollY }: Props) => {
                                                     {t('menu.accessories', 'The Accessories')}
                                                 </Link>
                                                 <Link
+                                                    to="/collections?in_stock=true"
+                                                    onClick={() => setIsMenuOpen(false)}
+                                                    className="text-3xl md:text-4xl italic text-gunmetal hover:text-black transition-colors"
+                                                >
+                                                    {t('menu.inStock', 'In Stock')}
+                                                </Link>
+                                                <Link
                                                     to="/about-us"
                                                     onClick={() => setIsMenuOpen(false)}
                                                     className="text-3xl md:text-4xl italic text-gunmetal hover:text-black transition-colors"

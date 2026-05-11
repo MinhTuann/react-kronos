@@ -7,6 +7,7 @@ const resources = {
     translation: {
       header: {
         brands: "Brands",
+        collections: "Collections",
         sell: "Sell Your Watch",
         magazine: "Magazine",
         history: "Kronos History",
@@ -25,6 +26,7 @@ const resources = {
         accessories: "The Accessories",
         theCompany: "The Company",
         newsEvents: "News & Events",
+        inStock: "In Stock",
         all: "All"
       },
       search: {
@@ -91,7 +93,8 @@ const resources = {
         applyFilters: "Apply Filters",
         previous: "Previous",
         next: "Next",
-        watch_not_found: "Watch Not Found"
+        watch_not_found: "Watch Not Found",
+        accessoryTypes: "Accessory Types"
       },
       news: {
         title: "News & Events",
@@ -105,6 +108,7 @@ const resources = {
     translation: {
       header: {
         brands: "Thương hiệu",
+        collections: "Bộ sưu tập",
         sell: "Ký Gửi & Thu Mua",
         magazine: "Tạp chí",
         history: "Lịch sử Kronos",
@@ -123,6 +127,7 @@ const resources = {
         accessories: "Phụ kiện",
         theCompany: "Về chúng tôi",
         newsEvents: "Tin tức & Sự kiện",
+        inStock: "Hàng sẵn có",
         all: "Tất cả"
       },
       search: {
@@ -190,7 +195,8 @@ const resources = {
         applyFilters: "Áp dụng",
         previous: "Trước",
         next: "Tiếp",
-        watch_not_found: "Không tìm thấy đồng hồ"
+        watch_not_found: "Không tìm thấy đồng hồ",
+        accessoryTypes: "Loại phụ kiện"
       },
       news: {
         title: "Tin tức & Sự kiện",

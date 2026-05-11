@@ -223,6 +223,7 @@ export const publicApi = {
   getAccessories: async (
     brandId?: string, 
     collectionIds?: string | string[], 
+    accessoryTypeIds?: string | string[],
     search?: string, 
     cursor?: string, 
     limit?: number, 
@@ -234,6 +235,7 @@ export const publicApi = {
       params: {
         brand_id: brandId,
         collection_ids: collectionIds,
+        accessory_type_ids: accessoryTypeIds,
         search,
         cursor,
         limit,
@@ -241,6 +243,11 @@ export const publicApi = {
       },
       signal: options?.signal,
     });
+  },
+
+  // Fetch Accessory Types
+  getAccessoryTypes: async (options?: RequestOptions): Promise<any[]> => {
+    return getJson<any[]>({ url: '/accessory-types', signal: options?.signal, cache: true });
   },
 
   // Fetch Single Detailed Accessory
