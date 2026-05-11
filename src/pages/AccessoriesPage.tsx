@@ -128,8 +128,8 @@ const AccessoriesPage: React.FC = () => {
         const fetchFilters = async () => {
             try {
                 const [bData, cData] = await Promise.all([
-                    publicApi.getBrands({ signal: controller.signal }),
-                    publicApi.getCollections(undefined, { signal: controller.signal })
+                    publicApi.getBrands('accessory', { signal: controller.signal }),
+                    publicApi.getCollections(undefined, 'accessory', { signal: controller.signal })
                 ]);
                 if (controller.signal.aborted) return;
                 setBrands(Array.isArray(bData) ? bData : []);

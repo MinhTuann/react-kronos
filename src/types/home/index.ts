@@ -44,6 +44,7 @@ export interface Watch {
   noindex?: boolean;
   stock_quantity?: number;
   sold_quantity?: number;
+  is_in_stock?: boolean;
   images?: string[];
 }
 
@@ -73,10 +74,11 @@ export interface Accessory {
   seo_description?: string | null;
   seo_description_en?: string | null;
   seo_image_url?: string | null;
+  featured_avatar_url?: string | null;
   canonical_url?: string | null;
   noindex?: boolean;
   stock_quantity?: number;
   sold_quantity?: number;
+  is_in_stock?: boolean;
   images?: string[];
 }
-

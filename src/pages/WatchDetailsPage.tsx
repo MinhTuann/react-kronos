@@ -368,7 +368,7 @@ const WatchDetailsPage: React.FC = () => {
                                 )}
                                 <div>
                                     <p className="text-[10px] tracking-[0.2em] uppercase text-gunmetal/50 mb-1">{t('common.availability')}</p>
-                                    {(watch.stock_quantity || 0) > (watch.sold_quantity || 0) ? (
+                                    {watch.is_in_stock ? (
                                         <p className="text-sm font-medium text-green-700 flex items-center gap-2">
                                             <span className="w-1.5 h-1.5 rounded-full bg-green-500 block"></span>
                                             {t('common.in_stock')}

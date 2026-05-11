@@ -135,17 +135,22 @@ export type { RequestOptions };
 
 export const publicApi = {
   // Fetch Brands
-  getBrands: async (options?: RequestOptions): Promise<PublicBrand[]> => {
-    return getJson<PublicBrand[]>({ url: '/brands', signal: options?.signal, cache: true });
+  getBrands: async (type?: 'watch' | 'accessory', options?: RequestOptions): Promise<PublicBrand[]> => {
+    return getJson<PublicBrand[]>({ 
+      url: '/brands', 
+      params: { type },
+      signal: options?.signal, 
+      cache: true 
+    });
   },
 
   // Fetch Collections
-  getCollections: async (brandId?: string, options?: RequestOptions): Promise<PublicCollection[]> => {
-    return getJson<PublicCollection[]>({
-      url: '/collections',
-      params: { brand_id: brandId },
+  getCollections: async (brandId?: string, type?: 'watch' | 'accessory', options?: RequestOptions): Promise<PublicCollection[]> => {
+    return getJson<PublicCollection[]>({ 
+      url: '/collections', 
+      params: { brand_id: brandId, type },
       signal: options?.signal,
-      cache: true,
+      cache: true
     });
   },
 
