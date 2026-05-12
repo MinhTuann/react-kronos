@@ -411,7 +411,7 @@ const WatchDetailsPage: React.FC = () => {
             </div>
 
             {hasViewMore && (
-                <section className="max-w-[1200px] mx-auto px-6 lg:px-12 mt-24 pt-16">
+                <section className="max-w-[1600px] mx-auto px-6 lg:px-12 mt-24 pt-16">
                     <div className="text-center mb-8 relative">
                         <div className="absolute left-0 top-1/2 -mt-px w-full h-px bg-gunmetal/10 -z-10"></div>
                         <button
@@ -441,7 +441,7 @@ const WatchDetailsPage: React.FC = () => {
                                 <div className="pb-16 pt-8 flex justify-center border-b border-gunmetal/10">
                                     <article
                                         lang={currentLang}
-                                        className="prose prose-stone prose-lg md:prose-xl max-w-[800px] w-full
+                                        className="prose prose-stone prose-lg md:prose-xl max-w-[1000px] w-full
                                         prose-headings:font-serif prose-headings:italic prose-headings:font-light prose-headings:tracking-tight
                                         prose-p:font-light prose-p:leading-relaxed prose-p:text-stone-600
                                         prose-li:text-stone-600 prose-strong:text-gunmetal

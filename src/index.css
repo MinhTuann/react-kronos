@@ -4,13 +4,13 @@
 
 @layer utilities {
   .prose .ql-align-center {
-    text-align: center;
+    text-align: center !important;
   }
   .prose .ql-align-right {
-    text-align: right;
+    text-align: right !important;
   }
   .prose .ql-align-justify {
-    text-align: justify;
+    text-align: justify !important;
   }
   .prose img {
     @apply rounded-sm mx-auto shadow-md transition-all duration-700 hover:shadow-xl;
@@ -41,6 +41,6 @@
 .prose .ql-font-monospace { font-family: monospace; }
 
 /* Existing alignments */
-.ql-align-center { text-align: center; }
-.ql-align-right { text-align: right; }
-.ql-align-justify { text-align: justify; }
+.ql-align-center { text-align: center !important; }
+.ql-align-right { text-align: right !important; }
+.ql-align-justify { text-align: justify !important; }
