@@ -1,12 +1,13 @@
 import { Outlet } from 'react-router-dom';
 import { useScroll } from 'motion/react';
-import { Footer, Header } from '@/components/app';
+import { Footer, Header, ScrollToTop } from '@/components';
 
 const MainLayout = () => {
     const { scrollY } = useScroll();
 
     return (
         <div className='font-serif bg-white text-black font-thin antialiased'>
+            <ScrollToTop />
             <Header scrollY={scrollY} />
             <main className='min-h-screen'>
                 <Outlet />
@@ -15,5 +16,6 @@ const MainLayout = () => {
         </div>
     );
 }
+
 
 export default MainLayout;
