@@ -10,6 +10,8 @@ interface Props {
   isLoading?: boolean;
 }
 
+const VIDEO_PLAY_LIMIT = 3;
+
 // --- 1. The Parent Container Variants ---
 const slideVariants = {
   enter: (direction: number) => ({
@@ -45,21 +47,70 @@ const videoVariants = {
   })
 };
 
-const ParallaxVideo = ({ url, poster, direction, isPlaying }: { url: string; poster?: string; direction: number; isPlaying: boolean }) => {
+const ParallaxVideo = ({
+  url,
+  poster,
+  direction,
+  isPlaying,
+  onAutoPlayEnd
+}: {
+  url: string;
+  poster?: string;
+  direction: number;
+  isPlaying: boolean;
+  onAutoPlayEnd?: () => void;
+}) => {
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isPosterLoaded, setIsPosterLoaded] = useState(false);
+  const playCount = useRef(0);
+  const [isFocused, setIsFocused] = useState(true);
+  const [isInView, setIsInView] = useState(false);
 
   useEffect(() => {
     setIsLoaded(false);
     setIsPosterLoaded(false);
+    playCount.current = 0;
   }, [url]);
+
+  useEffect(() => {
+    if (isPlaying) {
+      playCount.current = 0;
+    }
+  }, [isPlaying]);
+
+  useEffect(() => {
+    const handleFocus = () => {
+      setIsFocused(true);
+      playCount.current = 0; // Restart play count on focus
+    };
+    const handleBlur = () => setIsFocused(false);
+
+    window.addEventListener('focus', handleFocus);
+    window.addEventListener('blur', handleBlur);
+    setIsFocused(document.hasFocus());
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('blur', handleBlur);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!localVideoRef.current) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsInView(entry.isIntersecting),
+      { threshold: 0.1 }
+    );
+    observer.observe(localVideoRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const handlePlayback = async () => {
       if (localVideoRef.current) {
         try {
-          if (isPlaying) {
+          if (isPlaying && isFocused && isInView && playCount.current < VIDEO_PLAY_LIMIT) {
             await localVideoRef.current.play();
           } else {
             localVideoRef.current.pause();
@@ -70,7 +121,16 @@ const ParallaxVideo = ({ url, poster, direction, isPlaying }: { url: string; pos
       }
     };
     handlePlayback();
-  }, [isPlaying, url]);
+  }, [isPlaying, isFocused, isInView, url]);
+
+  const handleEnded = () => {
+    playCount.current += 1;
+    if (playCount.current < VIDEO_PLAY_LIMIT && isFocused && isPlaying && isInView) {
+      localVideoRef.current?.play().catch(() => { });
+    } else {
+      onAutoPlayEnd?.();
+    }
+  };
 
   return (
     <div className="absolute inset-0 w-full h-full">
@@ -104,9 +164,9 @@ const ParallaxVideo = ({ url, poster, direction, isPlaying }: { url: string; pos
           src={url}
           poster={poster}
           onLoadedData={() => setIsLoaded(true)}
+          onEnded={handleEnded}
           className="absolute inset-0 w-full h-full object-cover pointer-events-none"
           muted
-          loop
           playsInline
         />
       </motion.div>
@@ -131,7 +191,7 @@ const VideoCarousel = ({ videos = [], isLoading = false }: Props) => {
       <div className="relative w-full h-[100dvh] overflow-hidden bg-black flex items-center justify-center">
         <Skeleton className="absolute inset-0 w-full h-full rounded-none opacity-40" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10" />
-        
+
         <div className="absolute bottom-0 left-0 w-full p-[10dvh] z-20 space-y-6">
           <div className="space-y-4">
             <Skeleton width={350} height={48} className="rounded-lg opacity-50" />
@@ -203,11 +263,12 @@ const VideoCarousel = ({ videos = [], isLoading = false }: Props) => {
           onDragEnd={handleDragEnd}
           className='absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing overflow-hidden'
         >
-          <ParallaxVideo 
-            url={video.url} 
+          <ParallaxVideo
+            url={video.url}
             poster={video.thumbnail_url}
-            direction={direction} 
-            isPlaying={isPlaying} 
+            direction={direction}
+            isPlaying={isPlaying}
+            onAutoPlayEnd={() => setIsPlaying(false)}
           />
 
           <div className='absolute w-full bottom-0 left-0 p-[10dvh] bg-gradient-to-t from-black/80 to-transparent pointer-events-none'>
@@ -218,7 +279,7 @@ const VideoCarousel = ({ videos = [], isLoading = false }: Props) => {
               onClick={(e) => e.stopPropagation()}
             >
               {((currentLang === 'en' && video.title_en) ? video.title_en : video.title).split('\\n').map(
-                (title, idx) => 
+                (title, idx) =>
                   <h1 className={`font-branding text-2xl md:text-4xl ${idx === 0 ? 'text-white' : 'text-vanilla'}`} key={`video-${idx}-title`}>
                     {title}
                   </h1>
