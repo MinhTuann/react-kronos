@@ -36,7 +36,7 @@ const Header = ({ scrollY }: Props) => {
 
         const fetchBrands = async () => {
             try {
-                const data = await publicApi.getBrands(undefined, { signal: controller.signal });
+                const data = await publicApi.getBrands('watch', { signal: controller.signal });
                 if (controller.signal.aborted) return;
                 setBrands(data);
             } catch (err) {
