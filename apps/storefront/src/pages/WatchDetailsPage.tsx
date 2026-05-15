@@ -3,6 +3,8 @@ import { useParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, ShieldCheck, ArrowLeft, Plus, Minus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import SpecValue from '@/components/common/SpecValue';
+import { Skeleton, TextSkeleton } from '@/components/common/Skeleton';
 import type { Watch } from '@/types';
 
 import { publicApi } from '@/lib/api';
@@ -30,6 +32,8 @@ const WatchDetailsPage: React.FC = () => {
     const currentLang = i18n.language;
     const origin = import.meta.env.VITE_SITE_URL || window.location.origin;
     const [isEditorialExpanded, setIsEditorialExpanded] = useState(false);
+    const [activeImageIndex, setActiveImageIndex] = useState(0);
+    const [direction, setDirection] = useState(0);
     const watchPath = id
         ? `/watch/${id}`
         : (brand_slug && ref ? `/watch/${brand_slug}/${collection_slug ? `${collection_slug}/` : ''}${ref}` : '/collections');
@@ -93,6 +97,7 @@ const WatchDetailsPage: React.FC = () => {
                     : await publicApi.getWatchBySlug(brand_slug!, ref!, collection_slug, { signal: controller.signal });
                 if (controller.signal.aborted) return;
                 setWatch(data);
+                setActiveImageIndex(0);
             } catch (err) {
                 if (controller.signal.aborted) return;
                 console.error("Failed to load details:", err);
@@ -110,8 +115,53 @@ const WatchDetailsPage: React.FC = () => {
 
     if (isLoading) {
         return (
-            <div className="pt-32 pb-24 min-h-[60vh] flex flex-col items-center justify-center">
-                 <div className="w-8 h-8 border-2 border-gunmetal/20 border-t-gunmetal rounded-full animate-spin" />
+            <div className="pt-24 md:pt-32 pb-24 min-h-screen bg-white">
+                <div className="max-w-[1600px] mx-auto px-6 lg:px-12 mb-8 md:mb-12">
+                    <div className="flex items-center gap-2">
+                        <Skeleton width={40} height={10} />
+                        <Skeleton width={10} height={10} variant="circle" />
+                        <Skeleton width={60} height={10} />
+                        <Skeleton width={10} height={10} variant="circle" />
+                        <Skeleton width={100} height={10} />
+                    </div>
+                </div>
+                <div className="max-w-[1600px] mx-auto px-6 lg:px-12 flex flex-col lg:flex-row gap-12 lg:gap-24">
+                    <div className="w-full lg:w-1/2">
+                        <Skeleton className="aspect-square md:aspect-[4/5] w-full rounded-lg" />
+                        <div className="flex gap-4 mt-6">
+                            {Array.from({ length: 4 }).map((_, index) => (
+                                <Skeleton key={index} className="w-20 h-20 rounded-md flex-shrink-0" />
+                            ))}
+                        </div>
+                    </div>
+                    <div className="w-full lg:w-1/2 space-y-8">
+                        <div className="border-b border-gunmetal/10 pb-8 space-y-4">
+                            <Skeleton width={100} height={12} />
+                            <Skeleton width="60%" height={24} />
+                            <Skeleton width="80%" height={48} />
+                            <div className="flex gap-6 mt-6">
+                                <Skeleton width={100} height={28} />
+                                <Skeleton width={120} height={16} />
+                            </div>
+                        </div>
+                        <div className="space-y-4">
+                            <Skeleton width={120} height={12} />
+                            <TextSkeleton lines={4} className="opacity-50" />
+                        </div>
+                        <div className="grid grid-cols-2 gap-y-6 gap-x-12 border-t border-gunmetal/10 pt-6">
+                            {Array.from({ length: 6 }).map((_, index) => (
+                                <div key={index} className="space-y-2">
+                                    <Skeleton width={60} height={10} />
+                                    <Skeleton width={100} height={16} />
+                                </div>
+                            ))}
+                        </div>
+                        <div className="flex gap-4 mt-8">
+                            <Skeleton className="flex-1 h-14 rounded" />
+                            <Skeleton className="flex-1 h-14 rounded" />
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }
@@ -155,22 +205,69 @@ const WatchDetailsPage: React.FC = () => {
             <div className="max-w-[1600px] mx-auto px-6 lg:px-12 flex flex-col lg:flex-row gap-12 lg:gap-24">
 
                 {/* Left Column - Image Gallery */}
-                <div className="w-full lg:w-1/2 flex flex-col md:flex-row gap-6">
-                    {/* Main Image */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                        className="w-full flex-1 bg-stone-50 rounded-lg p-12 md:p-24 flex items-center justify-center relative group"
-                    >
-                        <img
-                            src={watch.image}
-                            alt={watch.name}
-                            className="w-full max-w-[400px] h-auto object-contain drop-shadow-2xl transition-transform duration-[1.5s] ease-out group-hover:scale-105"
-                        />
-                        {/* Subtle Reflection Effect */}
-                        <div className="absolute -bottom-8 w-3/4 h-8 bg-gradient-to-t from-transparent to-black/5 blur-xl rounded-full opacity-50" />
-                    </motion.div>
+                <div className="w-full lg:w-1/2 flex flex-col gap-6">
+                    {/* Main Image Stage */}
+                    <div className="relative aspect-square md:aspect-[4/5] bg-stone-50 rounded-lg overflow-hidden flex items-center justify-center p-8 md:p-16">
+                        <AnimatePresence initial={false} custom={direction} mode="wait">
+                            <motion.div
+                                key={activeImageIndex}
+                                custom={direction}
+                                initial={{ opacity: 0, x: direction > 0 ? 50 : -50 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: direction > 0 ? -50 : 50 }}
+                                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                                className="w-full h-full flex items-center justify-center"
+                            >
+                                <img
+                                    src={watch.images && watch.images.length > 0 ? watch.images[activeImageIndex] : watch.image}
+                                    alt={`${watch.name} - View ${activeImageIndex + 1}`}
+                                    className="w-full h-full object-contain drop-shadow-2xl"
+                                />
+                            </motion.div>
+                        </AnimatePresence>
+
+                        {watch.images && watch.images.length > 1 && (
+                            <>
+                                <button
+                                    onClick={() => {
+                                        setDirection(-1);
+                                        setActiveImageIndex((prev) => (prev === 0 ? watch.images!.length - 1 : prev - 1));
+                                    }}
+                                    className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center text-gunmetal hover:bg-white transition-colors z-10 shadow-sm"
+                                >
+                                    <ChevronRight className="rotate-180" size={20} />
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        setDirection(1);
+                                        setActiveImageIndex((prev) => (prev === watch.images!.length - 1 ? 0 : prev + 1));
+                                    }}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center text-gunmetal hover:bg-white transition-colors z-10 shadow-sm"
+                                >
+                                    <ChevronRight size={20} />
+                                </button>
+                            </>
+                        )}
+
+                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-3/4 h-8 bg-gradient-to-t from-transparent to-black/5 blur-xl rounded-full opacity-50" />
+                    </div>
+
+                    {watch.images && watch.images.length > 1 && (
+                        <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+                            {watch.images.map((image, index) => (
+                                <button
+                                    key={index}
+                                    onClick={() => {
+                                        setDirection(index > activeImageIndex ? 1 : -1);
+                                        setActiveImageIndex(index);
+                                    }}
+                                    className={`relative flex-shrink-0 w-20 h-20 rounded-md overflow-hidden bg-stone-50 border-2 transition-all ${index === activeImageIndex ? 'border-golden shadow-md' : 'border-transparent opacity-60 hover:opacity-100'}`}
+                                >
+                                    <img src={image} alt={`${watch.name} thumbnail ${index}`} className="w-full h-full object-contain p-2" />
+                                </button>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 {/* Right Column - Watch Information */}
@@ -228,33 +325,33 @@ const WatchDetailsPage: React.FC = () => {
                                 {(watch.material || watch.color) && (
                                     <div>
                                         <p className="text-[10px] tracking-[0.2em] uppercase text-gunmetal/50 mb-1">{t('common.material')}</p>
-                                        <p className="text-sm font-medium text-gunmetal">
-                                            {(watch.material || watch.color) ? ((currentLang === 'en' && watch.material_en) ? watch.material_en : watch.material || watch.color) : ''}
-                                        </p>
+                                        <div className="text-sm font-medium text-gunmetal">
+                                            <SpecValue value={(watch.material || watch.color) ? ((currentLang === 'en' && watch.material_en) ? watch.material_en : watch.material || watch.color) : ''} />
+                                        </div>
                                     </div>
                                 )}
                                 {watch.movement && (
                                     <div>
                                         <p className="text-[10px] tracking-[0.2em] uppercase text-gunmetal/50 mb-1">{t('common.movement')}</p>
-                                        <p className="text-sm font-medium text-gunmetal">
-                                            {(currentLang === 'en' && watch.movement_en) ? watch.movement_en : watch.movement}
-                                        </p>
+                                        <div className="text-sm font-medium text-gunmetal">
+                                            <SpecValue value={(currentLang === 'en' && watch.movement_en) ? watch.movement_en : watch.movement} />
+                                        </div>
                                     </div>
                                 )}
                                 {watch.strap && (
                                     <div>
                                         <p className="text-[10px] tracking-[0.2em] uppercase text-gunmetal/50 mb-1">{t('common.strap')}</p>
-                                        <p className="text-sm font-medium text-gunmetal">
-                                            {(currentLang === 'en' && watch.strap_en) ? watch.strap_en : watch.strap}
-                                        </p>
+                                        <div className="text-sm font-medium text-gunmetal">
+                                            <SpecValue value={(currentLang === 'en' && watch.strap_en) ? watch.strap_en : watch.strap} />
+                                        </div>
                                     </div>
                                 )}
                                 {watch.dial && (
                                     <div>
                                         <p className="text-[10px] tracking-[0.2em] uppercase text-gunmetal/50 mb-1">{t('common.dial')}</p>
-                                        <p className="text-sm font-medium text-gunmetal">
-                                            {(currentLang === 'en' && watch.dial_en) ? watch.dial_en : watch.dial}
-                                        </p>
+                                        <div className="text-sm font-medium text-gunmetal">
+                                            <SpecValue value={(currentLang === 'en' && watch.dial_en) ? watch.dial_en : watch.dial} />
+                                        </div>
                                     </div>
                                 )}
                                 {watch.condition && (
@@ -267,10 +364,17 @@ const WatchDetailsPage: React.FC = () => {
                                 )}
                                 <div>
                                     <p className="text-[10px] tracking-[0.2em] uppercase text-gunmetal/50 mb-1">{t('common.availability')}</p>
-                                    <p className="text-sm font-medium text-green-700 flex items-center gap-2">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-green-500 block"></span>
-                                        {t('common.in_stock')}
-                                    </p>
+                                    {watch.is_in_stock ? (
+                                        <p className="text-sm font-medium text-green-700 flex items-center gap-2">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-green-500 block"></span>
+                                            {t('common.in_stock')}
+                                        </p>
+                                    ) : (
+                                        <p className="text-sm font-medium text-amber-700 flex items-center gap-2">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 block animate-pulse"></span>
+                                            {t('common.pre_order')}
+                                        </p>
+                                    )}
                                 </div>
                                 <div>
                                     <p className="text-[10px] tracking-[0.2em] uppercase text-gunmetal/50 mb-1">{t('common.delivery')}</p>
@@ -280,10 +384,7 @@ const WatchDetailsPage: React.FC = () => {
                         </div>
 
                         {/* Actions */}
-                        <div className="flex flex-col sm:flex-row gap-4 mt-8">
-                            <button className="flex-1 bg-gunmetal text-white text-xs uppercase tracking-[0.2em] font-semibold py-5 px-8 hover:bg-black transition-colors flex items-center justify-center gap-3">
-                                {t('common.add_to_cart')}
-                            </button>
+                        <div className="mt-8">
                             <button className="flex-1 border border-gunmetal/20 text-gunmetal text-xs uppercase tracking-[0.2em] font-semibold py-5 px-8 hover:bg-stone-50 transition-colors">
                                 {t('common.contact_boutiques')}
                             </button>
