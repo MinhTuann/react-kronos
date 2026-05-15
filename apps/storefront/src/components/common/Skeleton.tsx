@@ -71,6 +71,45 @@ export const WatchCardSkeleton = () => (
   </div>
 );
 
+export const NewsCardSkeleton = () => (
+  <div className="space-y-4">
+    <MediaSkeleton aspect="aspect-video" className="rounded-xl" />
+    <div className="space-y-2">
+      <Skeleton width="30%" height={12} variant="text" />
+      <Skeleton width="100%" height={24} />
+      <Skeleton width="100%" height={24} />
+      <Skeleton width="60%" height={16} variant="text" className="mt-4" />
+    </div>
+  </div>
+);
+
+export const BrandSectionSkeleton = ({ reversed = false }: { reversed?: boolean }) => (
+  <section className="py-12 md:py-24 max-w-7xl mx-auto px-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+      <div className={`aspect-square rounded-2xl overflow-hidden ${reversed ? 'order-2' : 'order-2 md:order-1'}`}>
+        <Skeleton className="w-full h-full" />
+      </div>
+      <div className={`space-y-8 ${reversed ? 'order-1' : 'order-1 md:order-2'}`}>
+        <div className="space-y-4">
+          <Skeleton width={120} height={12} />
+          <Skeleton width="80%" height={48} />
+          <Skeleton width={150} height={24} className="opacity-60" />
+          <TextSkeleton lines={3} className="max-w-md opacity-40" />
+        </div>
+        <div className="grid grid-cols-2 gap-y-8 gap-x-12 border-t border-bone/30 pt-8">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <div key={index} className="space-y-2">
+              <Skeleton width={60} height={10} />
+              <Skeleton width={100} height={18} />
+            </div>
+          ))}
+        </div>
+        <Skeleton width={180} height={40} className="rounded-lg" />
+      </div>
+    </div>
+  </section>
+);
+
 export const CollectionsGridSkeleton = () => (
   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-12 md:gap-y-16 xl:gap-x-8">
     {Array.from({ length: 8 }).map((_, index) => (

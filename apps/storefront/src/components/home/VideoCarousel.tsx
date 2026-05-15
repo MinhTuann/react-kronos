@@ -3,10 +3,14 @@ import { ChevronLeft, ChevronRight, Play, Pause } from 'lucide-react';
 import { motion, AnimatePresence, useMotionValue, useSpring, type PanInfo } from 'motion/react';
 import { useTranslation } from 'react-i18next';
 import type { VideoSlide } from '@/types';
+import { Skeleton, TextSkeleton } from '../common/Skeleton';
 
 interface Props {
-  videos: VideoSlide[];
+  videos?: VideoSlide[];
+  isLoading?: boolean;
 }
+
+const VIDEO_PLAY_LIMIT = 3;
 
 // --- 1. The Parent Container Variants ---
 const slideVariants = {
@@ -46,20 +50,71 @@ const videoVariants = {
 };
 
 // --- 3. The Isolated Video Component (Fixes the Ref bug) ---
-const ParallaxVideo = ({ url, poster, direction, isPlaying }: { url: string; poster?: string; direction: number; isPlaying: boolean }) => {
+const ParallaxVideo = ({
+  url,
+  poster,
+  direction,
+  isPlaying,
+  onAutoPlayEnd,
+}: {
+  url: string;
+  poster?: string;
+  direction: number;
+  isPlaying: boolean;
+  onAutoPlayEnd?: () => void;
+}) => {
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isPosterLoaded, setIsPosterLoaded] = useState(false);
+  const playCount = useRef(0);
+  const [isFocused, setIsFocused] = useState(true);
+  const [isInView, setIsInView] = useState(false);
 
   // Reset loading state when the source URL changes
   useEffect(() => {
     setIsLoaded(false);
+    setIsPosterLoaded(false);
+    playCount.current = 0;
   }, [url]);
+
+  useEffect(() => {
+    if (isPlaying) {
+      playCount.current = 0;
+    }
+  }, [isPlaying]);
+
+  useEffect(() => {
+    const handleFocus = () => {
+      setIsFocused(true);
+      playCount.current = 0;
+    };
+    const handleBlur = () => setIsFocused(false);
+
+    window.addEventListener('focus', handleFocus);
+    window.addEventListener('blur', handleBlur);
+    setIsFocused(document.hasFocus());
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('blur', handleBlur);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!localVideoRef.current) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsInView(entry.isIntersecting),
+      { threshold: 0.1 }
+    );
+    observer.observe(localVideoRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const handlePlayback = async () => {
       if (localVideoRef.current) {
         try {
-          if (isPlaying) {
+          if (isPlaying && isFocused && isInView && playCount.current < VIDEO_PLAY_LIMIT) {
             await localVideoRef.current.play();
           } else {
             localVideoRef.current.pause();
@@ -70,48 +125,83 @@ const ParallaxVideo = ({ url, poster, direction, isPlaying }: { url: string; pos
       }
     };
     handlePlayback();
-  }, [isPlaying, url]);
+  }, [isPlaying, isFocused, isInView, url]);
+
+  const handleEnded = () => {
+    playCount.current += 1;
+    if (playCount.current < VIDEO_PLAY_LIMIT && isFocused && isPlaying && isInView) {
+      localVideoRef.current?.play().catch(() => {});
+    } else {
+      onAutoPlayEnd?.();
+    }
+  };
 
   return (
-    <motion.div
-      custom={direction}
-      variants={videoVariants}
-      transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-      className="absolute inset-0 w-full h-full scale-[1.15]"
-    >
-      <AnimatePresence>
-        {poster && !isLoaded && (
-          <motion.img
-            key="poster"
-            src={poster}
-            initial={{ opacity: 1 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.8, ease: "easeInOut" }}
-            className="absolute inset-0 w-full h-full object-cover z-10"
-          />
-        )}
-      </AnimatePresence>
-      <video
-        ref={localVideoRef}
-        src={url}
-        onLoadedData={() => setIsLoaded(true)}
-        className="absolute inset-0 w-full h-full object-cover pointer-events-none"
-        muted
-        loop
-        playsInline
-      />
-    </motion.div>
+    <div className="absolute inset-0 w-full h-full">
+      {!isLoaded && !isPosterLoaded && (
+        <div className="absolute inset-0 w-full h-full z-20">
+          <Skeleton className="w-full h-full rounded-none" />
+        </div>
+      )}
+      <motion.div
+        custom={direction}
+        variants={videoVariants}
+        transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+        className="absolute inset-0 w-full h-full scale-[1.15]"
+      >
+        <AnimatePresence>
+          {poster && !isLoaded && (
+            <motion.img
+              key="poster"
+              src={poster}
+              onLoad={() => setIsPosterLoaded(true)}
+              initial={{ opacity: 1 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.8, ease: "easeInOut" }}
+              className="absolute inset-0 w-full h-full object-cover z-10"
+            />
+          )}
+        </AnimatePresence>
+        <video
+          ref={localVideoRef}
+          src={url}
+          poster={poster}
+          onLoadedData={() => setIsLoaded(true)}
+          onEnded={handleEnded}
+          className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+          muted
+          playsInline
+        />
+      </motion.div>
+    </div>
   );
 };
 
-const VideoCarousel = ({ videos }: Props) => {
+const VideoCarousel = ({ videos = [], isLoading = false }: Props) => {
   // We now track the index AND the direction we are moving
   const [[page, direction], setPage] = useState([0, 0]);
   const [hoverSide, setHoverSide] = useState<'left' | 'right' | null>(null);
   const [isPlaying, setIsPlaying] = useState(true);
   const { t, i18n } = useTranslation();
   const currentLang = i18n.language;
+
+  if (isLoading) {
+    return (
+      <div className="relative w-full h-[100dvh] overflow-hidden bg-black flex items-center justify-center">
+        <Skeleton className="absolute inset-0 w-full h-full rounded-none opacity-40" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10" />
+        <div className="absolute bottom-0 left-0 w-full p-[10dvh] z-20 space-y-6">
+          <div className="space-y-4">
+            <Skeleton width={350} height={48} className="rounded-lg opacity-50" />
+            <Skeleton width={250} height={48} className="rounded-lg opacity-30" />
+          </div>
+          <TextSkeleton lines={2} className="max-w-xl opacity-20" />
+          <Skeleton width={140} height={44} className="rounded-lg opacity-40" />
+        </div>
+      </div>
+    );
+  }
   
   // Safely wrap the index so it doesn't break if it goes out of bounds
   // (Though our boundaries prevent this, it's a good safety net)
@@ -216,7 +306,8 @@ const VideoCarousel = ({ videos }: Props) => {
             url={video.url} 
             poster={video.thumbnail_url}
             direction={direction} 
-            isPlaying={isPlaying} 
+            isPlaying={isPlaying}
+            onAutoPlayEnd={() => setIsPlaying(false)}
           />
 
           {/* Title Area */}
@@ -238,7 +329,6 @@ const VideoCarousel = ({ videos }: Props) => {
               </p>
               <button
                 className='font-branding bg-stormy hover:bg-opacity-90 text-[10px] md:text-[11px] text-white uppercase tracking-widest font-medium px-6 py-3 rounded-lg'
-                onClick={(e) => { e.preventDefault(); console.log('press'); }}
               >
                 {t('common.exploreMore')}
               </button>

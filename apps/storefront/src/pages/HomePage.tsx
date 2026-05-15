@@ -61,17 +61,26 @@ const HomePage = () => {
         return () => controller.abort();
     }, []);
 
-    if (isLoading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
-
     return (
         <div>
-            {homeData.slides?.length > 0 && <VideoCarousel videos={homeData.slides} />}
-            <InStocks watches={inStockWatches} />
-            <BestBrand />
-            <SecondBrand />
-            <ThirdBrand />
-            <OurStory data={homeData.sections?.our_story} />
-            <NewsEvents news={homeData.news} />
+            {isLoading ? (
+                <div className="space-y-20 pb-20">
+                    <VideoCarousel isLoading={true} />
+                    <InStocks isLoading={true} />
+                    <BestBrand isLoading={true} />
+                    <NewsEvents isLoading={true} />
+                </div>
+            ) : (
+                <>
+                    {homeData.slides?.length > 0 && <VideoCarousel videos={homeData.slides} />}
+                    <InStocks watches={inStockWatches} />
+                    <BestBrand watch={homeData.sections?.best_brand} />
+                    <SecondBrand watch={homeData.sections?.second_brand} />
+                    <ThirdBrand watch={homeData.sections?.third_brand} />
+                    <OurStory data={homeData.sections?.our_story} />
+                    <NewsEvents news={homeData.news} />
+                </>
+            )}
         </div>
     );
 }
