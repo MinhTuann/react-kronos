@@ -2,7 +2,9 @@ import { createBrowserRouter } from 'react-router-dom';
 import MainLayout from '@/layouts/MainLayout';
 import HomePage from '@/pages/HomePage';
 import CollectionsPage from '@/pages/CollectionsPage';
+import AccessoriesPage from '@/pages/AccessoriesPage';
 import WatchDetailsPage from '@/pages/WatchDetailsPage';
+import AccessoryDetailsPage from '@/pages/AccessoryDetailsPage';
 import AboutUsPage from '@/pages/AboutUsPage';
 import ContactUsPage from '@/pages/ContactUsPage';
 import NewsEventsPage from '@/pages/NewsEventsPage';
@@ -22,8 +24,16 @@ export const router = createBrowserRouter([
                 element: <CollectionsPage />,
             },
             {
+                path: 'accessories',
+                element: <AccessoriesPage />,
+            },
+            {
                 path: 'watch/:id',
                 element: <WatchDetailsPage />,
+            },
+            {
+                path: 'accessory/:id',
+                element: <AccessoryDetailsPage />,
             },
             {
                 path: 'about-us',

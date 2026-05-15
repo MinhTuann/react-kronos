@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { Watch } from '../types';
+import type { Watch, Accessory } from '../types';
 import type { PublicBrand, PublicCollection } from '@kronos/contracts-public';
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -121,6 +121,12 @@ export interface PublicSeoSettings {
   logo_url?: string;
   pages?: Record<PublicSeoPageKey, PublicSeoPageEntry>;
 }
+
+export interface PublicAccessoryType {
+  id: string;
+  name: string;
+  name_en?: string;
+}
   
 export interface PaginatedResponse<T> {
   data: T[];
@@ -133,17 +139,38 @@ export interface PaginatedResponse<T> {
 export type { PublicBrand, PublicCollection };
 export type { RequestOptions };
 
+const isRequestOptions = (value: unknown): value is RequestOptions =>
+  typeof value === 'object' && value !== null && !Array.isArray(value);
+
 export const publicApi = {
   // Fetch Brands
-  getBrands: async (options?: RequestOptions): Promise<PublicBrand[]> => {
-    return getJson<PublicBrand[]>({ url: '/brands', signal: options?.signal, cache: true });
+  getBrands: async (
+    typeOrOptions?: 'watch' | 'accessory' | RequestOptions,
+    maybeOptions?: RequestOptions,
+  ): Promise<PublicBrand[]> => {
+    const type = typeof typeOrOptions === 'string' ? typeOrOptions : undefined;
+    const options = isRequestOptions(typeOrOptions) ? typeOrOptions : maybeOptions;
+
+    return getJson<PublicBrand[]>({
+      url: '/brands',
+      params: { type },
+      signal: options?.signal,
+      cache: true,
+    });
   },
 
   // Fetch Collections
-  getCollections: async (brandId?: string, options?: RequestOptions): Promise<PublicCollection[]> => {
+  getCollections: async (
+    brandId?: string,
+    typeOrOptions?: 'watch' | 'accessory' | RequestOptions,
+    maybeOptions?: RequestOptions,
+  ): Promise<PublicCollection[]> => {
+    const type = typeof typeOrOptions === 'string' ? typeOrOptions : undefined;
+    const options = isRequestOptions(typeOrOptions) ? typeOrOptions : maybeOptions;
+
     return getJson<PublicCollection[]>({
       url: '/collections',
-      params: { brand_id: brandId },
+      params: { brand_id: brandId, type },
       signal: options?.signal,
       cache: true,
     });
@@ -174,6 +201,42 @@ export const publicApi = {
   // Fetch Single Detailed Watch
   getWatchById: async (id: string | number, options?: RequestOptions): Promise<Watch> => {
     return getJson<Watch>({ url: `/watches/${id}`, signal: options?.signal });
+  },
+
+  // Fetch Public Accessories (Paginated)
+  getAccessories: async (
+    brandId?: string,
+    collectionIds?: string | string[],
+    accessoryTypeIds?: string | string[],
+    search?: string,
+    cursor?: string,
+    limit?: number,
+    inStock?: boolean,
+    options?: RequestOptions
+  ): Promise<PaginatedResponse<Accessory>> => {
+    return getJson<PaginatedResponse<Accessory>>({
+      url: '/accessories',
+      params: {
+        brand_id: brandId,
+        collection_ids: collectionIds,
+        accessory_type_ids: accessoryTypeIds,
+        search,
+        cursor,
+        limit,
+        in_stock: inStock,
+      },
+      signal: options?.signal,
+    });
+  },
+
+  // Fetch Accessory Types
+  getAccessoryTypes: async (options?: RequestOptions): Promise<PublicAccessoryType[]> => {
+    return getJson<PublicAccessoryType[]>({ url: '/accessory-types', signal: options?.signal, cache: true });
+  },
+
+  // Fetch Single Detailed Accessory
+  getAccessoryById: async (id: string | number, options?: RequestOptions): Promise<Accessory> => {
+    return getJson<Accessory>({ url: `/accessories/${id}`, signal: options?.signal });
   },
 
   // Fetch In-Stock Watches (Random 8)

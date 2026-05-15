@@ -36,7 +36,7 @@ const Header = ({ scrollY }: Props) => {
 
         const fetchBrands = async () => {
             try {
-                const data = await publicApi.getBrands({ signal: controller.signal });
+                const data = await publicApi.getBrands('watch', { signal: controller.signal });
                 if (controller.signal.aborted) return;
                 setBrands(data);
             } catch (err) {
@@ -55,7 +55,7 @@ const Header = ({ scrollY }: Props) => {
     const handleBrandSelect = async (brand: PublicBrand) => {
         setSelectedBrand(brand);
         try {
-            const data = await publicApi.getCollections(brand.id);
+            const data = await publicApi.getCollections(brand.id, 'watch');
             setCollections(data);
             setMenuDepth('collections');
         } catch (err) {
@@ -224,6 +224,13 @@ const Header = ({ scrollY }: Props) => {
                                                     {t('menu.theBrands')}
                                                     <span className="text-[10px] tracking-[0.2em] font-branding opacity-0 group-hover:opacity-100 transition-all -translate-x-4 group-hover:translate-x-0">{t('menu.discover')}</span>
                                                 </button>
+                                                <Link
+                                                    to="/accessories"
+                                                    onClick={() => setIsMenuOpen(false)}
+                                                    className="text-3xl md:text-4xl italic text-gunmetal hover:text-black transition-colors"
+                                                >
+                                                    {t('menu.accessories')}
+                                                </Link>
                                                 <Link
                                                     to="/about-us"
                                                     onClick={() => setIsMenuOpen(false)}

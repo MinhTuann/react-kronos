@@ -125,8 +125,8 @@ const CollectionsPage: React.FC = () => {
         const fetchFilters = async () => {
             try {
                 const [bData, cData] = await Promise.all([
-                    publicApi.getBrands({ signal: controller.signal }),
-                    publicApi.getCollections(undefined, { signal: controller.signal })
+                    publicApi.getBrands('watch', { signal: controller.signal }),
+                    publicApi.getCollections(undefined, 'watch', { signal: controller.signal })
                 ]);
                 if (controller.signal.aborted) return;
                 setBrands(bData);
