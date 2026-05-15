@@ -203,6 +203,19 @@ export const publicApi = {
     return getJson<Watch>({ url: `/watches/${id}`, signal: options?.signal });
   },
 
+  getWatchBySlug: async (
+    brandSlug: string,
+    ref: string,
+    collectionSlug?: string,
+    options?: RequestOptions,
+  ): Promise<Watch> => {
+    const path = collectionSlug
+      ? `/watch-by-slug/${brandSlug}/${collectionSlug}/${ref}`
+      : `/watch-by-slug/${brandSlug}/${ref}`;
+
+    return getJson<Watch>({ url: path, signal: options?.signal });
+  },
+
   // Fetch Public Accessories (Paginated)
   getAccessories: async (
     brandId?: string,
@@ -237,6 +250,19 @@ export const publicApi = {
   // Fetch Single Detailed Accessory
   getAccessoryById: async (id: string | number, options?: RequestOptions): Promise<Accessory> => {
     return getJson<Accessory>({ url: `/accessories/${id}`, signal: options?.signal });
+  },
+
+  getAccessoryBySlug: async (
+    brandSlug: string,
+    ref: string,
+    collectionSlug?: string,
+    options?: RequestOptions,
+  ): Promise<Accessory> => {
+    const path = collectionSlug
+      ? `/accessory-by-slug/${brandSlug}/${collectionSlug}/${ref}`
+      : `/accessory-by-slug/${brandSlug}/${ref}`;
+
+    return getJson<Accessory>({ url: path, signal: options?.signal });
   },
 
   // Fetch In-Stock Watches (Random 8)

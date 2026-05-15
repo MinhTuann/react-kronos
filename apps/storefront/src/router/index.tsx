@@ -32,7 +32,23 @@ export const router = createBrowserRouter([
                 element: <WatchDetailsPage />,
             },
             {
+                path: 'watch/:brand_slug/:ref',
+                element: <WatchDetailsPage />,
+            },
+            {
+                path: 'watch/:brand_slug/:collection_slug/:ref',
+                element: <WatchDetailsPage />,
+            },
+            {
                 path: 'accessory/:id',
+                element: <AccessoryDetailsPage />,
+            },
+            {
+                path: 'accessory/:brand_slug/:ref',
+                element: <AccessoryDetailsPage />,
+            },
+            {
+                path: 'accessory/:brand_slug/:collection_slug/:ref',
                 element: <AccessoryDetailsPage />,
             },
             {

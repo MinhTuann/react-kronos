@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { motion, useInView } from 'framer-motion'
 import type { Easing, Variants } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
+import { getWatchUrl } from '@/utils'
 
 export const WatchItem = ({ watch }: { watch: Watch }) => {
     // 1. Create a reference to the watch card
@@ -15,7 +16,7 @@ export const WatchItem = ({ watch }: { watch: Watch }) => {
     return (
         <Link
             ref={ref}
-            to={`/watch/${watch.id}`}
+            to={getWatchUrl(watch)}
             className='block group cursor-pointer relative rounded-lg overflow-hidden transition-all duration-500 hover:shadow-[0_20px_50px_rgba(0,0,0,0.05)]'
         >
             {/* Image Container */}

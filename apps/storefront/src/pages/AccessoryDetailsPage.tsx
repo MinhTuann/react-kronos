@@ -18,7 +18,12 @@ const formatPrice = (price: number) =>
   }).format(price);
 
 const AccessoryDetailsPage: React.FC = () => {
-  const { id } = useParams<{ id?: string }>();
+  const { id, brand_slug, collection_slug, ref } = useParams<{
+    id?: string;
+    brand_slug?: string;
+    collection_slug?: string;
+    ref?: string;
+  }>();
   const [accessory, setAccessory] = useState<Accessory | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { t, i18n } = useTranslation();
@@ -27,6 +32,9 @@ const AccessoryDetailsPage: React.FC = () => {
   const [isEditorialExpanded, setIsEditorialExpanded] = useState(false);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [direction, setDirection] = useState(0);
+  const accessoryPath = id
+    ? `/accessory/${id}`
+    : (brand_slug && ref ? `/accessory/${brand_slug}/${collection_slug ? `${collection_slug}/` : ''}${ref}` : '/accessories');
 
   useSeo({
     pageKey: 'collections',
@@ -43,7 +51,7 @@ const AccessoryDetailsPage: React.FC = () => {
       : '',
     image: accessory?.seo_image_url || accessory?.image,
     canonicalUrl: accessory?.canonical_url || undefined,
-    canonicalPath: accessory?.canonical_url ? undefined : (id ? `/accessory/${id}` : '/accessories'),
+    canonicalPath: accessory?.canonical_url ? undefined : accessoryPath,
     noindex: accessory ? accessory.noindex : (!accessory && !isLoading),
     type: 'product',
     structuredData: accessory ? [
@@ -62,13 +70,13 @@ const AccessoryDetailsPage: React.FC = () => {
           priceCurrency: 'USD',
           price: accessory.price,
           availability: accessory.is_in_stock ? 'https://schema.org/InStock' : 'https://schema.org/PreOrder',
-          url: accessory.canonical_url || `${origin}/accessory/${id}`,
+          url: accessory.canonical_url || `${origin}${accessoryPath}`,
         } : undefined,
       },
       createBreadcrumbJsonLd(origin, [
         { name: currentLang.startsWith('en') ? 'Home' : 'Trang chủ', path: '/' },
         { name: currentLang.startsWith('en') ? 'Accessories' : 'Phụ kiện', path: '/accessories' },
-        { name: accessory.name, path: id ? `/accessory/${id}` : '/accessories' },
+        { name: accessory.name, path: accessoryPath },
       ]),
     ] : undefined,
   });
@@ -78,11 +86,13 @@ const AccessoryDetailsPage: React.FC = () => {
     window.scrollTo(0, 0);
 
     const fetchDetails = async () => {
-      if (!id) return;
+      if (!id && !(brand_slug && ref)) return;
 
       try {
         setIsLoading(true);
-        const data = await publicApi.getAccessoryById(id, { signal: controller.signal });
+        const data = id
+          ? await publicApi.getAccessoryById(id, { signal: controller.signal })
+          : await publicApi.getAccessoryBySlug(brand_slug!, ref!, collection_slug, { signal: controller.signal });
         if (controller.signal.aborted) return;
         setAccessory(data);
       } catch (err) {
@@ -97,7 +107,7 @@ const AccessoryDetailsPage: React.FC = () => {
 
     fetchDetails();
     return () => controller.abort();
-  }, [id]);
+  }, [id, brand_slug, collection_slug, ref]);
 
   if (isLoading) {
     return (

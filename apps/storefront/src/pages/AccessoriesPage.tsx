@@ -8,6 +8,7 @@ import type { Accessory } from '@/types';
 import { CollectionsGridSkeleton, Skeleton } from '@/components/common/Skeleton';
 import { publicApi, type PublicBrand, type PublicCollection, type PublicAccessoryType } from '@/lib/api';
 import { createBreadcrumbJsonLd, useSeo } from '@/seo';
+import { getAccessoryUrl } from '@/utils';
 
 const readMultiValueParam = (params: URLSearchParams, key: string): string[] => {
   const repeated = params.getAll(key).filter(Boolean);
@@ -29,7 +30,7 @@ const AccessoryCard = ({ accessory }: { accessory: Accessory }) => {
   return (
     <Link
       ref={ref}
-      to={`/accessory/${accessory.id}`}
+      to={getAccessoryUrl(accessory)}
       className="block group cursor-pointer relative rounded-lg overflow-hidden transition-all duration-500 hover:shadow-[0_20px_50px_rgba(0,0,0,0.05)]"
     >
       <div className="relative aspect-[4/5] w-full overflow-hidden flex items-center justify-center p-12">
