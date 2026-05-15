@@ -202,9 +202,27 @@ const Header = ({ scrollY }: Props) => {
                             className="fixed top-0 left-0 h-[100dvh] w-full md:w-[450px] bg-white z-[70] shadow-2xl overflow-hidden flex flex-col pt-32"
                         >
                             <div className="flex flex-col h-full px-12">
-                                <span className="font-branding text-[10px] tracking-[0.4em] uppercase text-gunmetal/50 mb-8 border-b border-gunmetal/20 pb-4 block">
-                                    {t('menu.title')}
-                                </span>
+                                <div className="flex justify-between items-center mb-8 border-b border-gunmetal/20 pb-4">
+                                    <span className="font-branding text-[10px] tracking-[0.4em] uppercase text-gunmetal/50">
+                                        {t('menu.title')}
+                                    </span>
+
+                                    <div className="sm:hidden flex items-center gap-3">
+                                        <button
+                                            onClick={() => i18n.changeLanguage('vi')}
+                                            className={`text-[10px] tracking-[0.2em] transition-colors font-branding ${i18n.language.startsWith('vi') ? 'text-black font-bold' : 'text-gunmetal/50 hover:text-black'}`}
+                                        >
+                                            VI
+                                        </button>
+                                        <span className="text-gunmetal/20 text-[10px] font-light">|</span>
+                                        <button
+                                            onClick={() => i18n.changeLanguage('en')}
+                                            className={`text-[10px] tracking-[0.2em] transition-colors font-branding ${i18n.language.startsWith('en') ? 'text-black font-bold' : 'text-gunmetal/50 hover:text-black'}`}
+                                        >
+                                            EN
+                                        </button>
+                                    </div>
+                                </div>
 
                                 <div className="flex-1 overflow-hidden">
                                     <AnimatePresence mode="wait" initial={false}>
@@ -230,6 +248,13 @@ const Header = ({ scrollY }: Props) => {
                                                     className="text-3xl md:text-4xl italic text-gunmetal hover:text-black transition-colors"
                                                 >
                                                     {t('menu.accessories')}
+                                                </Link>
+                                                <Link
+                                                    to="/collections?in_stock=true"
+                                                    onClick={() => setIsMenuOpen(false)}
+                                                    className="text-3xl md:text-4xl italic text-gunmetal hover:text-black transition-colors"
+                                                >
+                                                    {t('menu.inStock')}
                                                 </Link>
                                                 <Link
                                                     to="/about-us"

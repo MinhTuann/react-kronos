@@ -1,4 +1,4 @@
-import { CONTACT_EMAIL, CONTACT_PHONE, YEAR_OF_FOUNDATION } from '@/utils';
+import { CONTACT_EMAIL, CONTACT_PHONE, YEAR_OF_FOUNDATION, MAP_URL, FACEBOOK_URL, INSTAGRAM_URL } from '@/utils';
 import { Facebook, Instagram, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -90,13 +90,13 @@ const Footer = () => {
                             {t('footer.connect')}
                         </h5>
                         <div className="flex gap-8 mb-12">
-                            <a href="#" className="text-stone-400 hover:text-black hover:-translate-y-1 transition-all duration-300">
+                            <a href={FACEBOOK_URL} target="_blank" rel="noopener noreferrer" className="text-stone-400 hover:text-black hover:-translate-y-1 transition-all duration-300">
                                 <Facebook size={20} strokeWidth={1.2} />
                             </a>
-                            <a href="#" className="text-stone-400 hover:text-black hover:-translate-y-1 transition-all duration-300">
+                            <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className="text-stone-400 hover:text-black hover:-translate-y-1 transition-all duration-300">
                                 <Instagram size={20} strokeWidth={1.2} />
                             </a>
-                            <a href="#" className="text-stone-400 hover:text-black hover:-translate-y-1 transition-all duration-300">
+                            <a href={MAP_URL} target="_blank" rel="noopener noreferrer" className="text-stone-400 hover:text-black hover:-translate-y-1 transition-all duration-300">
                                 <MapPin size={20} strokeWidth={1.2} />
                             </a>
                         </div>

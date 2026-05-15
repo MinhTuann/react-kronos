@@ -25,6 +25,7 @@ const resources = {
         accessories: "The Accessories",
         theCompany: "The Company",
         newsEvents: "News & Events",
+        inStock: "In Stock",
         all: "All"
       },
       search: {
@@ -123,6 +124,7 @@ const resources = {
         accessories: "Phụ kiện",
         theCompany: "Về chúng tôi",
         newsEvents: "Tin tức & Sự kiện",
+        inStock: "Hàng sẵn có",
         all: "Tất cả"
       },
       search: {
