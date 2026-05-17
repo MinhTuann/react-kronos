@@ -32,7 +32,7 @@ const FooterNavGroup = ({ title, links }: { title: string, links: string[] }) =>
 
 const Footer = () => {
     const { t } = useTranslation();
-    
+
     return (
         <footer className="bg-white text-gunmetal pt-24 pb-12 border-t border-gunmetal/10">
             <div className="max-w-[1600px] mx-auto px-6 sm:px-8 lg:px-12">

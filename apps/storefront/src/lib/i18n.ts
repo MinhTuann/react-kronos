@@ -7,6 +7,7 @@ const resources = {
     translation: {
       header: {
         brands: "Brands",
+        collections: "Collections",
         sell: "Sell Your Watch",
         magazine: "Magazine",
         history: "Kronos History",
@@ -53,10 +54,10 @@ const resources = {
         specifications: "Technical Specifications",
         caseSize: "Case Size",
         material: "Material",
-        color: "Color",
         movement: "Movement",
         strap: "Strap/Bracelet",
-        dial: "Dial",
+        dial: "Dial Color",
+        color: "Color",
         condition: "Condition",
         relatedProducts: "Related Products",
         contactUs: "Contact Us",
@@ -65,14 +66,15 @@ const resources = {
         availability: "Availability",
         delivery: "Delivery",
         in_stock: "In Stock",
-        pre_order: "Pre Order",
         contact_boutiques: "Contact Boutiques",
         authenticity: "Authenticity Guaranteed",
         secure_payment: "Secure Payment",
         back_to_collections: "Back to Collections",
         delivery_time: "3-5 Business Days",
         load_more: "Load More",
-        syncing: "SYNCING"
+        syncing: "SYNCING",
+        sold_out: "Sold Out",
+        pre_order: "Pre-order"
       },
       home: {
         latestArrivals: "Latest Arrivals",
@@ -88,11 +90,11 @@ const resources = {
         showFilters: "Show Filters",
         hideFilters: "Hide Filters",
         filter: "Filter",
-        accessoryTypes: "Accessory Types",
         applyFilters: "Apply Filters",
         previous: "Previous",
         next: "Next",
-        watch_not_found: "Watch Not Found"
+        watch_not_found: "Watch Not Found",
+        accessoryTypes: "Accessory Types"
       },
       news: {
         title: "News & Events",
@@ -106,6 +108,7 @@ const resources = {
     translation: {
       header: {
         brands: "Thương hiệu",
+        collections: "Bộ sưu tập",
         sell: "Ký Gửi & Thu Mua",
         magazine: "Tạp chí",
         history: "Lịch sử Kronos",
@@ -152,10 +155,10 @@ const resources = {
         specifications: "Thông số kỹ thuật",
         caseSize: "Kích thước",
         material: "Chất liệu",
-        color: "Màu sắc",
         movement: "Bộ máy",
         strap: "Dây đeo",
-        dial: "Mặt số",
+        dial: "Màu mặt số",
+        color: "Màu sắc",
         condition: "Tình trạng",
         relatedProducts: "Sản phẩm liên quan",
         contactUs: "Liên hệ",
@@ -164,7 +167,6 @@ const resources = {
         availability: "Tình trạng hàng",
         delivery: "Giao hàng",
         in_stock: "Còn hàng",
-        pre_order: "Đặt trước",
         contact_boutiques: "Liên hệ cửa hàng",
         authenticity: "Đảm bảo chính hãng",
         secure_payment: "Thanh toán an toàn",
@@ -172,7 +174,9 @@ const resources = {
         delivery_time: "3-5 ngày làm việc",
         watch_not_found: "Không tìm thấy đồng hồ",
         load_more: "Xem Thêm",
-        syncing: "ĐANG TẢI"
+        syncing: "ĐANG TẢI",
+        sold_out: "Hết hàng",
+        pre_order: "Đặt hàng"
       },
       home: {
         latestArrivals: "Sản phẩm mới nhất",
@@ -188,11 +192,11 @@ const resources = {
         showFilters: "Hiện bộ lọc",
         hideFilters: "Ẩn bộ lọc",
         filter: "Bộ lọc",
-        accessoryTypes: "Loại phụ kiện",
         applyFilters: "Áp dụng",
         previous: "Trước",
         next: "Tiếp",
-        watch_not_found: "Không tìm thấy đồng hồ"
+        watch_not_found: "Không tìm thấy đồng hồ",
+        accessoryTypes: "Loại phụ kiện"
       },
       news: {
         title: "Tin tức & Sự kiện",

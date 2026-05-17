@@ -1,10 +1,10 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { useTranslation } from 'react-i18next';
-import SpecValue from '@/components/common/SpecValue';
-import type { Watch } from '@/types';
-import { getWatchUrl } from '@/utils';
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
+import SpecValue from "@/components/common/SpecValue";
+import type { Watch } from "@/types";
+import { getWatchUrl } from "@/utils";
 import { BrandSectionSkeleton, Skeleton } from '../common/Skeleton';
 
 const SpecItem = ({ label, value, index }: { label: string; value: string; index: number }) => (
@@ -21,12 +21,11 @@ const SpecItem = ({ label, value, index }: { label: string; value: string; index
     </motion.div>
 );
 
-const ThirdBrand = ({ watch, isLoading = false }: { watch?: Watch; isLoading?: boolean }) => {
+const ThirdBrand = ({ watch, isLoading = false }: { watch?: Watch, isLoading?: boolean }) => {
     const { t, i18n } = useTranslation();
     const [imageLoaded, setImageLoaded] = useState(false);
     const lang = i18n.language.split('-')[0];
-    const getLocalized = (baseValue?: string, enValue?: string | null) =>
-        lang === 'en' ? (enValue || baseValue || '') : (baseValue || enValue || '');
+    const getLocalized = (baseValue?: string, enValue?: string | null) => lang === 'en' ? (enValue || baseValue || '') : (baseValue || enValue || '');
 
     if (isLoading) return <BrandSectionSkeleton reversed />;
     if (!watch) return null;

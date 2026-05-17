@@ -21,12 +21,11 @@ const SpecItem = ({ label, value, index }: { label: string; value: string; index
     </motion.div>
 );
 
-const SecondBrand = ({ watch, isLoading = false }: { watch?: Watch; isLoading?: boolean }) => {
+const SecondBrand = ({ watch, isLoading = false }: { watch?: Watch, isLoading?: boolean }) => {
     const { t, i18n } = useTranslation();
     const [imageLoaded, setImageLoaded] = useState(false);
     const lang = i18n.language.split('-')[0];
-    const getLocalized = (baseValue?: string, enValue?: string | null) =>
-        lang === 'en' ? (enValue || baseValue || '') : (baseValue || enValue || '');
+    const getLocalized = (baseValue?: string, enValue?: string | null) => lang === 'en' ? (enValue || baseValue || '') : (baseValue || enValue || '');
 
     if (isLoading) return <BrandSectionSkeleton />;
     if (!watch) return null;

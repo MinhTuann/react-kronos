@@ -2,14 +2,34 @@ import React, { useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { MapPin, Phone, Mail, Clock, ArrowRight } from 'lucide-react';
 import type { Variants, Easing } from 'framer-motion';
-import { CONTACT_ADDRESS, CONTACT_EMAIL, CONTACT_PHONE } from '@/utils';
+import { CONTACT_ADDRESS, CONTACT_EMAIL, CONTACT_PHONE, MAP_URL } from '@/utils';
 import { createBreadcrumbJsonLd, useSeo } from '@/seo';
+import { useTranslation } from 'react-i18next';
+
+// --- Animation Configurations ---
+const customEase: Easing = [0.16, 1, 0.3, 1];
+
+const fadeUp: Variants = {
+    hidden: { opacity: 0, y: 40 },
+    visible: { opacity: 1, y: 0, transition: { duration: 1, ease: customEase } }
+};
+
+const staggerContainer: Variants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: { staggerChildren: 0.15 }
+    }
+};
 
 const ContactUsPage: React.FC = () => {
+    const { i18n } = useTranslation();
+    const currentLang = i18n.language.split('-')[0];
     const origin = import.meta.env.VITE_SITE_URL || window.location.origin;
 
     useSeo({
         pageKey: 'contact-us',
+        lang: currentLang,
         canonicalPath: '/contact-us',
         structuredData: createBreadcrumbJsonLd(origin, [
             { name: 'Home', path: '/' },
@@ -20,22 +40,6 @@ const ContactUsPage: React.FC = () => {
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);
-
-    // --- Animation Configurations ---
-    const customEase: Easing = [0.16, 1, 0.3, 1];
-    
-    const fadeUp: Variants = {
-        hidden: { opacity: 0, y: 40 },
-        visible: { opacity: 1, y: 0, transition: { duration: 1, ease: customEase } }
-    };
-
-    const staggerContainer: Variants = {
-        hidden: { opacity: 0 },
-        visible: {
-            opacity: 1,
-            transition: { staggerChildren: 0.15 }
-        }
-    };
 
     // Parallax hook for the hero text
     const heroRef = useRef(null);
@@ -82,9 +86,9 @@ const ContactUsPage: React.FC = () => {
             {/* --- 2. The Main Contact Interface --- */}
             <section className="max-w-[1600px] mx-auto px-6 lg:px-12 pb-24 md:pb-40">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-16 lg:gap-24">
-                    
+
                     {/* Left: The Editorial Form */}
-                    <motion.div 
+                    <motion.div
                         initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}
                         className="flex flex-col bg-stone-50 p-8 md:p-12 lg:p-16 rounded-lg"
                     >
@@ -145,21 +149,21 @@ const ContactUsPage: React.FC = () => {
 
                     {/* Right: Direct Contact & Imagery */}
                     <div className="flex flex-col h-full justify-between gap-12">
-                        
+
                         {/* The Consultation Desk Image */}
-                        <motion.div 
+                        <motion.div
                             initial={{ opacity: 0, x: 40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 1.2, ease: customEase }}
                             className="w-full aspect-[4/3] lg:aspect-auto lg:flex-1 overflow-hidden rounded-lg"
                         >
-                            <img 
-                                src={`${import.meta.env.BASE_URL}DSC04306.jpg`} 
-                                alt="Kronos Consultation Desk" 
+                            <img
+                                src={`${import.meta.env.BASE_URL}DSC04306.jpg`}
+                                alt="Kronos Consultation Desk"
                                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-[3s] ease-out"
                             />
                         </motion.div>
 
                         {/* Contact Information Grid */}
-                        <motion.div 
+                        <motion.div
                             initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}
                             className="grid grid-cols-1 sm:grid-cols-2 gap-8 lg:gap-12"
                         >
@@ -192,16 +196,16 @@ const ContactUsPage: React.FC = () => {
             {/* --- 3. The Boutique Location --- */}
             <section className="max-w-[1600px] mx-auto px-6 lg:px-12">
                 <div className="grid grid-cols-1 lg:grid-cols-12 border-t border-gunmetal/10 pt-16 md:pt-24 gap-12 lg:gap-0 items-center">
-                    
+
                     {/* Location Image */}
                     <div className="lg:col-span-6">
-                        <motion.div 
+                        <motion.div
                             initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 1, ease: customEase }}
                             className="aspect-[2/3] w-full lg:w-[85%] bg-stone-100 overflow-hidden rounded-lg"
                         >
-                            <img 
-                                src={`${import.meta.env.BASE_URL}DSC04304.jpg`} 
-                                alt="Kronos Boutique Entrance" 
+                            <img
+                                src={`${import.meta.env.BASE_URL}DSC04304.jpg`}
+                                alt="Kronos Boutique Entrance"
                                 className="w-full h-full object-cover"
                             />
                         </motion.div>
@@ -209,23 +213,29 @@ const ContactUsPage: React.FC = () => {
 
                     {/* Location Details */}
                     <div className="lg:col-span-6 flex flex-col justify-center lg:pl-12 xl:pl-24">
-                        <motion.div 
+                        <motion.div
                             initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}
                         >
                             <motion.span variants={fadeUp} className="font-branding text-[10px] tracking-[0.4em] uppercase text-gunmetal/40 font-bold mb-6 block">
                                 The Flagship
                             </motion.span>
-                            
+
                             <motion.h2 variants={fadeUp} className="italic text-3xl md:text-5xl font-light text-gunmetal mb-8 leading-tight">
                                 Kronos Luxury Timepieces
                             </motion.h2>
 
-                            <motion.div variants={fadeUp} className="flex items-start gap-4 mb-8">
-                                <MapPin size={20} className="text-gunmetal/40 shrink-0 mt-1" strokeWidth={1.5} />
-                                <p className="text-[14px] md:text-[15px] font-light text-stone-500 leading-relaxed">
+                            <motion.a
+                                href={MAP_URL}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                variants={fadeUp}
+                                className="flex items-start gap-4 mb-8 group cursor-pointer"
+                            >
+                                <MapPin size={20} className="text-gunmetal/40 group-hover:text-gunmetal shrink-0 mt-1 transition-colors" strokeWidth={1.5} />
+                                <p className="text-[14px] md:text-[15px] font-light text-stone-500 group-hover:text-gunmetal leading-relaxed transition-colors">
                                     {CONTACT_ADDRESS}
                                 </p>
-                            </motion.div>
+                            </motion.a>
 
                             <motion.div variants={fadeUp} className="flex items-start gap-4 mb-12 pb-12 border-b border-gunmetal/10">
                                 <Clock size={20} className="text-gunmetal/40 shrink-0 mt-1" strokeWidth={1.5} />
@@ -236,10 +246,16 @@ const ContactUsPage: React.FC = () => {
                                 </div>
                             </motion.div>
 
-                            <motion.button variants={fadeUp} className="group flex items-center gap-4 text-[10px] uppercase tracking-[0.3em] font-bold text-gunmetal">
+                            <motion.a
+                                href={MAP_URL}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                variants={fadeUp}
+                                className="group flex items-center gap-4 text-[10px] uppercase tracking-[0.3em] font-bold text-gunmetal"
+                            >
                                 <span className="h-[1px] w-8 bg-gunmetal/30 group-hover:w-16 group-hover:bg-gunmetal transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"></span>
                                 Get Directions
-                            </motion.button>
+                            </motion.a>
                         </motion.div>
                     </div>
 

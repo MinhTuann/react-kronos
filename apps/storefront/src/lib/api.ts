@@ -122,12 +122,6 @@ export interface PublicSeoSettings {
   pages?: Record<PublicSeoPageKey, PublicSeoPageEntry>;
 }
 
-export interface PublicAccessoryType {
-  id: string;
-  name: string;
-  name_en?: string;
-}
-  
 export interface PaginatedResponse<T> {
   data: T[];
   meta: {
@@ -139,23 +133,20 @@ export interface PaginatedResponse<T> {
 export type { PublicBrand, PublicCollection };
 export type { RequestOptions };
 
-const isRequestOptions = (value: unknown): value is RequestOptions =>
-  typeof value === 'object' && value !== null && !Array.isArray(value);
-
 export const publicApi = {
   // Fetch Brands
   getBrands: async (
     typeOrOptions?: 'watch' | 'accessory' | RequestOptions,
-    maybeOptions?: RequestOptions,
+    maybeOptions?: RequestOptions
   ): Promise<PublicBrand[]> => {
     const type = typeof typeOrOptions === 'string' ? typeOrOptions : undefined;
-    const options = isRequestOptions(typeOrOptions) ? typeOrOptions : maybeOptions;
+    const options = typeof typeOrOptions === 'string' ? maybeOptions : typeOrOptions;
 
     return getJson<PublicBrand[]>({
       url: '/brands',
       params: { type },
       signal: options?.signal,
-      cache: true,
+      cache: true
     });
   },
 
@@ -163,26 +154,27 @@ export const publicApi = {
   getCollections: async (
     brandId?: string,
     typeOrOptions?: 'watch' | 'accessory' | RequestOptions,
-    maybeOptions?: RequestOptions,
+    maybeOptions?: RequestOptions
   ): Promise<PublicCollection[]> => {
     const type = typeof typeOrOptions === 'string' ? typeOrOptions : undefined;
-    const options = isRequestOptions(typeOrOptions) ? typeOrOptions : maybeOptions;
+    const options = typeof typeOrOptions === 'string' ? maybeOptions : typeOrOptions;
 
     return getJson<PublicCollection[]>({
       url: '/collections',
       params: { brand_id: brandId, type },
       signal: options?.signal,
-      cache: true,
+      cache: true
     });
   },
 
   // Fetch Public Watches (Paginated)
   getWatches: async (
-    brandId?: string, 
-    collectionIds?: string | string[], 
-    search?: string, 
-    cursor?: string, 
-    limit?: number, 
+    brandId?: string,
+    collectionIds?: string | string[],
+    search?: string,
+    cursor?: string,
+    limit?: number,
+    inStock?: boolean,
     options?: RequestOptions
   ): Promise<PaginatedResponse<Watch>> => {
     return getJson<PaginatedResponse<Watch>>({
@@ -193,6 +185,7 @@ export const publicApi = {
         search,
         cursor,
         limit,
+        in_stock: inStock
       },
       signal: options?.signal,
     });
@@ -203,17 +196,40 @@ export const publicApi = {
     return getJson<Watch>({ url: `/watches/${id}`, signal: options?.signal });
   },
 
-  getWatchBySlug: async (
-    brandSlug: string,
-    ref: string,
-    collectionSlug?: string,
-    options?: RequestOptions,
-  ): Promise<Watch> => {
-    const path = collectionSlug
-      ? `/watch-by-slug/${brandSlug}/${collectionSlug}/${ref}`
-      : `/watch-by-slug/${brandSlug}/${ref}`;
+  getWatchBySlug: async (brand: string, ref: string, collection?: string, options?: RequestOptions): Promise<Watch> => {
+    const url = collection
+        ? `/watch-by-slug/${brand}/${collection}/${ref}`
+        : `/watch-by-slug/${brand}/${ref}`;
+    return getJson<Watch>({ url, signal: options?.signal });
+  },
 
-    return getJson<Watch>({ url: path, signal: options?.signal });
+  // Fetch In-Stock Watches (Random 8)
+  getInStockWatches: async (options?: RequestOptions): Promise<Watch[]> => {
+    return getJson<Watch[]>({ url: '/in-stock', signal: options?.signal, cache: true });
+  },
+
+  // Fetch Home Page Dynamic Content
+  getHomePageData: async (options?: RequestOptions): Promise<any> => {
+    return getJson<any>({ url: '/homepage', signal: options?.signal, cache: true });
+  },
+
+  getSeoSettings: async (options?: RequestOptions): Promise<PublicSeoSettings> => {
+    return getJson<PublicSeoSettings>({ url: '/seo', signal: options?.signal, cache: true });
+  },
+
+  // Fetch Articles (Paginated)
+  getArticles: async (cursor?: string, limit?: number, options?: RequestOptions): Promise<PaginatedResponse<PublicArticle>> => {
+    return getJson<PaginatedResponse<PublicArticle>>({
+        url: '/articles',
+        params: { cursor, limit },
+        signal: options?.signal,
+        cache: false
+    });
+  },
+
+  // Fetch Single Article
+  getArticleBySlug: async (slug: string, options?: RequestOptions): Promise<PublicArticle> => {
+    return getJson<PublicArticle>({ url: `/articles/${slug}`, signal: options?.signal, cache: false });
   },
 
   // Fetch Public Accessories (Paginated)
@@ -236,15 +252,15 @@ export const publicApi = {
         search,
         cursor,
         limit,
-        in_stock: inStock,
+        in_stock: inStock
       },
       signal: options?.signal,
     });
   },
 
   // Fetch Accessory Types
-  getAccessoryTypes: async (options?: RequestOptions): Promise<PublicAccessoryType[]> => {
-    return getJson<PublicAccessoryType[]>({ url: '/accessory-types', signal: options?.signal, cache: true });
+  getAccessoryTypes: async (options?: RequestOptions): Promise<any[]> => {
+    return getJson<any[]>({ url: '/accessory-types', signal: options?.signal, cache: true });
   },
 
   // Fetch Single Detailed Accessory
@@ -252,45 +268,10 @@ export const publicApi = {
     return getJson<Accessory>({ url: `/accessories/${id}`, signal: options?.signal });
   },
 
-  getAccessoryBySlug: async (
-    brandSlug: string,
-    ref: string,
-    collectionSlug?: string,
-    options?: RequestOptions,
-  ): Promise<Accessory> => {
-    const path = collectionSlug
-      ? `/accessory-by-slug/${brandSlug}/${collectionSlug}/${ref}`
-      : `/accessory-by-slug/${brandSlug}/${ref}`;
-
-    return getJson<Accessory>({ url: path, signal: options?.signal });
-  },
-
-  // Fetch In-Stock Watches (Random 8)
-  getInStockWatches: async (options?: RequestOptions): Promise<Watch[]> => {
-    return getJson<Watch[]>({ url: '/in-stock', signal: options?.signal, cache: true });
-  },
-
-  // Fetch Home Page Dynamic Content
-  getHomePageData: async (options?: RequestOptions): Promise<any> => {
-    return getJson<any>({ url: '/homepage', signal: options?.signal, cache: true });
-  },
-
-  getSeoSettings: async (options?: RequestOptions): Promise<PublicSeoSettings> => {
-    return getJson<PublicSeoSettings>({ url: '/seo', signal: options?.signal, cache: true });
-  },
-
-  // Fetch Articles (Paginated)
-  getArticles: async (cursor?: string, limit?: number, options?: RequestOptions): Promise<PaginatedResponse<PublicArticle>> => {
-    return getJson<PaginatedResponse<PublicArticle>>({ 
-        url: '/articles', 
-        params: { cursor, limit },
-        signal: options?.signal, 
-        cache: false 
-    });
-  },
-
-  // Fetch Single Article
-  getArticleBySlug: async (slug: string, options?: RequestOptions): Promise<PublicArticle> => {
-    return getJson<PublicArticle>({ url: `/articles/${slug}`, signal: options?.signal, cache: false });
+  getAccessoryBySlug: async (brand: string, ref: string, collection?: string, options?: RequestOptions): Promise<Accessory> => {
+    const url = collection
+        ? `/accessory-by-slug/${brand}/${collection}/${ref}`
+        : `/accessory-by-slug/${brand}/${ref}`;
+    return getJson<Accessory>({ url, signal: options?.signal });
   }
 };

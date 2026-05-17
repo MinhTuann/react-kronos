@@ -4,13 +4,13 @@
 
 @layer utilities {
   .prose .ql-align-center {
-    text-align: center;
+    text-align: center !important;
   }
   .prose .ql-align-right {
-    text-align: right;
+    text-align: right !important;
   }
   .prose .ql-align-justify {
-    text-align: justify;
+    text-align: justify !important;
   }
   .prose img {
     @apply rounded-sm mx-auto shadow-md transition-all duration-700 hover:shadow-xl;
@@ -23,6 +23,13 @@
   .prose blockquote {
     @apply border-l-4 border-golden pl-6 italic text-stone-600 my-8;
   }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 /* Quill specific classes for full feature support */
@@ -30,10 +37,10 @@
 .prose .ql-size-large { font-size: 1.5em; }
 .prose .ql-size-huge { font-size: 2.5em; }
 .prose .ql-direction-rtl { direction: rtl; }
-.prose .ql-font-serif { font-family: serif; }
+.prose .ql-font-serif { font-family: 'Lora', 'Playfair Display', serif; }
 .prose .ql-font-monospace { font-family: monospace; }
 
 /* Existing alignments */
-.ql-align-center { text-align: center; }
-.ql-align-right { text-align: right; }
-.ql-align-justify { text-align: justify; }
+.ql-align-center { text-align: center !important; }
+.ql-align-right { text-align: right !important; }
+.ql-align-justify { text-align: justify !important; }

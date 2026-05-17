@@ -4,21 +4,8 @@ import { Link } from 'react-router-dom';
 import type { PublicArticle } from '@/lib/api';
 import { NewsCardSkeleton, Skeleton } from '../common/Skeleton';
 
-const NewsItem = ({
-    item,
-    title,
-    category,
-    summary,
-    t,
-}: {
-    item: PublicArticle;
-    title: string;
-    category: string;
-    summary: string;
-    t: (key: string) => string;
-}) => {
+const NewsItem = ({ item, title, category, summary, t }: { item: PublicArticle, title: string, category: string, summary: string, t: any }) => {
     const [imageLoaded, setImageLoaded] = useState(false);
-
     return (
         <Link to={`/news-events/${item.slug}`} className="group block">
             <div className="aspect-[4/5] overflow-hidden mb-6 bg-stone-100 rounded-sm relative">
@@ -49,7 +36,7 @@ const NewsItem = ({
     );
 };
 
-const NewsEvents = ({ news, isLoading = false }: { news?: PublicArticle[]; isLoading?: boolean }) => {
+const NewsEvents = ({ news, isLoading = false }: { news?: PublicArticle[], isLoading?: boolean }) => {
     const { t, i18n } = useTranslation();
     const currentLang = i18n.language as 'vi' | 'en';
 
@@ -75,8 +62,8 @@ const NewsEvents = ({ news, isLoading = false }: { news?: PublicArticle[]; isLoa
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
                     {isLoading ? (
-                        Array.from({ length: 3 }).map((_, index) => (
-                            <NewsCardSkeleton key={index} />
+                        Array.from({ length: 3 }).map((_, i) => (
+                            <NewsCardSkeleton key={i} />
                         ))
                     ) : (
                         displayNews.map((item) => {

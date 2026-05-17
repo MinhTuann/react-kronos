@@ -8,19 +8,22 @@ interface SkeletonProps {
   animate?: boolean;
 }
 
+/**
+ * A luxurious, modern skeleton loader with a subtle shimmer effect.
+ */
 export const Skeleton = ({
-  className = '',
+  className = "",
   width,
   height,
   variant = 'rect',
-  animate = true,
+  animate = true
 }: SkeletonProps) => {
-  const baseClasses = 'relative overflow-hidden bg-gunmetal/5';
+  const baseClasses = "relative overflow-hidden bg-gunmetal/5";
 
   const variantClasses = {
-    rect: 'rounded-lg',
-    circle: 'rounded-full',
-    text: 'rounded h-4 my-2',
+    rect: "rounded-lg",
+    circle: "rounded-full",
+    text: "rounded h-4 my-2"
   };
 
   return (
@@ -31,11 +34,13 @@ export const Skeleton = ({
       {animate && (
         <motion.div
           className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent"
-          animate={{ x: ['-100%', '100%'] }}
+          animate={{
+            x: ['-100%', '100%']
+          }}
           transition={{
             repeat: Infinity,
             duration: 2,
-            ease: 'easeInOut',
+            ease: "easeInOut"
           }}
         />
       )}
@@ -43,18 +48,18 @@ export const Skeleton = ({
   );
 };
 
-export const MediaSkeleton = ({ className = '', aspect = 'aspect-video' }: { className?: string; aspect?: string }) => (
+export const MediaSkeleton = ({ className = "", aspect = "aspect-video" }: { className?: string, aspect?: string }) => (
   <Skeleton className={`${aspect} w-full ${className}`} />
 );
 
-export const TextSkeleton = ({ lines = 3, className = '' }: { lines?: number; className?: string }) => (
+export const TextSkeleton = ({ lines = 3, className = "" }: { lines?: number, className?: string }) => (
   <div className={`space-y-2 ${className}`}>
-    {Array.from({ length: lines }).map((_, index) => (
+    {Array.from({ length: lines }).map((_, i) => (
       <Skeleton
-        key={index}
+        key={i}
         variant="text"
-        width={index === lines - 1 ? '60%' : '100%'}
-        className={index === 0 ? 'h-6 mb-4' : ''}
+        width={i === lines - 1 ? "60%" : "100%"}
+        className={i === 0 ? "h-6 mb-4" : ""} // First line taller like a title
       />
     ))}
   </div>
@@ -97,8 +102,8 @@ export const BrandSectionSkeleton = ({ reversed = false }: { reversed?: boolean 
           <TextSkeleton lines={3} className="max-w-md opacity-40" />
         </div>
         <div className="grid grid-cols-2 gap-y-8 gap-x-12 border-t border-bone/30 pt-8">
-          {Array.from({ length: 4 }).map((_, index) => (
-            <div key={index} className="space-y-2">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="space-y-2">
               <Skeleton width={60} height={10} />
               <Skeleton width={100} height={18} />
             </div>
@@ -112,8 +117,8 @@ export const BrandSectionSkeleton = ({ reversed = false }: { reversed?: boolean 
 
 export const CollectionsGridSkeleton = () => (
   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-12 md:gap-y-16 xl:gap-x-8">
-    {Array.from({ length: 8 }).map((_, index) => (
-      <WatchCardSkeleton key={index} />
+    {Array.from({ length: 8 }).map((_, i) => (
+      <WatchCardSkeleton key={i} />
     ))}
   </div>
 );

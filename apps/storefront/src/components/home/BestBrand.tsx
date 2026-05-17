@@ -1,11 +1,11 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { useTranslation } from 'react-i18next';
-import SpecValue from '@/components/common/SpecValue';
-import type { Watch } from '@/types';
-import { getWatchUrl } from '@/utils';
-import { Skeleton, TextSkeleton } from '../common/Skeleton';
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
+import SpecValue from "@/components/common/SpecValue";
+import type { Watch } from "@/types";
+import { getWatchUrl } from "@/utils";
+import { Skeleton, TextSkeleton } from "../common/Skeleton";
 
 const SpecItem = ({ label, value, index }: { label: string; value: string; index: number }) => (
     <motion.div
@@ -22,12 +22,11 @@ const SpecItem = ({ label, value, index }: { label: string; value: string; index
     </motion.div>
 );
 
-const BestBrand = ({ watch, isLoading = false }: { watch?: Watch; isLoading?: boolean }) => {
+const BestBrand = ({ watch, isLoading = false }: { watch?: Watch, isLoading?: boolean }) => {
     const { t, i18n } = useTranslation();
     const [imageLoaded, setImageLoaded] = useState(false);
     const lang = i18n.language.split('-')[0];
-    const getLocalized = (baseValue?: string, enValue?: string | null) =>
-        lang === 'en' ? (enValue || baseValue || '') : (baseValue || enValue || '');
+    const getLocalized = (baseValue?: string, enValue?: string | null) => lang === 'en' ? (enValue || baseValue || '') : (baseValue || enValue || '');
 
     if (isLoading) {
         return (
@@ -45,8 +44,8 @@ const BestBrand = ({ watch, isLoading = false }: { watch?: Watch; isLoading?: bo
                     </div>
                     <div className='flex flex-col justify-end md:items-end'>
                         <div className='grid grid-cols-2 gap-x-12 gap-y-8'>
-                            {Array.from({ length: 4 }).map((_, index) => (
-                                <div key={index} className="space-y-2 flex flex-col md:items-end">
+                            {Array.from({ length: 4 }).map((_, i) => (
+                                <div key={i} className="space-y-2 flex flex-col md:items-end">
                                     <Skeleton width={60} height={10} />
                                     <Skeleton width={100} height={18} />
                                 </div>

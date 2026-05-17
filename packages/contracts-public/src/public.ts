@@ -9,15 +9,24 @@ export interface PublicCollection {
   name: string;
 }
 
+export interface PublicWatchImage {
+  id?: string;
+  url: string;
+  is_primary?: boolean;
+  display_order?: number;
+}
+
 export interface PublicWatch {
   id: string;
   brand: string;
+  brand_slug?: string;
   collection: string;
+  collection_slug?: string;
   name: string;
   ref: string;
   price?: number;
   image: string;
-  images?: string[];
+  images?: Array<string | PublicWatchImage>;
   size?: string | null;
   material?: string | null;
   material_en?: string | null;
@@ -38,6 +47,11 @@ export interface PublicWatch {
   seo_description?: string | null;
   seo_description_en?: string | null;
   seo_image_url?: string | null;
+  featured_avatar_url?: string | null;
+  stock?: number;
+  stock_quantity?: number;
+  sold_quantity?: number;
+  is_in_stock?: boolean;
   canonical_url?: string | null;
   noindex?: boolean;
 }

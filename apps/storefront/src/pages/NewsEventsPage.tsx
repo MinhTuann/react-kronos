@@ -6,7 +6,24 @@ import { Link } from 'react-router-dom';
 import { publicApi } from '../lib/api';
 import type { PublicArticle } from '../lib/api';
 import { GoToTop, LoadMore } from '@/components/app';
+import { Skeleton, TextSkeleton } from '@/components/common/Skeleton';
 import { createBreadcrumbJsonLd, useSeo } from '@/seo';
+
+// --- Animation Configurations ---
+const customEase: Easing = [0.16, 1, 0.3, 1];
+
+const fadeUp: Variants = {
+    hidden: { opacity: 0, y: 40 },
+    visible: { opacity: 1, y: 0, transition: { duration: 1, ease: customEase } }
+};
+
+const staggerContainer: Variants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: { staggerChildren: 0.15 }
+    }
+};
 
 const NewsEventsPage: React.FC = () => {
     const [articles, setArticles] = useState<PublicArticle[]>([]);
@@ -23,15 +40,15 @@ const NewsEventsPage: React.FC = () => {
             else setIsLoadingMore(true);
 
             const currentCursor = reset ? undefined : (lastCursor || undefined);
-            
+
             const response = await publicApi.getArticles(currentCursor, itemsPerPage);
-            
+
             if (reset) {
                 setArticles(response.data);
             } else {
                 setArticles(prev => [...prev, ...response.data]);
             }
-            
+
             setHasNextPage(response.meta.hasNextPage);
             setLastCursor(response.meta.lastCursor);
         } catch (err) {
@@ -60,21 +77,6 @@ const NewsEventsPage: React.FC = () => {
             { name: currentLang === 'en' ? 'News & Events' : 'Tin tuc & Su kien', path: '/news-events' },
         ]),
     });
-
-    const customEase: Easing = [0.16, 1, 0.3, 1];
-
-    const fadeUp: Variants = {
-        hidden: { opacity: 0, y: 40 },
-        visible: { opacity: 1, y: 0, transition: { duration: 1, ease: customEase } }
-    };
-
-    const staggerContainer: Variants = {
-        hidden: { opacity: 0 },
-        visible: {
-            opacity: 1,
-            transition: { staggerChildren: 0.15 }
-        }
-    };
 
     const heroRef = useRef(null);
     const { scrollYProgress: heroScroll } = useScroll({
@@ -108,6 +110,7 @@ const NewsEventsPage: React.FC = () => {
                 </div>
 
                 <motion.div
+                    key={`${currentLang}-hero`}
                     style={{ y: heroY, opacity: heroOpacity }}
                     initial="hidden"
                     animate="visible"
@@ -137,6 +140,7 @@ const NewsEventsPage: React.FC = () => {
                             className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4"
                         >
                             <button
+                                key={`${currentLang}-cat-all`}
                                 onClick={() => setSelectedCategory(null)}
                                 className={`font-branding text-[10px] tracking-[0.3em] uppercase transition-all duration-500 relative py-2 ${selectedCategory === null ? 'text-gunmetal font-bold' : 'text-stone-400 hover:text-gunmetal'
                                     }`}
@@ -168,8 +172,19 @@ const NewsEventsPage: React.FC = () => {
             <section className="pb-20 md:pb-32 px-6 lg:px-12 max-w-[1600px] mx-auto z-10 relative bg-white min-h-[40vh]">
 
                 {loading ? (
-                    <div className="flex justify-center items-center py-20">
-                        <div className="w-8 h-8 rounded-full border-b-2 border-gunmetal animate-spin"></div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-24">
+                        {Array.from({ length: 4 }).map((_, i) => (
+                            <div key={i} className="space-y-6">
+                                <Skeleton className="w-full aspect-[4/3] rounded-sm" />
+                                <div className="flex items-center gap-4">
+                                    <Skeleton width={80} height={10} />
+                                    <Skeleton width={24} height={1} />
+                                    <Skeleton width={60} height={12} />
+                                </div>
+                                <Skeleton width="90%" height={32} />
+                                <TextSkeleton lines={3} className="opacity-40" />
+                            </div>
+                        ))}
                     </div>
                 ) : filteredArticles.length === 0 ? (
                     <div className="text-center text-stone-400 py-20 font-serif italic text-xl">

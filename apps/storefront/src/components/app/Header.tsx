@@ -55,7 +55,7 @@ const Header = ({ scrollY }: Props) => {
     const handleBrandSelect = async (brand: PublicBrand) => {
         setSelectedBrand(brand);
         try {
-            const data = await publicApi.getCollections(brand.id, 'watch');
+            const data = await publicApi.getCollections(brand.id);
             setCollections(data);
             setMenuDepth('collections');
         } catch (err) {
@@ -207,6 +207,7 @@ const Header = ({ scrollY }: Props) => {
                                         {t('menu.title')}
                                     </span>
 
+                                    {/* Mobile Language Switcher */}
                                     <div className="sm:hidden flex items-center gap-3">
                                         <button
                                             onClick={() => i18n.changeLanguage('vi')}
@@ -247,14 +248,14 @@ const Header = ({ scrollY }: Props) => {
                                                     onClick={() => setIsMenuOpen(false)}
                                                     className="text-3xl md:text-4xl italic text-gunmetal hover:text-black transition-colors"
                                                 >
-                                                    {t('menu.accessories')}
+                                                    {t('menu.accessories', 'The Accessories')}
                                                 </Link>
                                                 <Link
                                                     to="/collections?in_stock=true"
                                                     onClick={() => setIsMenuOpen(false)}
                                                     className="text-3xl md:text-4xl italic text-gunmetal hover:text-black transition-colors"
                                                 >
-                                                    {t('menu.inStock')}
+                                                    {t('menu.inStock', 'In Stock')}
                                                 </Link>
                                                 <Link
                                                     to="/about-us"

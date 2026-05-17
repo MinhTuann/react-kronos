@@ -1,7 +1,6 @@
 import { Outlet } from 'react-router-dom';
 import { useScroll } from 'motion/react';
-import { Footer, Header } from '@/components/app';
-import ScrollToTop from '@/components/common/ScrollToTop';
+import { Footer, Header, ScrollToTop } from '@/components';
 
 const MainLayout = () => {
     const { scrollY } = useScroll();
@@ -17,5 +16,6 @@ const MainLayout = () => {
         </div>
     );
 }
+
 
 export default MainLayout;

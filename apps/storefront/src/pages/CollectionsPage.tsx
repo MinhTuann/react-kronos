@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { GoToTop, LoadMore } from '@/components/app';
 import type { Watch } from '@/types';
 import { WatchItem } from '@/components/home/InStocks';
-// import { Dropdown } from '@/components/app';
+import { CollectionsGridSkeleton } from '@/components/common/Skeleton';
 
 import { publicApi } from '@/lib/api';
 import type { PublicBrand, PublicCollection } from '@/lib/api';
@@ -34,7 +34,7 @@ const CollectionsPage: React.FC = () => {
     const { t, i18n } = useTranslation();
     const [hasNextPage, setHasNextPage] = useState(false);
     const [lastCursor, setLastCursor] = useState<string | null>(null);
-    const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [isFilterOpen, setIsFilterOpen] = useState(new URLSearchParams(window.location.search).get('in_stock') === 'true');
     // const [sortMethod, setSortMethod] = useState<'recommended' | 'price-asc' | 'price-desc'>('recommended');
 
     // Search Query parsing
@@ -47,6 +47,7 @@ const CollectionsPage: React.FC = () => {
     const [collections, setCollections] = useState<PublicCollection[]>([]);
     const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
     const [selectedCollections, setSelectedCollections] = useState<string[]>([]);
+    const [isInStockOnly, setIsInStockOnly] = useState(queryParams.get('in_stock') === 'true');
     const currentLang = i18n.language.split('-')[0];
     const origin = import.meta.env.VITE_SITE_URL || window.location.origin;
     const selectedBrandName = brands.find((brand) => brand.id === selectedBrands[0])?.name;
@@ -116,7 +117,7 @@ const CollectionsPage: React.FC = () => {
     }, [location.search]);
 
     const itemsPerPage = 12; // Adjusted to a better grid number
-    const currentWatches = watches;
+    const currentWatches = Array.isArray(watches) ? watches : [];
 
     // Initial Filters Fetch (Runs Once)
     useEffect(() => {
@@ -129,8 +130,8 @@ const CollectionsPage: React.FC = () => {
                     publicApi.getCollections(undefined, 'watch', { signal: controller.signal })
                 ]);
                 if (controller.signal.aborted) return;
-                setBrands(bData);
-                setCollections(cData);
+                setBrands(Array.isArray(bData) ? bData : []);
+                setCollections(Array.isArray(cData) ? cData : []);
             } catch (err) {
                 if (controller.signal.aborted) return;
                 console.error("Failed to fetch filters:", err);
@@ -150,26 +151,30 @@ const CollectionsPage: React.FC = () => {
             }
 
             const currentCursor = reset ? undefined : (lastCursor || undefined);
-            
+
             const brandId = selectedBrands.length > 0 ? selectedBrands[0] : undefined;
             const collectionIds = selectedCollections.length > 0 ? selectedCollections : undefined;
 
             const response = await publicApi.getWatches(
-                brandId, 
-                collectionIds, 
-                searchQuery, 
-                currentCursor, 
-                itemsPerPage
+                brandId,
+                collectionIds,
+                searchQuery,
+                currentCursor,
+                itemsPerPage,
+                isInStockOnly
             );
-            
+
+            const nextWatches = Array.isArray(response?.data) ? response.data : [];
+            const nextMeta = response?.meta ?? { hasNextPage: false, lastCursor: null };
+
             if (reset) {
-                setWatches(response.data);
+                setWatches(nextWatches);
             } else {
-                setWatches(prev => [...prev, ...response.data]);
+                setWatches(prev => [...prev, ...nextWatches]);
             }
-            
-            setHasNextPage(response.meta.hasNextPage);
-            setLastCursor(response.meta.lastCursor);
+
+            setHasNextPage(Boolean(nextMeta.hasNextPage));
+            setLastCursor(nextMeta.lastCursor ?? null);
 
         } catch (err) {
             console.error("Failed to fetch public watches:", err);
@@ -182,7 +187,7 @@ const CollectionsPage: React.FC = () => {
     // Run fetch on mount and whenever filters/search change
     useEffect(() => {
         fetchWatches(true);
-    }, [searchQuery, selectedBrands, selectedCollections]);
+    }, [searchQuery, selectedBrands, selectedCollections, isInStockOnly]);
 
     // Scroll Listener removed for reusable GoToTop component
 
@@ -224,6 +229,20 @@ const CollectionsPage: React.FC = () => {
 
         return (
             <div className='pr-4 lg:pr-8 space-y-10 lg:space-y-12'>
+                {/* In Stock Filter */}
+                <div>
+                    <h4 className='text-[10px] tracking-[0.3em] uppercase font-bold border-b border-gunmetal/10 pb-4 mb-4'>{t('common.availability')}</h4>
+                    <label className="flex items-center gap-3 cursor-pointer group transition-colors text-gunmetal/60 hover:text-black text-sm">
+                        <input
+                            type="checkbox"
+                            className="accent-gunmetal w-4 h-4"
+                            checked={isInStockOnly}
+                            onChange={(e) => setIsInStockOnly(e.target.checked)}
+                        />
+                        {t('common.in_stock')}
+                    </label>
+                </div>
+
                 {brands.length > 0 && (
                     <div>
                         <h4 className='text-[10px] tracking-[0.3em] uppercase font-bold border-b border-gunmetal/10 pb-4 mb-4'>{t('header.brands')}</h4>
@@ -267,7 +286,7 @@ const CollectionsPage: React.FC = () => {
 
                 {selectedBrands.length > 0 && visibleCollections.length > 0 && (
                     <div>
-                        <h4 className='text-[10px] tracking-[0.3em] uppercase font-bold border-b border-gunmetal/10 pb-4 mb-4'>{t('header.brands')}</h4>
+                        <h4 className='text-[10px] tracking-[0.3em] uppercase font-bold border-b border-gunmetal/10 pb-4 mb-4'>{t('header.collections')}</h4>
                         <ul className='space-y-4 lg:space-y-3 text-sm font-light text-gunmetal/80 max-h-48 overflow-y-auto pr-2 custom-scrollbar'>
                             {visibleCollections.map(collection => (
                                 <li key={collection.id}>
@@ -363,9 +382,7 @@ const CollectionsPage: React.FC = () => {
                 {/* 1. Add motion.div and layout here so the container animates its width change smoothly */}
                 <div className='flex-1 relative min-h-[400px]'>
                     {isLoading ? (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="w-8 h-8 border-2 border-gunmetal/20 border-t-gunmetal rounded-full animate-spin" />
-                        </div>
+                        <CollectionsGridSkeleton />
                     ) : (
                         <motion.div
                             key={`${'sortMethod'}-${selectedBrands.join(',')}-${selectedCollections.join(',')}`}

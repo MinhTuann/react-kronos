@@ -5,6 +5,7 @@ import { ChevronRight, ArrowLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { publicApi } from '../lib/api';
 import type { PublicArticle } from '../lib/api';
+import { Skeleton, TextSkeleton } from '@/components/common/Skeleton';
 import { createBreadcrumbJsonLd, useSeo } from '@/seo';
 
 const NewsEventDetailsPage: React.FC = () => {
@@ -91,8 +92,17 @@ const NewsEventDetailsPage: React.FC = () => {
 
     if (isLoading) {
         return (
-            <div className="pt-32 pb-24 min-h-screen flex flex-col items-center justify-center bg-white">
-                 <div className="w-8 h-8 border-2 border-gunmetal/20 border-t-gunmetal rounded-full animate-spin" />
+            <div className="bg-white min-h-screen">
+                <Skeleton className="w-full h-[60vh] md:h-[80vh]" />
+                <div className="max-w-3xl mx-auto px-6 py-20 space-y-6">
+                    <div className="flex items-center gap-4 justify-center">
+                        <Skeleton width={80} height={10} />
+                        <Skeleton width={24} height={1} />
+                        <Skeleton width={60} height={10} />
+                    </div>
+                    <TextSkeleton lines={8} className="opacity-40" />
+                    <TextSkeleton lines={6} className="opacity-30 mt-8" />
+                </div>
             </div>
         );
     }
@@ -139,7 +149,7 @@ const NewsEventDetailsPage: React.FC = () => {
 
     return (
         <div className="bg-white text-gunmetal min-h-screen overflow-hidden selection:bg-gunmetal selection:text-white">
-            
+
             {/* Header Breadcrumbs */}
             <div className="absolute top-24 md:top-32 left-0 right-0 z-20 max-w-[1600px] mx-auto px-6 lg:px-12">
                 <nav className="flex items-center text-[10px] uppercase tracking-[0.2em] text-white mix-blend-difference drop-shadow-md">
@@ -157,8 +167,8 @@ const NewsEventDetailsPage: React.FC = () => {
             <section ref={heroRef} className="relative h-[60vh] md:h-[80vh] w-full overflow-hidden bg-stone-900">
                 <motion.div style={{ y: heroY }} className="absolute inset-0 w-full h-full">
                     {article.image_url ? (
-                        <img 
-                            src={article.image_url} 
+                        <img
+                            src={article.image_url}
                             alt={displayTitle}
                             className="w-full h-full object-cover opacity-80"
                         />
@@ -166,11 +176,11 @@ const NewsEventDetailsPage: React.FC = () => {
                         <div className="w-full h-full bg-gunmetal"></div>
                     )}
                 </motion.div>
-                
+
                 {/* Gradient overlays to ensure text readability */}
                 <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/80" />
-                
-                <motion.div 
+
+                <motion.div
                     style={{ opacity: heroOpacity }}
                     className="absolute inset-0 flex flex-col justify-end items-center text-center px-6 pb-20 md:pb-32 z-10"
                 >
@@ -206,16 +216,16 @@ const NewsEventDetailsPage: React.FC = () => {
                     transition={{ duration: 0.8 }}
                 >
                     {/* Rich Text Formatted Content */}
-                    <article 
+                    <article
                         lang={currentLang}
                         className="prose prose-stone prose-lg md:prose-xl max-w-none
-                        prose-headings:font-serif prose-headings:italic prose-headings:font-light prose-headings:tracking-tight 
+                        prose-headings:font-serif prose-headings:italic prose-headings:font-light prose-headings:tracking-tight
                         prose-p:font-light prose-p:leading-relaxed prose-p:text-stone-500
                         prose-a:text-golden prose-a:no-underline hover:prose-a:text-gunmetal"
                         dangerouslySetInnerHTML={{ __html: displayHtml }}
                     />
                 </motion.div>
-                
+
                 {/* Back Navigation Footer */}
                 <div className="mt-32 pt-12 border-t border-gunmetal/10 text-center">
                     <Link to="/news-events" className="inline-flex items-center gap-3 text-xs uppercase tracking-[0.2em] font-semibold text-gunmetal/60 hover:text-black transition-colors group">

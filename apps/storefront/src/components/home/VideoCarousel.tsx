@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Play, Pause } from 'lucide-react';
 import { motion, AnimatePresence, useMotionValue, useSpring, type PanInfo } from 'motion/react';
 import { useTranslation } from 'react-i18next';
@@ -34,28 +34,25 @@ const slideVariants = {
 // --- 2. The Child Parallax Variants ---
 const videoVariants = {
   enter: (direction: number) => ({
-    // If the container enters from the right, the video starts pushed 20% to the left
     x: direction > 0 ? '-20%' : '20%',
-    scale: 1.15, // Scale up slightly so we don't see black edges when it shifts
+    scale: 1.15,
   }),
   center: {
     x: 0,
     scale: 1.15,
   },
   exit: (direction: number) => ({
-    // If the container exits to the left, the video pans 20% to the right
     x: direction < 0 ? '-20%' : '20%',
     scale: 1.15,
   })
 };
 
-// --- 3. The Isolated Video Component (Fixes the Ref bug) ---
 const ParallaxVideo = ({
   url,
   poster,
   direction,
   isPlaying,
-  onAutoPlayEnd,
+  onAutoPlayEnd
 }: {
   url: string;
   poster?: string;
@@ -70,7 +67,6 @@ const ParallaxVideo = ({
   const [isFocused, setIsFocused] = useState(true);
   const [isInView, setIsInView] = useState(false);
 
-  // Reset loading state when the source URL changes
   useEffect(() => {
     setIsLoaded(false);
     setIsPosterLoaded(false);
@@ -86,7 +82,7 @@ const ParallaxVideo = ({
   useEffect(() => {
     const handleFocus = () => {
       setIsFocused(true);
-      playCount.current = 0;
+      playCount.current = 0; // Restart play count on focus
     };
     const handleBlur = () => setIsFocused(false);
 
@@ -120,7 +116,7 @@ const ParallaxVideo = ({
             localVideoRef.current.pause();
           }
         } catch (error) {
-          // Playback might be interrupted by navigation
+          // Playback might be interrupted
         }
       }
     };
@@ -130,7 +126,7 @@ const ParallaxVideo = ({
   const handleEnded = () => {
     playCount.current += 1;
     if (playCount.current < VIDEO_PLAY_LIMIT && isFocused && isPlaying && isInView) {
-      localVideoRef.current?.play().catch(() => {});
+      localVideoRef.current?.play().catch(() => { });
     } else {
       onAutoPlayEnd?.();
     }
@@ -179,18 +175,23 @@ const ParallaxVideo = ({
 };
 
 const VideoCarousel = ({ videos = [], isLoading = false }: Props) => {
-  // We now track the index AND the direction we are moving
   const [[page, direction], setPage] = useState([0, 0]);
   const [hoverSide, setHoverSide] = useState<'left' | 'right' | null>(null);
   const [isPlaying, setIsPlaying] = useState(true);
   const { t, i18n } = useTranslation();
   const currentLang = i18n.language;
 
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  const cursorX = useSpring(mouseX, { stiffness: 500, damping: 28 });
+  const cursorY = useSpring(mouseY, { stiffness: 500, damping: 28 });
+
   if (isLoading) {
     return (
       <div className="relative w-full h-[100dvh] overflow-hidden bg-black flex items-center justify-center">
         <Skeleton className="absolute inset-0 w-full h-full rounded-none opacity-40" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10" />
+
         <div className="absolute bottom-0 left-0 w-full p-[10dvh] z-20 space-y-6">
           <div className="space-y-4">
             <Skeleton width={350} height={48} className="rounded-lg opacity-50" />
@@ -202,37 +203,24 @@ const VideoCarousel = ({ videos = [], isLoading = false }: Props) => {
       </div>
     );
   }
-  
-  // Safely wrap the index so it doesn't break if it goes out of bounds
-  // (Though our boundaries prevent this, it's a good safety net)
+
   const index = Math.max(0, Math.min(page, videos.length - 1));
+  const video = videos[index];
 
-  // Motion values for smooth cursor tracking
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-  const cursorX = useSpring(mouseX, { stiffness: 500, damping: 28 });
-  const cursorY = useSpring(mouseY, { stiffness: 500, damping: 28 });
-
-  // Helper to change pages and set the direction simultaneously
   const paginate = (newDirection: number) => {
     const newIndex = page + newDirection;
-    // Boundary check
     if (newIndex >= 0 && newIndex < videos.length) {
       setPage([newIndex, newDirection]);
       setIsPlaying(true);
     }
   };
 
-  // --- 1. Mouse Tracking Logic (Desktop) ---
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
-
     mouseX.set(x);
     mouseY.set(e.clientY - rect.top);
-
     const isLeft = x < (rect.width / 2);
-
     if ((isLeft && index === 0) || (!isLeft && index === videos.length - 1)) {
       setHoverSide(null);
     } else {
@@ -241,40 +229,17 @@ const VideoCarousel = ({ videos = [], isLoading = false }: Props) => {
   };
 
   const handleClick = () => {
-    if (hoverSide === 'left') {
-      paginate(-1); // Move Left
-    } else if (hoverSide === 'right') {
-      paginate(1);  // Move Right
-    }
+    if (hoverSide === 'left') paginate(-1);
+    else if (hoverSide === 'right') paginate(1);
   };
 
-  // --- 2. Swipe Logic (Mobile) ---
-  // Minimum distance or velocity required to trigger a slide change
   const swipeConfidenceThreshold = 10000;
-  const swipePower = (offset: number, velocity: number) => {
-    return Math.abs(offset) * velocity;
-  };
-
-  const handleDragEnd = (_e: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+  const swipePower = (offset: number, velocity: number) => Math.abs(offset) * velocity;
+  const handleDragEnd = (_e: any, info: PanInfo) => {
     const swipe = swipePower(info.offset.x, info.velocity.x);
-
-    // Swiped Left (Next Slide)
-    if (swipe < -swipeConfidenceThreshold) {
-      paginate(1);
-    } 
-    // Swiped Right (Previous Slide)
-    else if (swipe > swipeConfidenceThreshold) {
-      paginate(-1);
-    }
+    if (swipe < -swipeConfidenceThreshold) paginate(1);
+    else if (swipe > swipeConfidenceThreshold) paginate(-1);
   };
-
-  // Reset states
-  useEffect(() => {
-    if (index === 0 && hoverSide === 'left') setHoverSide(null);
-    if (index === videos.length - 1 && hoverSide === 'right') setHoverSide(null);
-  }, [index, hoverSide, videos.length]);
-
-  const video = useMemo(() => videos[index], [index, videos]);
 
   return (
     <div
@@ -283,9 +248,6 @@ const VideoCarousel = ({ videos = [], isLoading = false }: Props) => {
       onMouseLeave={() => setHoverSide(null)}
       onClick={handleClick}
     >
-      {/* We use initial={false} so the very first video doesn't slide in on page load.
-        We pass 'direction' into custom so the variants know which way to slide.
-      */}
       <AnimatePresence initial={false} custom={direction}>
         <motion.div
           key={index}
@@ -301,16 +263,14 @@ const VideoCarousel = ({ videos = [], isLoading = false }: Props) => {
           onDragEnd={handleDragEnd}
           className='absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing overflow-hidden'
         >
-          {/* REPLACE the old <motion.video> block with our new isolated component */}
-          <ParallaxVideo 
-            url={video.url} 
+          <ParallaxVideo
+            url={video.url}
             poster={video.thumbnail_url}
-            direction={direction} 
+            direction={direction}
             isPlaying={isPlaying}
             onAutoPlayEnd={() => setIsPlaying(false)}
           />
 
-          {/* Title Area */}
           <div className='absolute w-full bottom-0 left-0 p-[10dvh] bg-gradient-to-t from-black/80 to-transparent pointer-events-none'>
             <div
               className='w-fit opacity-60 hover:opacity-100 transition-opacity pointer-events-auto cursor-auto'
@@ -319,7 +279,7 @@ const VideoCarousel = ({ videos = [], isLoading = false }: Props) => {
               onClick={(e) => e.stopPropagation()}
             >
               {((currentLang === 'en' && video.title_en) ? video.title_en : video.title).split('\\n').map(
-                (title, idx) => 
+                (title, idx) =>
                   <h1 className={`font-branding text-2xl md:text-4xl ${idx === 0 ? 'text-white' : 'text-vanilla'}`} key={`video-${idx}-title`}>
                     {title}
                   </h1>
@@ -337,7 +297,6 @@ const VideoCarousel = ({ videos = [], isLoading = false }: Props) => {
         </motion.div>
       </AnimatePresence>
 
-      {/* 3. The Custom Following Cursor (Desktop Only) */}
       <AnimatePresence mode='wait'>
         {hoverSide && (
           <motion.div
@@ -360,7 +319,6 @@ const VideoCarousel = ({ videos = [], isLoading = false }: Props) => {
         )}
       </AnimatePresence>
 
-      {/* 4. Global UI Controls (These sit above the sliding videos so they don't move) */}
       <div className='absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 pointer-events-none z-10'>
         {videos.map((_, i) => (
           <div

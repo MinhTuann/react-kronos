@@ -8,6 +8,7 @@ import { Skeleton, TextSkeleton } from '@/components/common/Skeleton';
 import type { Watch } from '@/types';
 
 import { publicApi } from '@/lib/api';
+import { useImageLoadState } from '@/lib/useImageLoadState';
 import { createBreadcrumbJsonLd, useSeo } from '@/seo';
 
 const formatPrice = (price: number) => {
@@ -24,19 +25,26 @@ const WatchDetailsPage: React.FC = () => {
         id?: string;
         brand_slug?: string;
         collection_slug?: string;
-        ref?: string;
+        ref?: string
     }>();
     const [watch, setWatch] = useState<Watch | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const { t, i18n } = useTranslation();
     const currentLang = i18n.language;
     const origin = import.meta.env.VITE_SITE_URL || window.location.origin;
+    const detailPath = id
+        ? `/watch/${id}`
+        : `/watch/${brand_slug}/${collection_slug ? `${collection_slug}/` : ''}${ref}`;
     const [isEditorialExpanded, setIsEditorialExpanded] = useState(false);
     const [activeImageIndex, setActiveImageIndex] = useState(0);
     const [direction, setDirection] = useState(0);
-    const watchPath = id
-        ? `/watch/${id}`
-        : (brand_slug && ref ? `/watch/${brand_slug}/${collection_slug ? `${collection_slug}/` : ''}${ref}` : '/collections');
+    const activeImageSrc = watch?.images && watch.images.length > 0
+        ? watch.images[activeImageIndex]
+        : watch?.image;
+    const {
+        isReady: isActiveImageLoaded,
+        markReady: markActiveImageReady,
+    } = useImageLoadState(activeImageSrc, { eager: true });
 
     useSeo({
         pageKey: 'collections',
@@ -50,8 +58,8 @@ const WatchDetailsPage: React.FC = () => {
                 : watch.seo_description || ((currentLang.startsWith('en') && watch.description_en) ? watch.description_en : watch.description))
             : '',
         image: watch?.seo_image_url || watch?.image,
-        canonicalUrl: watch?.canonical_url ?? undefined,
-        canonicalPath: watch?.canonical_url ? undefined : watchPath,
+        canonicalUrl: watch?.canonical_url || undefined,
+        canonicalPath: watch?.canonical_url ? undefined : (brand_slug && ref ? detailPath : '/collections'),
         noindex: watch ? watch.noindex : (!watch && !isLoading),
         type: 'product',
         structuredData: watch ? [
@@ -70,13 +78,16 @@ const WatchDetailsPage: React.FC = () => {
                     priceCurrency: 'USD',
                     price: watch.price,
                     availability: 'https://schema.org/InStock',
-                    url: watch.canonical_url || `${origin}${watchPath}`,
+                    url: watch.canonical_url || `${origin}${detailPath}`,
                 } : undefined,
             },
             createBreadcrumbJsonLd(origin, [
                 { name: currentLang.startsWith('en') ? 'Home' : 'Trang chu', path: '/' },
                 { name: currentLang.startsWith('en') ? 'Collections' : 'Bo suu tap', path: '/collections' },
-                { name: watch.name, path: watchPath },
+                {
+                    name: watch.name,
+                    path: detailPath,
+                },
             ]),
         ] : undefined,
     });
@@ -95,9 +106,9 @@ const WatchDetailsPage: React.FC = () => {
                 const data = id
                     ? await publicApi.getWatchById(id, { signal: controller.signal })
                     : await publicApi.getWatchBySlug(brand_slug!, ref!, collection_slug, { signal: controller.signal });
+
                 if (controller.signal.aborted) return;
                 setWatch(data);
-                setActiveImageIndex(0);
             } catch (err) {
                 if (controller.signal.aborted) return;
                 console.error("Failed to load details:", err);
@@ -129,8 +140,8 @@ const WatchDetailsPage: React.FC = () => {
                     <div className="w-full lg:w-1/2">
                         <Skeleton className="aspect-square md:aspect-[4/5] w-full rounded-lg" />
                         <div className="flex gap-4 mt-6">
-                            {Array.from({ length: 4 }).map((_, index) => (
-                                <Skeleton key={index} className="w-20 h-20 rounded-md flex-shrink-0" />
+                            {Array.from({ length: 4 }).map((_, i) => (
+                                <Skeleton key={i} className="w-20 h-20 rounded-md flex-shrink-0" />
                             ))}
                         </div>
                     </div>
@@ -149,8 +160,8 @@ const WatchDetailsPage: React.FC = () => {
                             <TextSkeleton lines={4} className="opacity-50" />
                         </div>
                         <div className="grid grid-cols-2 gap-y-6 gap-x-12 border-t border-gunmetal/10 pt-6">
-                            {Array.from({ length: 6 }).map((_, index) => (
-                                <div key={index} className="space-y-2">
+                            {Array.from({ length: 6 }).map((_, i) => (
+                                <div key={i} className="space-y-2">
                                     <Skeleton width={60} height={10} />
                                     <Skeleton width={100} height={16} />
                                 </div>
@@ -208,6 +219,11 @@ const WatchDetailsPage: React.FC = () => {
                 <div className="w-full lg:w-1/2 flex flex-col gap-6">
                     {/* Main Image Stage */}
                     <div className="relative aspect-square md:aspect-[4/5] bg-stone-50 rounded-lg overflow-hidden flex items-center justify-center p-8 md:p-16">
+                        {!isActiveImageLoaded && (
+                            <div className="absolute inset-0 p-8 md:p-16">
+                                <Skeleton className="w-full h-full rounded-lg" />
+                            </div>
+                        )}
                         <AnimatePresence initial={false} custom={direction} mode="wait">
                             <motion.div
                                 key={activeImageIndex}
@@ -219,13 +235,20 @@ const WatchDetailsPage: React.FC = () => {
                                 className="w-full h-full flex items-center justify-center"
                             >
                                 <img
-                                    src={watch.images && watch.images.length > 0 ? watch.images[activeImageIndex] : watch.image}
+                                    src={activeImageSrc}
                                     alt={`${watch.name} - View ${activeImageIndex + 1}`}
-                                    className="w-full h-full object-contain drop-shadow-2xl"
+                                    loading="eager"
+                                    decoding="async"
+                                    onLoad={markActiveImageReady}
+                                    onError={markActiveImageReady}
+                                    className={`w-full h-full object-contain drop-shadow-2xl transition-opacity duration-500 ${
+                                        isActiveImageLoaded ? 'opacity-100' : 'opacity-0'
+                                    }`}
                                 />
                             </motion.div>
                         </AnimatePresence>
 
+                        {/* Navigation Arrows (Only if more than 1 image) */}
                         {watch.images && watch.images.length > 1 && (
                             <>
                                 <button
@@ -249,21 +272,24 @@ const WatchDetailsPage: React.FC = () => {
                             </>
                         )}
 
+                        {/* Subtle Reflection Effect */}
                         <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-3/4 h-8 bg-gradient-to-t from-transparent to-black/5 blur-xl rounded-full opacity-50" />
                     </div>
 
+                    {/* Thumbnails Row */}
                     {watch.images && watch.images.length > 1 && (
                         <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
-                            {watch.images.map((image, index) => (
+                            {watch.images.map((img, idx) => (
                                 <button
-                                    key={index}
+                                    key={idx}
                                     onClick={() => {
-                                        setDirection(index > activeImageIndex ? 1 : -1);
-                                        setActiveImageIndex(index);
+                                        setDirection(idx > activeImageIndex ? 1 : -1);
+                                        setActiveImageIndex(idx);
                                     }}
-                                    className={`relative flex-shrink-0 w-20 h-20 rounded-md overflow-hidden bg-stone-50 border-2 transition-all ${index === activeImageIndex ? 'border-golden shadow-md' : 'border-transparent opacity-60 hover:opacity-100'}`}
+                                    className={`relative flex-shrink-0 w-20 h-20 rounded-md overflow-hidden bg-stone-50 border-2 transition-all ${idx === activeImageIndex ? 'border-golden shadow-md' : 'border-transparent opacity-60 hover:opacity-100'
+                                        }`}
                                 >
-                                    <img src={image} alt={`${watch.name} thumbnail ${index}`} className="w-full h-full object-contain p-2" />
+                                    <img src={img} alt={`${watch.name} thumbnail ${idx}`} className="w-full h-full object-contain p-2" />
                                 </button>
                             ))}
                         </div>
@@ -385,7 +411,7 @@ const WatchDetailsPage: React.FC = () => {
 
                         {/* Actions */}
                         <div className="mt-8">
-                            <button className="flex-1 border border-gunmetal/20 text-gunmetal text-xs uppercase tracking-[0.2em] font-semibold py-5 px-8 hover:bg-stone-50 transition-colors">
+                            <button className="w-full border border-gunmetal/20 text-gunmetal text-xs uppercase tracking-[0.2em] font-semibold py-5 px-8 hover:bg-stone-50 transition-colors">
                                 {t('common.contact_boutiques')}
                             </button>
                         </div>
@@ -407,7 +433,7 @@ const WatchDetailsPage: React.FC = () => {
             </div>
 
             {hasViewMore && (
-                <section className="max-w-[1200px] mx-auto px-6 lg:px-12 mt-24 pt-16">
+                <section className="max-w-[1600px] mx-auto px-6 lg:px-12 mt-24 pt-16">
                     <div className="text-center mb-8 relative">
                         <div className="absolute left-0 top-1/2 -mt-px w-full h-px bg-gunmetal/10 -z-10"></div>
                         <button
@@ -437,7 +463,7 @@ const WatchDetailsPage: React.FC = () => {
                                 <div className="pb-16 pt-8 flex justify-center border-b border-gunmetal/10">
                                     <article
                                         lang={currentLang}
-                                        className="prose prose-stone prose-lg md:prose-xl max-w-[800px] w-full
+                                        className="prose prose-stone prose-lg md:prose-xl max-w-[1000px] w-full
                                         prose-headings:font-serif prose-headings:italic prose-headings:font-light prose-headings:tracking-tight
                                         prose-p:font-light prose-p:leading-relaxed prose-p:text-stone-600
                                         prose-li:text-stone-600 prose-strong:text-gunmetal

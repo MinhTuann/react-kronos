@@ -22,7 +22,7 @@ const SpecValue = ({
   value,
   className = '',
   bulletClassName = 'marker:text-current',
-  renderSingleLine,
+  renderSingleLine
 }: SpecValueProps) => {
   const lines = splitSpecLines(value);
 
@@ -35,9 +35,7 @@ const SpecValue = ({
   return (
     <ul className={`list-disc pl-5 space-y-1 ${className}`}>
       {lines.map((line, index) => (
-        <li key={`${line}-${index}`} className={bulletClassName}>
-          {line}
-        </li>
+        <li key={`${line}-${index}`} className={bulletClassName}>{line}</li>
       ))}
     </ul>
   );
