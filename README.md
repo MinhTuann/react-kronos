@@ -1,3 +1,10 @@
+> [!WARNING]
+> LEGACY / DO NOT DEVELOP
+>
+> This repository is no longer the source of truth for Kronos.
+> All new features, bug fixes, and releases must happen in `kronos-monorepo` on `main`.
+> Keep this repo only as historical reference or emergency rollback material.
+
 # Kronos Watch Store - Storefront (React)
 
 This is the public storefront for the Kronos Watch Store system. The full system is split into three services:
