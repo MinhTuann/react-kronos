@@ -1,24 +1,48 @@
 #!/bin/sh
 
-echo ""
-echo "┌────────────────────────────┐"
-echo "│   Select an environment    │"
-echo "├────────────────────────────┤"
-echo "│  1) dev                    │"
-echo "│  2) uat                    │"
-echo "│  3) prod                   │"
-echo "└────────────────────────────┘"
-printf "Enter choice [1-3]: "
-read choice
+normalize_env() {
+  case "$1" in
+    1 | dev) printf '%s\n' "dev" ;;
+    2 | uat) printf '%s\n' "uat" ;;
+    3 | prod | production) printf '%s\n' "prod" ;;
+    *) return 1 ;;
+  esac
+}
 
-case $choice in
-  1) ENV="dev" ;;
-  2) ENV="uat" ;;
-  3) ENV="prod" ;;
-  *) echo "Invalid choice. Defaulting to dev."; ENV="dev" ;;
-esac
+select_env() {
+  if [ -n "$KRONOS_ENV" ] && normalize_env "$KRONOS_ENV"; then
+    return
+  fi
 
-echo "▶ Running with NODE_ENV=$ENV"
+  if [ -n "$NODE_ENV" ] && normalize_env "$NODE_ENV"; then
+    return
+  fi
+
+  if [ -t 0 ]; then
+    echo "" >&2
+    echo "+----------------------------+" >&2
+    echo "|   Select an environment    |" >&2
+    echo "+----------------------------+" >&2
+    echo "|  1) dev                    |" >&2
+    echo "|  2) uat                    |" >&2
+    echo "|  3) prod                   |" >&2
+    echo "+----------------------------+" >&2
+    printf "Enter choice [1-3]: " >&2
+    read choice
+
+    if normalize_env "$choice"; then
+      return
+    fi
+
+    echo "Invalid choice. Defaulting to dev." >&2
+  fi
+
+  printf '%s\n' "dev"
+}
+
+ENV=$(select_env)
+
+echo "Running with NODE_ENV=$ENV"
 echo ""
 
 NODE_ENV=$ENV exec "$@" --mode "$ENV"
