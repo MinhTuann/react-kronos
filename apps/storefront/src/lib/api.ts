@@ -122,6 +122,36 @@ export interface PublicSeoSettings {
   pages?: Record<PublicSeoPageKey, PublicSeoPageEntry>;
 }
 
+export type ContactRequestPurpose = 'timepiece_acquisition' | 'appointment' | 'service' | 'general';
+
+export interface ContactRequestWatchInfo {
+  id?: string | null;
+  brand?: string | null;
+  collection?: string | null;
+  name?: string | null;
+  ref?: string | null;
+  image?: string | null;
+  price?: number | null;
+  url?: string | null;
+}
+
+export interface CreateContactRequestPayload {
+  first_name: string;
+  last_name: string;
+  email?: string;
+  phone: string;
+  purpose: ContactRequestPurpose;
+  message: string;
+  selected_watch?: ContactRequestWatchInfo | null;
+  source_path?: string;
+}
+
+export interface PublicContactRequest {
+  id: string;
+  status: 'unresolved' | 'solved';
+  submitted_at?: string | null;
+}
+
 export interface PaginatedResponse<T> {
   data: T[];
   meta: {
@@ -215,6 +245,11 @@ export const publicApi = {
 
   getSeoSettings: async (options?: RequestOptions): Promise<PublicSeoSettings> => {
     return getJson<PublicSeoSettings>({ url: '/seo', signal: options?.signal, cache: true });
+  },
+
+  createContactRequest: async (payload: CreateContactRequestPayload): Promise<PublicContactRequest> => {
+    const response = await apiClient.post<{ data: PublicContactRequest }>('/contact-requests', payload);
+    return response.data.data;
   },
 
   // Fetch Articles (Paginated)

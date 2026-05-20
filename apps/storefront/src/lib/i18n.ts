@@ -76,6 +76,37 @@ const resources = {
         sold_out: "Sold Out",
         pre_order: "Pre-order"
       },
+      contactForm: {
+        title: "Send an Inquiry",
+        subtitle: "Please allow up to 24 hours for a personalized response.",
+        boutiqueSubtitle: "Our boutique team will respond with availability and acquisition details.",
+        boutiqueRequest: "Boutique Request",
+        selectedTimepiece: "Selected Timepiece",
+        close: "Close inquiry form",
+        submit: "Send Message",
+        submitting: "Sending...",
+        successInline: "We received your inquiry. Our boutique team will follow up shortly.",
+        errorInline: "We could not send your inquiry. Please try again or contact the boutique directly.",
+        contactToastTitle: "Request sent",
+        contactToastDescription: "Thank you. Our client relations team will follow up shortly.",
+        inquiryToastTitle: "Inquiry sent",
+        inquiryToastDescription: "Our boutique team will follow up with availability and acquisition details.",
+        fields: {
+          firstName: "First Name",
+          lastName: "Last Name",
+          email: "Email Address",
+          phone: "Phone Number",
+          purpose: "Purpose",
+          selectSubject: "Select Subject",
+          message: "Your Message"
+        },
+        purposes: {
+          timepieceAcquisition: "Timepiece Acquisition",
+          appointment: "Book an Appointment",
+          service: "After-Sales Service & Repair",
+          general: "General Inquiry"
+        }
+      },
       home: {
         latestArrivals: "Latest Arrivals",
         exploreCollections: "Explore Collections",
@@ -177,6 +208,37 @@ const resources = {
         syncing: "ĐANG TẢI",
         sold_out: "Hết hàng",
         pre_order: "Đặt hàng"
+      },
+      contactForm: {
+        title: "Gửi yêu cầu",
+        subtitle: "Vui lòng chờ tối đa 24 giờ để nhận phản hồi được cá nhân hóa.",
+        boutiqueSubtitle: "Đội ngũ boutique sẽ phản hồi về tình trạng hàng và thông tin sở hữu.",
+        boutiqueRequest: "Yêu cầu boutique",
+        selectedTimepiece: "Đồng hồ đã chọn",
+        close: "Đóng biểu mẫu yêu cầu",
+        submit: "Gửi yêu cầu",
+        submitting: "Đang gửi...",
+        successInline: "Chúng tôi đã nhận được yêu cầu. Đội ngũ boutique sẽ liên hệ lại trong thời gian sớm nhất.",
+        errorInline: "Không thể gửi yêu cầu. Vui lòng thử lại hoặc liên hệ trực tiếp boutique.",
+        contactToastTitle: "Đã gửi yêu cầu",
+        contactToastDescription: "Cảm ơn bạn. Đội ngũ chăm sóc khách hàng sẽ liên hệ lại trong thời gian sớm nhất.",
+        inquiryToastTitle: "Đã gửi yêu cầu",
+        inquiryToastDescription: "Đội ngũ boutique sẽ liên hệ về tình trạng hàng và thông tin sở hữu.",
+        fields: {
+          firstName: "Tên",
+          lastName: "Họ",
+          email: "Địa chỉ email",
+          phone: "Số điện thoại",
+          purpose: "Mục đích",
+          selectSubject: "Chọn chủ đề",
+          message: "Nội dung yêu cầu"
+        },
+        purposes: {
+          timepieceAcquisition: "Tư vấn sở hữu đồng hồ",
+          appointment: "Đặt lịch hẹn",
+          service: "Dịch vụ hậu mãi & sửa chữa",
+          general: "Yêu cầu chung"
+        }
       },
       home: {
         latestArrivals: "Sản phẩm mới nhất",

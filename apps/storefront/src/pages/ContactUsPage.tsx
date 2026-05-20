@@ -1,10 +1,11 @@
-import React, { useEffect, useRef } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
-import { MapPin, Phone, Mail, Clock, ArrowRight } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { AnimatePresence, motion, useScroll, useTransform } from 'framer-motion';
+import { CheckCircle2, MapPin, Phone, Mail, Clock } from 'lucide-react';
 import type { Variants, Easing } from 'framer-motion';
 import { CONTACT_ADDRESS, CONTACT_EMAIL, CONTACT_PHONE, MAP_URL } from '@/utils';
 import { createBreadcrumbJsonLd, useSeo } from '@/seo';
 import { useTranslation } from 'react-i18next';
+import ContactInquiryForm from '@/components/contact/ContactInquiryForm';
 
 // --- Animation Configurations ---
 const customEase: Easing = [0.16, 1, 0.3, 1];
@@ -23,9 +24,10 @@ const staggerContainer: Variants = {
 };
 
 const ContactUsPage: React.FC = () => {
-    const { i18n } = useTranslation();
+    const { t, i18n } = useTranslation();
     const currentLang = i18n.language.split('-')[0];
     const origin = import.meta.env.VITE_SITE_URL || window.location.origin;
+    const [isInquiryToastVisible, setIsInquiryToastVisible] = useState(false);
 
     useSeo({
         pageKey: 'contact-us',
@@ -33,13 +35,23 @@ const ContactUsPage: React.FC = () => {
         canonicalPath: '/contact-us',
         structuredData: createBreadcrumbJsonLd(origin, [
             { name: 'Home', path: '/' },
-            { name: 'Contact Us', path: '/contact-us' },
+            { name: t('common.contactUs'), path: '/contact-us' },
         ]),
     });
 
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);
+
+    useEffect(() => {
+        if (!isInquiryToastVisible) return;
+
+        const timeout = window.setTimeout(() => {
+            setIsInquiryToastVisible(false);
+        }, 5000);
+
+        return () => window.clearTimeout(timeout);
+    }, [isInquiryToastVisible]);
 
     // Parallax hook for the hero text
     const heroRef = useRef(null);
@@ -92,59 +104,11 @@ const ContactUsPage: React.FC = () => {
                         initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}
                         className="flex flex-col bg-stone-50 p-8 md:p-12 lg:p-16 rounded-lg"
                     >
-                        <motion.h3 variants={fadeUp} className="text-2xl md:text-3xl font-serif italic text-gunmetal mb-2">
-                            Send an Inquiry
-                        </motion.h3>
-                        <motion.p variants={fadeUp} className="text-sm text-stone-500 font-light mb-12">
-                            Please allow up to 24 hours for a personalized response.
-                        </motion.p>
-
-                        <form className="flex flex-col gap-8 md:gap-10">
-                            <motion.div variants={fadeUp} className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
-                                <div className="relative group">
-                                    <input type="text" id="firstName" required className="w-full bg-transparent border-b border-gunmetal/20 py-3 text-sm font-light text-gunmetal outline-none focus:border-gunmetal transition-colors peer" placeholder=" " />
-                                    <label htmlFor="firstName" className="absolute left-0 top-3 text-sm font-light text-stone-400 transition-all peer-focus:-top-4 peer-focus:text-[10px] peer-focus:text-gunmetal peer-focus:uppercase peer-focus:tracking-[0.2em] peer-valid:-top-4 peer-valid:text-[10px] peer-valid:text-gunmetal peer-valid:uppercase peer-valid:tracking-[0.2em] pointer-events-none">
-                                        First Name *
-                                    </label>
-                                </div>
-                                <div className="relative group">
-                                    <input type="text" id="lastName" required className="w-full bg-transparent border-b border-gunmetal/20 py-3 text-sm font-light text-gunmetal outline-none focus:border-gunmetal transition-colors peer" placeholder=" " />
-                                    <label htmlFor="lastName" className="absolute left-0 top-3 text-sm font-light text-stone-400 transition-all peer-focus:-top-4 peer-focus:text-[10px] peer-focus:text-gunmetal peer-focus:uppercase peer-focus:tracking-[0.2em] peer-valid:-top-4 peer-valid:text-[10px] peer-valid:text-gunmetal peer-valid:uppercase peer-valid:tracking-[0.2em] pointer-events-none">
-                                        Last Name *
-                                    </label>
-                                </div>
-                            </motion.div>
-
-                            <motion.div variants={fadeUp} className="relative group">
-                                <input type="email" id="email" required className="w-full bg-transparent border-b border-gunmetal/20 py-3 text-sm font-light text-gunmetal outline-none focus:border-gunmetal transition-colors peer" placeholder=" " />
-                                <label htmlFor="email" className="absolute left-0 top-3 text-sm font-light text-stone-400 transition-all peer-focus:-top-4 peer-focus:text-[10px] peer-focus:text-gunmetal peer-focus:uppercase peer-focus:tracking-[0.2em] peer-valid:-top-4 peer-valid:text-[10px] peer-valid:text-gunmetal peer-valid:uppercase peer-valid:tracking-[0.2em] pointer-events-none">
-                                    Email Address *
-                                </label>
-                            </motion.div>
-
-                            <motion.div variants={fadeUp} className="relative group">
-                                <select id="inquiryType" required className="w-full bg-transparent border-b border-gunmetal/20 py-3 text-sm font-light text-stone-500 outline-none focus:border-gunmetal transition-colors appearance-none cursor-pointer">
-                                    <option value="" disabled selected>Select Subject</option>
-                                    <option value="acquisition">Timepiece Acquisition</option>
-                                    <option value="appointment">Book an Appointment</option>
-                                    <option value="service">After-Sales Service & Repair</option>
-                                    <option value="other">General Inquiry</option>
-                                </select>
-                            </motion.div>
-
-                            <motion.div variants={fadeUp} className="relative group">
-                                <textarea id="message" required rows={4} className="w-full bg-transparent border-b border-gunmetal/20 py-3 text-sm font-light text-gunmetal outline-none focus:border-gunmetal transition-colors peer resize-none" placeholder=" "></textarea>
-                                <label htmlFor="message" className="absolute left-0 top-3 text-sm font-light text-stone-400 transition-all peer-focus:-top-4 peer-focus:text-[10px] peer-focus:text-gunmetal peer-focus:uppercase peer-focus:tracking-[0.2em] peer-valid:-top-4 peer-valid:text-[10px] peer-valid:text-gunmetal peer-valid:uppercase peer-valid:tracking-[0.2em] pointer-events-none">
-                                    Your Message
-                                </label>
-                            </motion.div>
-
-                            <motion.button variants={fadeUp} type="submit" className="group mt-4 flex items-center gap-4 text-[10px] uppercase tracking-[0.3em] font-bold text-gunmetal w-fit">
-                                <span className="h-[1px] w-8 bg-gunmetal/30 group-hover:w-16 group-hover:bg-gunmetal transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"></span>
-                                Send Message
-                                <ArrowRight size={14} className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500" />
-                            </motion.button>
-                        </form>
+                        <ContactInquiryForm
+                            variants={fadeUp}
+                            showInlineSuccess={false}
+                            onSuccess={() => setIsInquiryToastVisible(true)}
+                        />
                     </motion.div>
 
                     {/* Right: Direct Contact & Imagery */}
@@ -261,6 +225,30 @@ const ContactUsPage: React.FC = () => {
 
                 </div>
             </section>
+
+            <AnimatePresence>
+                {isInquiryToastVisible && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 16, scale: 0.98 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 16, scale: 0.98 }}
+                        transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                        className="fixed bottom-6 left-1/2 z-[120] flex w-[calc(100%-2rem)] max-w-md -translate-x-1/2 items-start gap-3 rounded-lg border border-green-200 bg-white px-4 py-4 text-gunmetal shadow-2xl sm:right-6 sm:left-auto sm:w-full sm:translate-x-0"
+                        role="status"
+                        aria-live="polite"
+                    >
+                        <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-green-50 text-green-700">
+                            <CheckCircle2 size={18} />
+                        </span>
+                        <span>
+                            <span className="block text-sm font-medium">{t('contactForm.contactToastTitle')}</span>
+                            <span className="mt-1 block text-xs leading-relaxed text-stone-500">
+                                {t('contactForm.contactToastDescription')}
+                            </span>
+                        </span>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
         </div>
     );

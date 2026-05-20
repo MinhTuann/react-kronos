@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Filter, X } from 'lucide-react';
@@ -26,28 +26,57 @@ const readMultiValueParam = (params: URLSearchParams, key: string): string[] => 
     return single.split(',').map(value => value.trim()).filter(Boolean);
 };
 
+
+
+const readFilterStateFromSearch = (search: string) => {
+    const params = new URLSearchParams(search);
+    const brandId = params.get('brandId') || params.get('brand_id');
+    const collectionIds = [
+        ...readMultiValueParam(params, 'collections'),
+        ...readMultiValueParam(params, 'collectionId'),
+        ...readMultiValueParam(params, 'collection_ids'),
+    ];
+
+    return {
+        selectedBrands: brandId ? [brandId] : [],
+        selectedCollections: Array.from(new Set(collectionIds)),
+        isInStockOnly: params.get('in_stock') === 'true',
+    };
+};
+
 const CollectionsPage: React.FC = () => {
     // States
     const [watches, setWatches] = useState<Watch[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const { t, i18n } = useTranslation();
+    const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    const initialFilterState = readFilterStateFromSearch(location.search);
+    const latestWatchesRequest = useRef(0);
     const [hasNextPage, setHasNextPage] = useState(false);
     const [lastCursor, setLastCursor] = useState<string | null>(null);
-    const [isFilterOpen, setIsFilterOpen] = useState(new URLSearchParams(window.location.search).get('in_stock') === 'true');
+    const [isFilterOpen, setIsFilterOpen] = useState(initialFilterState.isInStockOnly);
     // const [sortMethod, setSortMethod] = useState<'recommended' | 'price-asc' | 'price-desc'>('recommended');
 
     // Search Query parsing
-    const location = useLocation();
-    const queryParams = new URLSearchParams(location.search);
     const searchQuery = queryParams.get('search') || undefined;
 
     // Filter States
     const [brands, setBrands] = useState<PublicBrand[]>([]);
     const [collections, setCollections] = useState<PublicCollection[]>([]);
-    const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
-    const [selectedCollections, setSelectedCollections] = useState<string[]>([]);
-    const [isInStockOnly, setIsInStockOnly] = useState(queryParams.get('in_stock') === 'true');
+    const [selectedBrands, setSelectedBrands] = useState<string[]>(initialFilterState.selectedBrands);
+    const [selectedCollections, setSelectedCollections] = useState<string[]>(initialFilterState.selectedCollections);
+    const [isInStockOnly, setIsInStockOnly] = useState(initialFilterState.isInStockOnly);
+
+    const [prevSearch, setPrevSearch] = useState(location.search);
+    if (location.search !== prevSearch) {
+        const nextFilterState = readFilterStateFromSearch(location.search);
+        setPrevSearch(location.search);
+        setSelectedBrands(nextFilterState.selectedBrands);
+        setSelectedCollections(nextFilterState.selectedCollections);
+        setIsInStockOnly(nextFilterState.isInStockOnly);
+    }
     const currentLang = i18n.language.split('-')[0];
     const origin = import.meta.env.VITE_SITE_URL || window.location.origin;
     const selectedBrandName = brands.find((brand) => brand.id === selectedBrands[0])?.name;
@@ -103,18 +132,7 @@ const CollectionsPage: React.FC = () => {
         structuredData: createBreadcrumbJsonLd(origin, breadcrumbItems),
     });
 
-    useEffect(() => {
-        const params = new URLSearchParams(location.search);
-        const brandId = params.get('brandId') || params.get('brand_id');
-        const collectionIds = [
-            ...readMultiValueParam(params, 'collections'),
-            ...readMultiValueParam(params, 'collectionId'),
-            ...readMultiValueParam(params, 'collection_ids'),
-        ];
 
-        setSelectedBrands(brandId ? [brandId] : []);
-        setSelectedCollections(Array.from(new Set(collectionIds)));
-    }, [location.search]);
 
     const itemsPerPage = 12; // Adjusted to a better grid number
     const currentWatches = Array.isArray(watches) ? watches : [];
@@ -134,7 +152,7 @@ const CollectionsPage: React.FC = () => {
                 setCollections(Array.isArray(cData) ? cData : []);
             } catch (err) {
                 if (controller.signal.aborted) return;
-                console.error("Failed to fetch filters:", err);
+                console.error('Failed to fetch filters:', err);
             }
         };
         fetchFilters();
@@ -142,7 +160,14 @@ const CollectionsPage: React.FC = () => {
         return () => controller.abort();
     }, []);
 
-    const fetchWatches = async (reset = false) => {
+    const fetchWatches = async (reset = false, signal?: AbortSignal) => {
+        // Yield to the event loop to avoid calling setState synchronously within useEffect
+        await Promise.resolve();
+
+        const requestId = latestWatchesRequest.current + 1;
+        latestWatchesRequest.current = requestId;
+        const isStaleRequest = () => signal?.aborted || requestId !== latestWatchesRequest.current;
+
         try {
             if (reset) {
                 setIsLoading(true);
@@ -161,8 +186,11 @@ const CollectionsPage: React.FC = () => {
                 searchQuery,
                 currentCursor,
                 itemsPerPage,
-                isInStockOnly
+                isInStockOnly,
+                signal ? { signal } : undefined
             );
+
+            if (isStaleRequest()) return;
 
             const nextWatches = Array.isArray(response?.data) ? response.data : [];
             const nextMeta = response?.meta ?? { hasNextPage: false, lastCursor: null };
@@ -177,16 +205,27 @@ const CollectionsPage: React.FC = () => {
             setLastCursor(nextMeta.lastCursor ?? null);
 
         } catch (err) {
-            console.error("Failed to fetch public watches:", err);
+            if (isStaleRequest()) return;
+            console.error('Failed to fetch public watches:', err);
         } finally {
-            setIsLoading(false);
-            setIsLoadingMore(false);
+            if (!isStaleRequest()) {
+                setIsLoading(false);
+                setIsLoadingMore(false);
+            }
         }
     };
 
     // Run fetch on mount and whenever filters/search change
     useEffect(() => {
-        fetchWatches(true);
+        const controller = new AbortController();
+        const timer = setTimeout(() => {
+            fetchWatches(true, controller.signal);
+        }, 0);
+
+        return () => {
+            clearTimeout(timer);
+            controller.abort();
+        };
     }, [searchQuery, selectedBrands, selectedCollections, isInStockOnly]);
 
     // Scroll Listener removed for reusable GoToTop component
@@ -228,10 +267,10 @@ const CollectionsPage: React.FC = () => {
         const visibleCollections = collections.filter(c => selectedBrands.includes(c.brand_id));
 
         return (
-            <div className='pr-4 lg:pr-8 space-y-10 lg:space-y-12'>
+            <div className="pr-4 lg:pr-8 space-y-10 lg:space-y-12">
                 {/* In Stock Filter */}
                 <div>
-                    <h4 className='text-[10px] tracking-[0.3em] uppercase font-bold border-b border-gunmetal/10 pb-4 mb-4'>{t('common.availability')}</h4>
+                    <h4 className="text-[10px] tracking-[0.3em] uppercase font-bold border-b border-gunmetal/10 pb-4 mb-4">{t('common.availability')}</h4>
                     <label className="flex items-center gap-3 cursor-pointer group transition-colors text-gunmetal/60 hover:text-black text-sm">
                         <input
                             type="checkbox"
@@ -245,8 +284,8 @@ const CollectionsPage: React.FC = () => {
 
                 {brands.length > 0 && (
                     <div>
-                        <h4 className='text-[10px] tracking-[0.3em] uppercase font-bold border-b border-gunmetal/10 pb-4 mb-4'>{t('header.brands')}</h4>
-                        <ul className='space-y-4 lg:space-y-3 text-sm font-light max-h-48 overflow-y-auto pr-2 custom-scrollbar'>
+                        <h4 className="text-[10px] tracking-[0.3em] uppercase font-bold border-b border-gunmetal/10 pb-4 mb-4">{t('header.brands')}</h4>
+                        <ul className="space-y-4 lg:space-y-3 text-sm font-light max-h-48 overflow-y-auto pr-2 custom-scrollbar">
                             {brands.map(brand => {
                                 const isSelected = selectedBrands.includes(brand.id);
                                 return (
@@ -254,9 +293,9 @@ const CollectionsPage: React.FC = () => {
                                         <label className={`flex items-center gap-3 cursor-pointer group transition-colors ${isSelected ? 'text-black font-medium' : 'text-gunmetal/60 hover:text-black'}`}>
                                             <div className="relative flex items-center justify-center">
                                                 <input
-                                                    type='radio'
-                                                    name='brand'
-                                                    className='sr-only'
+                                                    type="radio"
+                                                    name="brand"
+                                                    className="sr-only"
                                                     checked={isSelected}
                                                     onClick={() => toggleBrand(brand.id)}
                                                     onChange={() => { }}
@@ -286,14 +325,14 @@ const CollectionsPage: React.FC = () => {
 
                 {selectedBrands.length > 0 && visibleCollections.length > 0 && (
                     <div>
-                        <h4 className='text-[10px] tracking-[0.3em] uppercase font-bold border-b border-gunmetal/10 pb-4 mb-4'>{t('header.collections')}</h4>
-                        <ul className='space-y-4 lg:space-y-3 text-sm font-light text-gunmetal/80 max-h-48 overflow-y-auto pr-2 custom-scrollbar'>
+                        <h4 className="text-[10px] tracking-[0.3em] uppercase font-bold border-b border-gunmetal/10 pb-4 mb-4">{t('header.collections')}</h4>
+                        <ul className="space-y-4 lg:space-y-3 text-sm font-light text-gunmetal/80 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
                             {visibleCollections.map(collection => (
                                 <li key={collection.id}>
-                                    <label className='flex items-center gap-3 cursor-pointer hover:text-black'>
+                                    <label className="flex items-center gap-3 cursor-pointer hover:text-black">
                                         <input
-                                            type='checkbox'
-                                            className='accent-gunmetal w-4 h-4'
+                                            type="checkbox"
+                                            className="accent-gunmetal w-4 h-4"
                                             checked={selectedCollections.includes(collection.id)}
                                             onChange={() => toggleCollection(collection.id)}
                                         />
@@ -318,32 +357,32 @@ const CollectionsPage: React.FC = () => {
     };
 
     return (
-        <div className='pt-24 md:pt-32 pb-24 min-h-screen bg-white relative'>
+        <div className="pt-24 md:pt-32 pb-24 min-h-screen bg-white relative">
 
             {/* --- Page Header --- */}
             {/* Fix: Changed flex layout to stack cleanly on mobile */}
-            <div className='max-w-[1600px] mx-auto px-6 lg:px-12 mb-10 md:mb-16 text-center lg:text-left flex flex-col lg:flex-row justify-between lg:items-end gap-4 md:gap-8'>
+            <div className="max-w-[1600px] mx-auto px-6 lg:px-12 mb-10 md:mb-16 text-center lg:text-left flex flex-col lg:flex-row justify-between lg:items-end gap-4 md:gap-8">
                 <div className="w-full">
                     {/* The Header now spans full width on mobile so the text centers properly */}
                     <div className="flex flex-col items-center lg:items-start">
-                        <span className='font-branding text-[10px] tracking-[0.4em] uppercase text-gunmetal/50 block mb-2 md:mb-4'>
+                        <span className="font-branding text-[10px] tracking-[0.4em] uppercase text-gunmetal/50 block mb-2 md:mb-4">
                             {t('collections.subtitle')}
                         </span>
-                        <h1 className='text-4xl md:text-5xl italic text-gunmetal tracking-tight'>
+                        <h1 className="text-4xl md:text-5xl italic text-gunmetal tracking-tight">
                             {t('collections.title')}
                         </h1>
                     </div>
                 </div>
-                <p className='text-sm font-light text-gunmetal/60 max-w-md leading-relaxed hidden lg:block'>
+                <p className="text-sm font-light text-gunmetal/60 max-w-md leading-relaxed hidden lg:block">
                     {t('collections.description')}
                 </p>
             </div>
 
             {/* --- Toolbar (Filters Toggle & Sort) --- */}
-            <div className='max-w-[1600px] mx-auto px-6 lg:px-12 mb-8 md:mb-10 border-b border-gunmetal/10 pb-4 md:pb-6 flex justify-between items-center sticky top-20 md:top-24 z-30 bg-white/95 backdrop-blur-md py-4'>
+            <div className="max-w-[1600px] mx-auto px-6 lg:px-12 mb-8 md:mb-10 border-b border-gunmetal/10 pb-4 md:pb-6 flex justify-between items-center sticky top-20 md:top-24 z-30 bg-white/95 backdrop-blur-md py-4">
                 <button
                     onClick={() => setIsFilterOpen(!isFilterOpen)}
-                    className='flex items-center gap-2 text-[10px] md:text-xs uppercase tracking-[0.2em] font-medium hover:text-black transition-colors'
+                    className="flex items-center gap-2 text-[10px] md:text-xs uppercase tracking-[0.2em] font-medium hover:text-black transition-colors"
                 >
                     <Filter size={16} strokeWidth={1.5} />
                     <span className="hidden sm:inline">{isFilterOpen ? t('collections.hideFilters') : t('collections.showFilters')}</span>
@@ -358,7 +397,7 @@ const CollectionsPage: React.FC = () => {
             </div>
 
             {/* --- Main Content Layout --- */}
-            <div className='max-w-[1600px] mx-auto px-6 lg:px-12 flex flex-col lg:flex-row'>
+            <div className="max-w-[1600px] mx-auto px-6 lg:px-12 flex flex-col lg:flex-row">
 
                 {/* --- Desktop Sidebar Filters --- */}
                 <AnimatePresence>
@@ -369,9 +408,9 @@ const CollectionsPage: React.FC = () => {
                             animate={{ width: 280, opacity: 1, marginRight: 48 }}
                             exit={{ width: 0, opacity: 0, marginRight: 0 }}
                             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                            className='hidden lg:block shrink-0 overflow-hidden'
+                            className="hidden lg:block shrink-0 overflow-hidden"
                         >
-                            <div className='w-[280px]'>
+                            <div className="w-[280px]">
                                 {renderFilterContent()}
                             </div>
                         </motion.aside>
@@ -380,19 +419,19 @@ const CollectionsPage: React.FC = () => {
 
                 {/* --- Product Grid --- */}
                 {/* 1. Add motion.div and layout here so the container animates its width change smoothly */}
-                <div className='flex-1 relative min-h-[400px]'>
+                <div className="flex-1 relative min-h-[400px]">
                     {isLoading ? (
                         <CollectionsGridSkeleton />
                     ) : (
                         <motion.div
                             key={`${'sortMethod'}-${selectedBrands.join(',')}-${selectedCollections.join(',')}`}
-                            initial='hidden'
-                            animate='visible'
+                            initial="hidden"
+                            animate="visible"
                             variants={{
                                 hidden: { opacity: 0 },
                                 visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
                             }}
-                            className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-12 md:gap-y-16 xl:gap-x-8'
+                            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-12 md:gap-y-16 xl:gap-x-8"
                         >
                             {currentWatches.map((watch) => (
                                 <motion.div

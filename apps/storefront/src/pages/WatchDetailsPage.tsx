@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronRight, ShieldCheck, ArrowLeft, Plus, Minus } from 'lucide-react';
+import { CheckCircle2, ChevronRight, ShieldCheck, ArrowLeft, Plus, Minus, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import SpecValue from '@/components/common/SpecValue';
 import { Skeleton, TextSkeleton } from '@/components/common/Skeleton';
+import ContactInquiryForm from '@/components/contact/ContactInquiryForm';
 import type { Watch } from '@/types';
 
 import { publicApi } from '@/lib/api';
@@ -36,6 +38,8 @@ const WatchDetailsPage: React.FC = () => {
         ? `/watch/${id}`
         : `/watch/${brand_slug}/${collection_slug ? `${collection_slug}/` : ''}${ref}`;
     const [isEditorialExpanded, setIsEditorialExpanded] = useState(false);
+    const [isInquiryOpen, setIsInquiryOpen] = useState(false);
+    const [isInquiryToastVisible, setIsInquiryToastVisible] = useState(false);
     const [activeImageIndex, setActiveImageIndex] = useState(0);
     const [direction, setDirection] = useState(0);
     const activeImageSrc = watch?.images && watch.images.length > 0
@@ -123,6 +127,36 @@ const WatchDetailsPage: React.FC = () => {
 
         return () => controller.abort();
     }, [id, brand_slug, collection_slug, ref]);
+
+    useEffect(() => {
+        if (!isInquiryOpen) return;
+
+        const originalOverflow = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                setIsInquiryOpen(false);
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            document.body.style.overflow = originalOverflow;
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [isInquiryOpen]);
+
+    useEffect(() => {
+        if (!isInquiryToastVisible) return;
+
+        const timeout = window.setTimeout(() => {
+            setIsInquiryToastVisible(false);
+        }, 5000);
+
+        return () => window.clearTimeout(timeout);
+    }, [isInquiryToastVisible]);
 
     if (isLoading) {
         return (
@@ -411,7 +445,13 @@ const WatchDetailsPage: React.FC = () => {
 
                         {/* Actions */}
                         <div className="mt-8">
-                            <button className="w-full border border-gunmetal/20 text-gunmetal text-xs uppercase tracking-[0.2em] font-semibold py-5 px-8 hover:bg-stone-50 transition-colors">
+                            <button
+                                type="button"
+                                onClick={() => setIsInquiryOpen(true)}
+                                aria-expanded={isInquiryOpen}
+                                aria-haspopup="dialog"
+                                className="w-full border border-gunmetal/20 text-gunmetal text-xs uppercase tracking-[0.2em] font-semibold py-5 px-8 hover:bg-stone-50 transition-colors"
+                            >
                                 {t('common.contact_boutiques')}
                             </button>
                         </div>
@@ -483,6 +523,84 @@ const WatchDetailsPage: React.FC = () => {
                     {t('common.back_to_collections')}
                 </Link>
             </div>
+
+            {createPortal(
+                <AnimatePresence>
+                    {isInquiryOpen && (
+                        <motion.div
+                            className="fixed inset-0 z-[100] flex items-center justify-center px-4 py-6 sm:px-6"
+                            role="dialog"
+                            aria-modal="true"
+                            aria-label={t('contactForm.title')}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                        >
+                            <button
+                                type="button"
+                                aria-label={t('contactForm.close')}
+                                onClick={() => setIsInquiryOpen(false)}
+                                className="absolute inset-0 bg-gunmetal/50 backdrop-blur-sm"
+                            />
+                            <motion.div
+                                initial={{ opacity: 0, y: 24, scale: 0.98 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, y: 24, scale: 0.98 }}
+                                transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                                className="relative z-10 w-full max-w-5xl max-h-[calc(100vh-2rem)] overflow-y-auto rounded-lg bg-stone-50 p-4 shadow-2xl md:overflow-visible md:p-6"
+                            >
+                                <button
+                                    type="button"
+                                    aria-label={t('contactForm.close')}
+                                    onClick={() => setIsInquiryOpen(false)}
+                                    className="absolute right-5 top-5 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-gunmetal/10 bg-white text-gunmetal shadow-sm hover:bg-stone-100 transition-colors"
+                                >
+                                    <X size={18} />
+                                </button>
+                                <ContactInquiryForm
+                                    title={t('contactForm.title')}
+                                    subtitle={t('contactForm.boutiqueSubtitle')}
+                                    selectedWatch={watch}
+                                    defaultPurpose="timepiece_acquisition"
+                                    density="compact"
+                                    onSuccess={() => {
+                                        setIsInquiryOpen(false);
+                                        setIsInquiryToastVisible(true);
+                                    }}
+                                />
+                            </motion.div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>,
+                document.body
+            )}
+
+            {createPortal(
+                <AnimatePresence>
+                    {isInquiryToastVisible && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 16, scale: 0.98 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: 16, scale: 0.98 }}
+                            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                            className="fixed bottom-6 left-1/2 z-[120] flex w-[calc(100%-2rem)] max-w-md -translate-x-1/2 items-start gap-3 rounded-lg border border-green-200 bg-white px-4 py-4 text-gunmetal shadow-2xl sm:right-6 sm:left-auto sm:w-full sm:translate-x-0"
+                            role="status"
+                            aria-live="polite"
+                        >
+                            <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-green-50 text-green-700">
+                                <CheckCircle2 size={18} />
+                            </span>
+                            <span>
+                                <span className="block text-sm font-medium">{t('contactForm.inquiryToastTitle')}</span>
+                                <span className="mt-1 block text-xs leading-relaxed text-stone-500">
+                                    {t('contactForm.inquiryToastDescription')}
+                                </span>
+                            </span>
+                        </motion.div>
+                    )}
+                </AnimatePresence>,
+                document.body
+            )}
         </div>
     );
 };
