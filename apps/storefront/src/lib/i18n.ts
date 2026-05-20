@@ -158,7 +158,7 @@ const resources = {
         accessories: "Phụ kiện",
         theCompany: "Về chúng tôi",
         newsEvents: "Tin tức & Sự kiện",
-        inStock: "Hàng sẵn có",
+        inStock: "Đồng hồ có sẵn",
         all: "Tất cả"
       },
       search: {
