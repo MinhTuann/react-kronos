@@ -1,6 +1,6 @@
 import axios from 'axios';
 import type { Watch, Accessory } from '../types';
-import type { PublicBrand, PublicCollection } from '@kronos/contracts-public';
+import type { PublicBrand, PublicCollection, PublicAccessoryType } from '@kronos/contracts-public';
 
 const API_URL = import.meta.env.VITE_API_URL;
 const apiClient = axios.create({ baseURL: API_URL });
@@ -160,7 +160,7 @@ export interface PaginatedResponse<T> {
   };
 }
 
-export type { PublicBrand, PublicCollection };
+export type { PublicBrand, PublicCollection, PublicAccessoryType };
 export type { RequestOptions };
 
 export const publicApi = {
@@ -294,8 +294,8 @@ export const publicApi = {
   },
 
   // Fetch Accessory Types
-  getAccessoryTypes: async (options?: RequestOptions): Promise<any[]> => {
-    return getJson<any[]>({ url: '/accessory-types', signal: options?.signal, cache: true });
+  getAccessoryTypes: async (options?: RequestOptions): Promise<PublicAccessoryType[]> => {
+    return getJson<PublicAccessoryType[]>({ url: '/accessory-types', signal: options?.signal, cache: true });
   },
 
   // Fetch Single Detailed Accessory

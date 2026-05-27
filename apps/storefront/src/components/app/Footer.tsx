@@ -2,36 +2,72 @@ import { CONTACT_EMAIL, CONTACT_PHONE, YEAR_OF_FOUNDATION, MAP_URL, FACEBOOK_URL
 import { Facebook, Instagram, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useState, useEffect } from 'react';
+import { publicApi, type PublicBrand } from '@/lib/api';
 
 const paths: Record<string, string> = {
     'Our Story': '/about-us',
     'Contact Us': '/contact-us',
-}
+};
 
 const getPath = (link: string) => paths[link] || '/collections';
 
+interface FooterLink {
+    label: string;
+    path: string;
+}
+
 // --- Reusable Navigation Column ---
-const FooterNavGroup = ({ title, links }: { title: string, links: string[] }) => (
+const FooterNavGroup = ({ title, links }: { title: string; links: Array<string | FooterLink> }) => (
     <div className="flex flex-col">
         <h5 className="font-branding mb-8 text-[10px] uppercase tracking-[0.4em] text-gunmetal font-bold">
             {title}
         </h5>
         <ul className="flex flex-col gap-4 text-[13px] text-stone-500 font-light">
-            {links.map((link, index) => (
-                <li key={index}>
-                    <Link className="hover:text-black transition-colors duration-300 flex items-center group w-fit" to={getPath(link)}>
-                        {/* Luxury Detail: A tiny line that smoothly extends out on hover */}
-                        <span className="h-[1px] w-0 bg-black mr-0 group-hover:w-4 group-hover:mr-3 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"></span>
-                        {link}
-                    </Link>
-                </li>
-            ))}
+            {links.map((link, index) => {
+                const label = typeof link === 'string' ? link : link.label;
+                const path = typeof link === 'string' ? getPath(link) : link.path;
+                return (
+                    <li key={index}>
+                        <Link className="hover:text-black transition-colors duration-300 flex items-center group w-fit" to={path}>
+                            {/* Luxury Detail: A tiny line that smoothly extends out on hover */}
+                            <span className="h-[1px] w-0 bg-black mr-0 group-hover:w-4 group-hover:mr-3 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"></span>
+                            {label}
+                        </Link>
+                    </li>
+                );
+            })}
         </ul>
     </div>
 );
 
 const Footer = () => {
     const { t } = useTranslation();
+    const [brands, setBrands] = useState<PublicBrand[]>([]);
+
+    useEffect(() => {
+        const controller = new AbortController();
+
+        const fetchBrands = async () => {
+            try {
+                const data = await publicApi.getBrands('watch', { signal: controller.signal });
+                if (controller.signal.aborted) return;
+                setBrands(data);
+            } catch (err) {
+                if (controller.signal.aborted) return;
+                console.error('Failed to fetch brands in Footer:', err);
+            }
+        };
+
+        fetchBrands();
+
+        return () => controller.abort();
+    }, []);
+
+    const brandLinks = brands.length > 0 ? brands.map(brand => ({
+        label: brand.name,
+        path: `/collections?brandName=${encodeURIComponent(brand.name)}`
+    })) : [];
 
     return (
         <footer className="bg-white text-gunmetal pt-24 pb-12 border-t border-gunmetal/10">
@@ -55,8 +91,8 @@ const Footer = () => {
                     <div className="order-1 md:order-2 flex flex-col items-center text-center justify-between lg:px-12">
                         <img
                             src={`${import.meta.env.BASE_URL}logo_black.png`}
-                            alt='Kronos Logo'
-                            className='h-16 md:h-20 w-auto mb-10 lg:mb-0'
+                            alt="Kronos Logo"
+                            className="h-16 md:h-20 w-auto mb-10 lg:mb-0"
                         />
                         <div className="mt-auto">
                             <span className="font-branding text-[10px] uppercase tracking-[0.4em] text-gunmetal font-bold block mb-2">
@@ -76,7 +112,7 @@ const Footer = () => {
                             <span className="block md:hidden h-[1px] w-4 bg-gunmetal/20"></span>
                         </span>
                         <h3 className="font-serif italic text-xl text-left md:text-right lg:text-2xl text-gunmetal leading-relaxed">
-                            "{t('footer.promiseText')}"
+                            &ldquo;{t('footer.promiseText')}&rdquo;
                         </h3>
                     </div>
 
@@ -112,10 +148,10 @@ const Footer = () => {
                         </a>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-y-16 gap-x-8 mb-24">
-                        <FooterNavGroup
+                        {brandLinks.length > 0 && <FooterNavGroup
                             title={t('menu.theBrands')}
-                            links={['Richard Mille', 'Rolex', 'Hublot', 'Patek Philippe', 'Cartier', 'Audemars Piguet', 'Vacheron Constantin']}
-                        />
+                            links={brandLinks}
+                        />}
                         <FooterNavGroup
                             title={t('menu.theCompany')}
                             links={['Our Story', 'Contact Us']}

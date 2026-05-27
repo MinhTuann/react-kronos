@@ -28,14 +28,39 @@ const readMultiValueParam = (params: URLSearchParams, key: string): string[] => 
 
 
 
-const readFilterStateFromSearch = (search: string) => {
+const readFilterStateFromSearch = (search: string, brandsList: PublicBrand[] = [], collectionsList: PublicCollection[] = []) => {
     const params = new URLSearchParams(search);
-    const brandId = params.get('brandId') || params.get('brand_id');
-    const collectionIds = [
+    let brandId = params.get('brandId') || params.get('brand_id');
+    const brandName = params.get('brandName') || params.get('brand_name');
+
+    if (!brandId && brandName && brandsList.length > 0) {
+        const found = brandsList.find(b => b.name.toLowerCase() === brandName.toLowerCase());
+        if (found) {
+            brandId = found.id;
+        }
+    }
+
+    let collectionIds = [
         ...readMultiValueParam(params, 'collections'),
         ...readMultiValueParam(params, 'collectionId'),
         ...readMultiValueParam(params, 'collection_ids'),
     ];
+
+    const collectionNames = [
+        ...readMultiValueParam(params, 'collectionName'),
+        ...readMultiValueParam(params, 'collection_name'),
+    ];
+
+    if (collectionNames.length > 0 && collectionsList.length > 0) {
+        const mappedIds = collectionNames.map(name => {
+            const found = collectionsList.find(c => c.name.toLowerCase() === name.toLowerCase());
+            return found ? found.id : null;
+        }).filter(Boolean) as string[];
+
+        if (mappedIds.length > 0) {
+            collectionIds = Array.from(new Set([...collectionIds, ...mappedIds]));
+        }
+    }
 
     return {
         selectedBrands: brandId ? [brandId] : [],
@@ -71,12 +96,50 @@ const CollectionsPage: React.FC = () => {
 
     const [prevSearch, setPrevSearch] = useState(location.search);
     if (location.search !== prevSearch) {
-        const nextFilterState = readFilterStateFromSearch(location.search);
+        const nextFilterState = readFilterStateFromSearch(location.search, brands, collections);
         setPrevSearch(location.search);
         setSelectedBrands(nextFilterState.selectedBrands);
         setSelectedCollections(nextFilterState.selectedCollections);
         setIsInStockOnly(nextFilterState.isInStockOnly);
     }
+
+    const isFilterInvalid = (() => {
+        if (brands.length === 0 && collections.length === 0) return false;
+
+        const params = new URLSearchParams(location.search);
+        const brandName = params.get('brandName') || params.get('brand_name');
+        const brandId = params.get('brandId') || params.get('brand_id');
+        const collectionNames = [
+            ...readMultiValueParam(params, 'collectionName'),
+            ...readMultiValueParam(params, 'collection_name'),
+        ];
+        const collectionIds = [
+            ...readMultiValueParam(params, 'collections'),
+            ...readMultiValueParam(params, 'collectionId'),
+            ...readMultiValueParam(params, 'collection_ids'),
+        ];
+
+        if (brandName && brands.length > 0) {
+            const found = brands.some(b => b.name.toLowerCase() === brandName.toLowerCase());
+            if (!found) return true;
+        }
+        if (brandId && brands.length > 0) {
+            const found = brands.some(b => b.id === brandId);
+            if (!found) return true;
+        }
+
+        if (collectionNames.length > 0 && collections.length > 0) {
+            const allFound = collectionNames.every(name => collections.some(c => c.name.toLowerCase() === name.toLowerCase()));
+            if (!allFound) return true;
+        }
+        if (collectionIds.length > 0 && collections.length > 0) {
+            const allFound = collectionIds.every(id => collections.some(c => c.id === id));
+            if (!allFound) return true;
+        }
+
+        return false;
+    })();
+
     const currentLang = i18n.language.split('-')[0];
     const origin = import.meta.env.VITE_SITE_URL || window.location.origin;
     const selectedBrandName = brands.find((brand) => brand.id === selectedBrands[0])?.name;
@@ -160,9 +223,58 @@ const CollectionsPage: React.FC = () => {
         return () => controller.abort();
     }, []);
 
+    // Resolve brandName and collectionName from URL once filters list is loaded
+    useEffect(() => {
+        const resolveParams = async () => {
+            if (brands.length === 0 && collections.length === 0) return;
+
+            const params = new URLSearchParams(location.search);
+            const brandName = params.get('brandName') || params.get('brand_name');
+            const collectionNames = [
+                ...readMultiValueParam(params, 'collectionName'),
+                ...readMultiValueParam(params, 'collection_name'),
+            ];
+
+            await Promise.resolve();
+
+            if (brandName && brands.length > 0) {
+                const found = brands.find(b => b.name.toLowerCase() === brandName.toLowerCase());
+                if (found && !selectedBrands.includes(found.id)) {
+                    setSelectedBrands([found.id]);
+                }
+            }
+
+            if (collectionNames.length > 0 && collections.length > 0) {
+                const mappedIds = collectionNames.map(name => {
+                    const found = collections.find(c => c.name.toLowerCase() === name.toLowerCase());
+                    return found ? found.id : null;
+                }).filter(Boolean) as string[];
+
+                if (mappedIds.length > 0) {
+                    const isDiff = mappedIds.some(id => !selectedCollections.includes(id)) || 
+                                   selectedCollections.some(id => !mappedIds.includes(id));
+                    if (isDiff) {
+                        setSelectedCollections(mappedIds);
+                    }
+                }
+            }
+        };
+
+        resolveParams();
+    }, [brands, collections, location.search, selectedBrands, selectedCollections]);
+
     const fetchWatches = async (reset = false, signal?: AbortSignal) => {
         // Yield to the event loop to avoid calling setState synchronously within useEffect
         await Promise.resolve();
+
+        if (isFilterInvalid) {
+            setWatches([]);
+            setHasNextPage(false);
+            setLastCursor(null);
+            setIsLoading(false);
+            setIsLoadingMore(false);
+            return;
+        }
 
         const requestId = latestWatchesRequest.current + 1;
         latestWatchesRequest.current = requestId;
@@ -226,7 +338,8 @@ const CollectionsPage: React.FC = () => {
             clearTimeout(timer);
             controller.abort();
         };
-    }, [searchQuery, selectedBrands, selectedCollections, isInStockOnly]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [searchQuery, selectedBrands, selectedCollections, isInStockOnly, isFilterInvalid]);
 
     // Scroll Listener removed for reusable GoToTop component
 
@@ -422,6 +535,17 @@ const CollectionsPage: React.FC = () => {
                 <div className="flex-1 relative min-h-[400px]">
                     {isLoading ? (
                         <CollectionsGridSkeleton />
+                    ) : isFilterInvalid || currentWatches.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center py-20 text-center">
+                            <h3 className="text-xl italic text-gunmetal mb-2">
+                                {currentLang === 'en' ? 'No items found' : 'Không tìm thấy sản phẩm'}
+                            </h3>
+                            <p className="text-sm font-light text-stone-400">
+                                {currentLang === 'en' 
+                                    ? 'Try adjusting your filters or browse our other collections.' 
+                                    : 'Vui lòng thử điều chỉnh bộ lọc hoặc khám phá các bộ sưu tập khác.'}
+                            </p>
+                        </div>
                     ) : (
                         <motion.div
                             key={`${'sortMethod'}-${selectedBrands.join(',')}-${selectedCollections.join(',')}`}

@@ -9,7 +9,7 @@ import { AccessoryItem } from '@/components/home/InStocks';
 import { CollectionsGridSkeleton } from '@/components/common/Skeleton';
 
 import { publicApi } from '@/lib/api';
-import type { PublicBrand, PublicCollection } from '@/lib/api';
+import type { PublicBrand, PublicCollection, PublicAccessoryType } from '@/lib/api';
 import { createBreadcrumbJsonLd, useSeo } from '@/seo';
 
 const readMultiValueParam = (params: URLSearchParams, key: string): string[] => {
@@ -44,11 +44,49 @@ const AccessoriesPage: React.FC = () => {
     // Filter States
     const [brands, setBrands] = useState<PublicBrand[]>([]);
     const [collections, setCollections] = useState<PublicCollection[]>([]);
-    const [accessoryTypes, setAccessoryTypes] = useState<any[]>([]);
+    const [accessoryTypes, setAccessoryTypes] = useState<PublicAccessoryType[]>([]);
     const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
     const [selectedCollections, setSelectedCollections] = useState<string[]>([]);
     const [selectedAccessoryTypes, setSelectedAccessoryTypes] = useState<string[]>([]);
     const [isInStockOnly, setIsInStockOnly] = useState(queryParams.get('in_stock') === 'true');
+
+    const isFilterInvalid = (() => {
+        if (brands.length === 0 && collections.length === 0) return false;
+
+        const params = new URLSearchParams(location.search);
+        const brandName = params.get('brandName') || params.get('brand_name');
+        const brandId = params.get('brandId') || params.get('brand_id');
+        const collectionNames = [
+            ...readMultiValueParam(params, 'collectionName'),
+            ...readMultiValueParam(params, 'collection_name'),
+        ];
+        const collectionIds = [
+            ...readMultiValueParam(params, 'collections'),
+            ...readMultiValueParam(params, 'collectionId'),
+            ...readMultiValueParam(params, 'collection_ids'),
+        ];
+
+        if (brandName && brands.length > 0) {
+            const found = brands.some(b => b.name.toLowerCase() === brandName.toLowerCase());
+            if (!found) return true;
+        }
+        if (brandId && brands.length > 0) {
+            const found = brands.some(b => b.id === brandId);
+            if (!found) return true;
+        }
+
+        if (collectionNames.length > 0 && collections.length > 0) {
+            const allFound = collectionNames.every(name => collections.some(c => c.name.toLowerCase() === name.toLowerCase()));
+            if (!allFound) return true;
+        }
+        if (collectionIds.length > 0 && collections.length > 0) {
+            const allFound = collectionIds.every(id => collections.some(c => c.id === id));
+            if (!allFound) return true;
+        }
+
+        return false;
+    })();
+
     const currentLang = i18n.language.split('-')[0];
     const origin = import.meta.env.VITE_SITE_URL || window.location.origin;
     const selectedBrandName = brands.find((brand) => brand.id === selectedBrands[0])?.name;
@@ -108,23 +146,55 @@ const AccessoriesPage: React.FC = () => {
     });
 
     useEffect(() => {
-        const params = new URLSearchParams(location.search);
-        const brandId = params.get('brandId') || params.get('brand_id');
-        const collectionIds = [
-            ...readMultiValueParam(params, 'collections'),
-            ...readMultiValueParam(params, 'collectionId'),
-            ...readMultiValueParam(params, 'collection_ids'),
-        ];
-        const typeIds = [
-            ...readMultiValueParam(params, 'types'),
-            ...readMultiValueParam(params, 'typeId'),
-            ...readMultiValueParam(params, 'accessory_type_ids'),
-        ];
+        const resolveParams = async () => {
+            const params = new URLSearchParams(location.search);
+            let brandId = params.get('brandId') || params.get('brand_id');
+            const brandName = params.get('brandName') || params.get('brand_name');
 
-        setSelectedBrands(brandId ? [brandId] : []);
-        setSelectedCollections(Array.from(new Set(collectionIds)));
-        setSelectedAccessoryTypes(Array.from(new Set(typeIds)));
-    }, [location.search]);
+            if (!brandId && brandName && brands.length > 0) {
+                const found = brands.find(b => b.name.toLowerCase() === brandName.toLowerCase());
+                if (found) {
+                    brandId = found.id;
+                }
+            }
+
+            let collectionIds = [
+                ...readMultiValueParam(params, 'collections'),
+                ...readMultiValueParam(params, 'collectionId'),
+                ...readMultiValueParam(params, 'collection_ids'),
+            ];
+
+            const collectionNames = [
+                ...readMultiValueParam(params, 'collectionName'),
+                ...readMultiValueParam(params, 'collection_name'),
+            ];
+
+            if (collectionNames.length > 0 && collections.length > 0) {
+                const mappedIds = collectionNames.map(name => {
+                    const found = collections.find(c => c.name.toLowerCase() === name.toLowerCase());
+                    return found ? found.id : null;
+                }).filter(Boolean) as string[];
+
+                if (mappedIds.length > 0) {
+                    collectionIds = Array.from(new Set([...collectionIds, ...mappedIds]));
+                }
+            }
+
+            const typeIds = [
+                ...readMultiValueParam(params, 'types'),
+                ...readMultiValueParam(params, 'typeId'),
+                ...readMultiValueParam(params, 'accessory_type_ids'),
+            ];
+
+            await Promise.resolve();
+
+            setSelectedBrands(brandId ? [brandId] : []);
+            setSelectedCollections(Array.from(new Set(collectionIds)));
+            setSelectedAccessoryTypes(Array.from(new Set(typeIds)));
+        };
+
+        resolveParams();
+    }, [location.search, brands, collections]);
 
     const itemsPerPage = 12;
     const currentAccessories = Array.isArray(accessories) ? accessories : [];
@@ -146,7 +216,7 @@ const AccessoriesPage: React.FC = () => {
                 setAccessoryTypes(Array.isArray(tData) ? tData : []);
             } catch (err) {
                 if (controller.signal.aborted) return;
-                console.error("Failed to fetch filters:", err);
+                console.error('Failed to fetch filters:', err);
             }
         };
         fetchFilters();
@@ -155,6 +225,15 @@ const AccessoriesPage: React.FC = () => {
     }, []);
 
     const fetchAccessories = async (reset = false) => {
+        await Promise.resolve();
+        if (isFilterInvalid) {
+            setAccessories([]);
+            setHasNextPage(false);
+            setLastCursor(null);
+            setIsLoading(false);
+            setIsLoadingMore(false);
+            return;
+        }
         try {
             if (reset) {
                 setIsLoading(true);
@@ -191,7 +270,7 @@ const AccessoriesPage: React.FC = () => {
             setLastCursor(nextMeta.lastCursor ?? null);
 
         } catch (err) {
-            console.error("Failed to fetch public accessories:", err);
+            console.error('Failed to fetch public accessories:', err);
         } finally {
             setIsLoading(false);
             setIsLoadingMore(false);
@@ -200,8 +279,12 @@ const AccessoriesPage: React.FC = () => {
 
     // Run fetch on mount and whenever filters/search change
     useEffect(() => {
-        fetchAccessories(true);
-    }, [searchQuery, selectedBrands, selectedCollections, selectedAccessoryTypes, isInStockOnly]);
+        const load = async () => {
+            await fetchAccessories(true);
+        };
+        load();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [searchQuery, selectedBrands, selectedCollections, selectedAccessoryTypes, isInStockOnly, isFilterInvalid]);
 
     // --- Filter Content Render Function ---
     const renderFilterContent = () => {
@@ -231,10 +314,10 @@ const AccessoriesPage: React.FC = () => {
         const visibleCollections = collections.filter(c => selectedBrands.includes(c.brand_id));
 
         return (
-            <div className='pr-4 lg:pr-8 space-y-10 lg:space-y-12'>
+            <div className="pr-4 lg:pr-8 space-y-10 lg:space-y-12">
                 {/* In Stock Filter */}
                 <div>
-                    <h4 className='text-[10px] tracking-[0.3em] uppercase font-bold border-b border-gunmetal/10 pb-4 mb-4'>{t('common.availability')}</h4>
+                    <h4 className="text-[10px] tracking-[0.3em] uppercase font-bold border-b border-gunmetal/10 pb-4 mb-4">{t('common.availability')}</h4>
                     <label className="flex items-center gap-3 cursor-pointer group transition-colors text-gunmetal/60 hover:text-black text-sm">
                         <input
                             type="checkbox"
@@ -248,14 +331,14 @@ const AccessoriesPage: React.FC = () => {
 
                 {accessoryTypes.length > 0 && (
                     <div>
-                        <h4 className='text-[10px] tracking-[0.3em] uppercase font-bold border-b border-gunmetal/10 pb-4 mb-4'>{t('collections.accessoryTypes')}</h4>
-                        <ul className='space-y-4 lg:space-y-3 text-sm font-light text-gunmetal/80 max-h-48 overflow-y-auto pr-2 custom-scrollbar'>
+                        <h4 className="text-[10px] tracking-[0.3em] uppercase font-bold border-b border-gunmetal/10 pb-4 mb-4">{t('collections.accessoryTypes')}</h4>
+                        <ul className="space-y-4 lg:space-y-3 text-sm font-light text-gunmetal/80 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
                             {accessoryTypes.map(type => (
                                 <li key={type.id}>
-                                    <label className='flex items-center gap-3 cursor-pointer hover:text-black'>
+                                    <label className="flex items-center gap-3 cursor-pointer hover:text-black">
                                         <input
-                                            type='checkbox'
-                                            className='accent-gunmetal w-4 h-4'
+                                            type="checkbox"
+                                            className="accent-gunmetal w-4 h-4"
                                             checked={selectedAccessoryTypes.includes(type.id)}
                                             onChange={() => toggleType(type.id)}
                                         />
@@ -269,8 +352,8 @@ const AccessoriesPage: React.FC = () => {
 
                 {brands.length > 0 && (
                     <div>
-                        <h4 className='text-[10px] tracking-[0.3em] uppercase font-bold border-b border-gunmetal/10 pb-4 mb-4'>{t('header.brands')}</h4>
-                        <ul className='space-y-4 lg:space-y-3 text-sm font-light max-h-48 overflow-y-auto pr-2 custom-scrollbar'>
+                        <h4 className="text-[10px] tracking-[0.3em] uppercase font-bold border-b border-gunmetal/10 pb-4 mb-4">{t('header.brands')}</h4>
+                        <ul className="space-y-4 lg:space-y-3 text-sm font-light max-h-48 overflow-y-auto pr-2 custom-scrollbar">
                             {brands.map(brand => {
                                 const isSelected = selectedBrands.includes(brand.id);
                                 return (
@@ -278,9 +361,9 @@ const AccessoriesPage: React.FC = () => {
                                         <label className={`flex items-center gap-3 cursor-pointer group transition-colors ${isSelected ? 'text-black font-medium' : 'text-gunmetal/60 hover:text-black'}`}>
                                             <div className="relative flex items-center justify-center">
                                                 <input
-                                                    type='radio'
-                                                    name='brand'
-                                                    className='sr-only'
+                                                    type="radio"
+                                                    name="brand"
+                                                    className="sr-only"
                                                     checked={isSelected}
                                                     onClick={() => toggleBrand(brand.id)}
                                                     onChange={() => { }}
@@ -308,14 +391,14 @@ const AccessoriesPage: React.FC = () => {
 
                 {selectedBrands.length > 0 && visibleCollections.length > 0 && (
                     <div>
-                        <h4 className='text-[10px] tracking-[0.3em] uppercase font-bold border-b border-gunmetal/10 pb-4 mb-4'>{t('header.collections')}</h4>
-                        <ul className='space-y-4 lg:space-y-3 text-sm font-light text-gunmetal/80 max-h-48 overflow-y-auto pr-2 custom-scrollbar'>
+                        <h4 className="text-[10px] tracking-[0.3em] uppercase font-bold border-b border-gunmetal/10 pb-4 mb-4">{t('header.collections')}</h4>
+                        <ul className="space-y-4 lg:space-y-3 text-sm font-light text-gunmetal/80 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
                             {visibleCollections.map(collection => (
                                 <li key={collection.id}>
-                                    <label className='flex items-center gap-3 cursor-pointer hover:text-black'>
+                                    <label className="flex items-center gap-3 cursor-pointer hover:text-black">
                                         <input
-                                            type='checkbox'
-                                            className='accent-gunmetal w-4 h-4'
+                                            type="checkbox"
+                                            className="accent-gunmetal w-4 h-4"
                                             checked={selectedCollections.includes(collection.id)}
                                             onChange={() => toggleCollection(collection.id)}
                                         />
@@ -339,29 +422,29 @@ const AccessoriesPage: React.FC = () => {
     };
 
     return (
-        <div className='pt-24 md:pt-32 pb-24 min-h-screen bg-white relative'>
-            <div className='max-w-[1600px] mx-auto px-6 lg:px-12 mb-10 md:mb-16 text-center lg:text-left flex flex-col lg:flex-row justify-between lg:items-end gap-4 md:gap-8'>
+        <div className="pt-24 md:pt-32 pb-24 min-h-screen bg-white relative">
+            <div className="max-w-[1600px] mx-auto px-6 lg:px-12 mb-10 md:mb-16 text-center lg:text-left flex flex-col lg:flex-row justify-between lg:items-end gap-4 md:gap-8">
                 <div className="w-full">
                     <div className="flex flex-col items-center lg:items-start">
-                        <span className='font-branding text-[10px] tracking-[0.4em] uppercase text-gunmetal/50 block mb-2 md:mb-4'>
+                        <span className="font-branding text-[10px] tracking-[0.4em] uppercase text-gunmetal/50 block mb-2 md:mb-4">
                             {currentLang === 'en' ? 'Refined Accessories' : 'Phụ kiện tinh chọn'}
                         </span>
-                        <h1 className='text-4xl md:text-5xl italic text-gunmetal tracking-tight'>
+                        <h1 className="text-4xl md:text-5xl italic text-gunmetal tracking-tight">
                             {currentLang === 'en' ? 'The Accessories' : 'Phụ Kiện'}
                         </h1>
                     </div>
                 </div>
-                <p className='text-sm font-light text-gunmetal/60 max-w-md leading-relaxed hidden lg:block'>
+                <p className="text-sm font-light text-gunmetal/60 max-w-md leading-relaxed hidden lg:block">
                     {currentLang === 'en'
                         ? 'Enhance your collection with our curated range of luxury watch accessories, from premium straps to protective cases.'
                         : 'Nâng tầm bộ sưu tập của bạn với các loại phụ kiện đồng hồ xa xỉ, từ dây đeo cao cấp đến hộp đựng bảo quản.'}
                 </p>
             </div>
 
-            <div className='max-w-[1600px] mx-auto px-6 lg:px-12 mb-8 md:mb-10 border-b border-gunmetal/10 pb-4 md:pb-6 flex justify-between items-center sticky top-20 md:top-24 z-30 bg-white/95 backdrop-blur-md py-4'>
+            <div className="max-w-[1600px] mx-auto px-6 lg:px-12 mb-8 md:mb-10 border-b border-gunmetal/10 pb-4 md:pb-6 flex justify-between items-center sticky top-20 md:top-24 z-30 bg-white/95 backdrop-blur-md py-4">
                 <button
                     onClick={() => setIsFilterOpen(!isFilterOpen)}
-                    className='flex items-center gap-2 text-[10px] md:text-xs uppercase tracking-[0.2em] font-medium hover:text-black transition-colors'
+                    className="flex items-center gap-2 text-[10px] md:text-xs uppercase tracking-[0.2em] font-medium hover:text-black transition-colors"
                 >
                     <Filter size={16} strokeWidth={1.5} />
                     <span className="hidden sm:inline">{isFilterOpen ? t('collections.hideFilters') : t('collections.showFilters')}</span>
@@ -369,7 +452,7 @@ const AccessoriesPage: React.FC = () => {
                 </button>
             </div>
 
-            <div className='max-w-[1600px] mx-auto px-6 lg:px-12 flex flex-col lg:flex-row'>
+            <div className="max-w-[1600px] mx-auto px-6 lg:px-12 flex flex-col lg:flex-row">
                 <AnimatePresence>
                     {isFilterOpen && (
                         <motion.aside
@@ -377,28 +460,39 @@ const AccessoriesPage: React.FC = () => {
                             animate={{ width: 280, opacity: 1, marginRight: 48 }}
                             exit={{ width: 0, opacity: 0, marginRight: 0 }}
                             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                            className='hidden lg:block shrink-0 overflow-hidden'
+                            className="hidden lg:block shrink-0 overflow-hidden"
                         >
-                            <div className='w-[280px]'>
+                            <div className="w-[280px]">
                                 {renderFilterContent()}
                             </div>
                         </motion.aside>
                     )}
                 </AnimatePresence>
 
-                <div className='flex-1 relative min-h-[400px]'>
+                <div className="flex-1 relative min-h-[400px]">
                     {isLoading ? (
                         <CollectionsGridSkeleton />
+                    ) : isFilterInvalid || currentAccessories.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center py-20 text-center">
+                            <h3 className="text-xl italic text-gunmetal mb-2">
+                                {currentLang === 'en' ? 'No items found' : 'Không tìm thấy sản phẩm'}
+                            </h3>
+                            <p className="text-sm font-light text-stone-400">
+                                {currentLang === 'en' 
+                                    ? 'Try adjusting your filters or browse our other collections.' 
+                                    : 'Vui lòng thử điều chỉnh bộ lọc hoặc khám phá các bộ sưu tập khác.'}
+                            </p>
+                        </div>
                     ) : (
                         <motion.div
                             key={`${selectedBrands.join(',')}-${selectedCollections.join(',')}`}
-                            initial='hidden'
-                            animate='visible'
+                            initial="hidden"
+                            animate="visible"
                             variants={{
                                 hidden: { opacity: 0 },
                                 visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
                             }}
-                            className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-12 md:gap-y-16 xl:gap-x-8'
+                            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-12 md:gap-y-16 xl:gap-x-8"
                         >
                             {currentAccessories.map((accessory) => (
                                 <motion.div

@@ -55,3 +55,10 @@ export interface PublicWatch {
   canonical_url?: string | null;
   noindex?: boolean;
 }
+
+export interface PublicAccessoryType {
+  id: string;
+  name: string;
+  name_en: string;
+  slug?: string;
+}

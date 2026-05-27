@@ -41,7 +41,7 @@ const Header = ({ scrollY }: Props) => {
                 setBrands(data);
             } catch (err) {
                 if (controller.signal.aborted) return;
-                console.error("Failed to fetch brands in Header:", err);
+                console.error('Failed to fetch brands in Header:', err);
             }
         }
         if (isMenuOpen && brands.length === 0) {
@@ -59,7 +59,7 @@ const Header = ({ scrollY }: Props) => {
             setCollections(data);
             setMenuDepth('collections');
         } catch (err) {
-            console.error("Failed to fetch collections for brand:", brand.name, err);
+            console.error('Failed to fetch collections for brand:', brand.name, err);
         }
     }
 
@@ -97,8 +97,8 @@ const Header = ({ scrollY }: Props) => {
                 ref={viewRef}
                 className={`fixed top-0 z-[80] w-[100dvw] transition-colors duration-500 items-center ${!isHomePage || (isScrolledOutOfVideo && !isMenuOpen && !isSearchOpen) ? 'bg-white' : 'bg-transparent'}`}
             >
-                <div className='mx-auto px-6 py-4 grid grid-cols-3 items-center justify-between'>
-                    <div className='flex justify-start'>
+                <div className="mx-auto px-6 py-4 grid grid-cols-3 items-center justify-between">
+                    <div className="flex justify-start">
                         {/* The Morphing Button */}
                         <button
                             onClick={toggleMenu}
@@ -108,14 +108,14 @@ const Header = ({ scrollY }: Props) => {
                         </button>
                     </div>
 
-                    <div className='flex justify-center transition-opacity duration-300'>
-                        <Link to="/" onClick={() => { setIsMenuOpen(false); setIsSearchOpen(false); }} className='flex items-center'>
-                            <img src={logoSrc} alt="logo" className='h-16 md:h-18 transition-all duration-300' />
+                    <div className="flex justify-center transition-opacity duration-300">
+                        <Link to="/" onClick={() => { setIsMenuOpen(false); setIsSearchOpen(false); }} className="flex items-center">
+                            <img src={logoSrc} alt="logo" className="h-16 md:h-18 transition-all duration-300" />
                         </Link>
                     </div>
 
-                    <div className='flex justify-end'>
-                        <div className='flex gap-2 md:gap-6 items-center'>
+                    <div className="flex justify-end">
+                        <div className="flex gap-2 md:gap-6 items-center">
                             {/* Language Switcher */}
                             <div className={`hidden sm:flex items-center gap-1 bg-gray-100/10 backdrop-blur-sm p-1 rounded-full border transition-colors duration-500 ${
                                 useDarkTheme ? 'border-black/20' : 'border-white/20'
@@ -330,7 +330,7 @@ const Header = ({ scrollY }: Props) => {
                                                     <button
                                                         onClick={() => {
                                                             setIsMenuOpen(false);
-                                                            navigate(`/collections?brandId=${selectedBrand?.id}`);
+                                                            navigate(`/collections?brandName=${encodeURIComponent(selectedBrand?.name || '')}`);
                                                         }}
                                                         className="text-left text-2xl md:text-3xl italic text-stormy hover:text-black transition-colors"
                                                     >
@@ -341,7 +341,7 @@ const Header = ({ scrollY }: Props) => {
                                                             key={collection.id}
                                                             onClick={() => {
                                                                 setIsMenuOpen(false);
-                                                                navigate(`/collections?brandId=${selectedBrand?.id}&collections=${collection.id}`);
+                                                                navigate(`/collections?brandName=${encodeURIComponent(selectedBrand?.name || '')}&collectionName=${encodeURIComponent(collection.name)}`);
                                                             }}
                                                             className="text-left text-2xl md:text-3xl italic text-gunmetal hover:text-black transition-colors"
                                                         >
@@ -383,7 +383,7 @@ const Header = ({ scrollY }: Props) => {
                              <motion.div
                                 initial={{ y: 30, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
-                                transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
+                                transition={{ duration: 0.8, delay: 0.3, ease: 'easeOut' }}
                                 className="relative group"
                             >
                                 <span className="font-branding text-[10px] tracking-[0.4em] uppercase text-gunmetal/50 block mb-6">
@@ -430,7 +430,7 @@ const Header = ({ scrollY }: Props) => {
                                             key={suggestion}
                                             variants={{
                                                 hidden: { opacity: 0, x: -10 },
-                                                visible: { opacity: 1, x: 0, transition: { duration: 0.8, ease: "easeOut" } }
+                                                visible: { opacity: 1, x: 0, transition: { duration: 0.8, ease: 'easeOut' } }
                                             }}
                                         >
                                             <button
@@ -474,21 +474,21 @@ const AnimatedMenuIcon = ({ isOpen }: { isOpen: boolean }) => (
         {/* Top Line */}
         <motion.path
             variants={{
-                closed: { d: "M 4 9 L 20 9" },
-                open: { d: "M 6 6 L 18 18" }
+                closed: { d: 'M 4 9 L 20 9' },
+                open: { d: 'M 6 6 L 18 18' }
             }}
             initial="closed"
-            animate={isOpen ? "open" : "closed"}
+            animate={isOpen ? 'open' : 'closed'}
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         />
         {/* Bottom Line */}
         <motion.path
             variants={{
-                closed: { d: "M 4 15 L 20 15" },
-                open: { d: "M 6 18 L 18 6" }
+                closed: { d: 'M 4 15 L 20 15' },
+                open: { d: 'M 6 18 L 18 6' }
             }}
             initial="closed"
-            animate={isOpen ? "open" : "closed"}
+            animate={isOpen ? 'open' : 'closed'}
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         />
     </motion.svg>
