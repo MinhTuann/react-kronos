@@ -3,14 +3,7 @@ import { Facebook, Instagram, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
-import { publicApi, type PublicBrand } from '@/lib/api';
-
-const paths: Record<string, string> = {
-    'Our Story': '/about-us',
-    'Contact Us': '/contact-us',
-};
-
-const getPath = (link: string) => paths[link] || '/collections';
+import { publicApi, type PublicBrand, type PublicArticle } from '@/lib/api';
 
 interface FooterLink {
     label: string;
@@ -18,32 +11,30 @@ interface FooterLink {
 }
 
 // --- Reusable Navigation Column ---
-const FooterNavGroup = ({ title, links }: { title: string; links: Array<string | FooterLink> }) => (
+const FooterNavGroup = ({ title, links }: { title: string; links: FooterLink[] }) => (
     <div className="flex flex-col">
         <h5 className="font-branding mb-8 text-[10px] uppercase tracking-[0.4em] text-gunmetal font-bold">
             {title}
         </h5>
         <ul className="flex flex-col gap-4 text-[13px] text-stone-500 font-light">
-            {links.map((link, index) => {
-                const label = typeof link === 'string' ? link : link.label;
-                const path = typeof link === 'string' ? getPath(link) : link.path;
-                return (
-                    <li key={index}>
-                        <Link className="hover:text-black transition-colors duration-300 flex items-center group w-fit" to={path}>
-                            {/* Luxury Detail: A tiny line that smoothly extends out on hover */}
-                            <span className="h-[1px] w-0 bg-black mr-0 group-hover:w-4 group-hover:mr-3 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"></span>
-                            {label}
-                        </Link>
-                    </li>
-                );
-            })}
+            {links.map((link, index) => (
+                <li key={index}>
+                    <Link className="hover:text-black transition-colors duration-300 flex items-center group w-fit" to={link.path}>
+                        {/* Luxury Detail: A tiny line that smoothly extends out on hover */}
+                        <span className="h-[1px] w-0 bg-black mr-0 group-hover:w-4 group-hover:mr-3 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"></span>
+                        {link.label}
+                    </Link>
+                </li>
+            ))}
         </ul>
     </div>
 );
 
 const Footer = () => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+    const currentLang = i18n.language.split('-')[0];
     const [brands, setBrands] = useState<PublicBrand[]>([]);
+    const [policies, setPolicies] = useState<PublicArticle[]>([]);
 
     useEffect(() => {
         const controller = new AbortController();
@@ -59,7 +50,19 @@ const Footer = () => {
             }
         };
 
+        const fetchPolicies = async () => {
+            try {
+                const response = await publicApi.getArticles(undefined, 10, true, { signal: controller.signal });
+                if (controller.signal.aborted) return;
+                setPolicies(response.data);
+            } catch (err) {
+                if (controller.signal.aborted) return;
+                console.error('Failed to fetch policies in Footer:', err);
+            }
+        };
+
         fetchBrands();
+        fetchPolicies();
 
         return () => controller.abort();
     }, []);
@@ -68,6 +71,11 @@ const Footer = () => {
         label: brand.name,
         path: `/collections?brandName=${encodeURIComponent(brand.name)}`
     })) : [];
+
+    const policyLinks = policies.map(article => ({
+        label: currentLang === 'en' && article.title_en ? article.title_en : article.title,
+        path: `/news-events/${article.slug || article.id}`
+    }));
 
     return (
         <footer className="bg-white text-gunmetal pt-24 pb-12 border-t border-gunmetal/10">
@@ -147,15 +155,22 @@ const Footer = () => {
                             {CONTACT_EMAIL}
                         </a>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-y-16 gap-x-8 mb-24">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-y-16 gap-x-8 mb-24">
                         {brandLinks.length > 0 && <FooterNavGroup
                             title={t('menu.theBrands')}
                             links={brandLinks}
                         />}
                         <FooterNavGroup
                             title={t('menu.theCompany')}
-                            links={['Our Story', 'Contact Us']}
+                            links={[
+                                { label: t('menu.ourStory'), path: '/about-us' },
+                                { label: t('menu.contactUs'), path: '/contact-us' },
+                            ]}
                         />
+                        {policyLinks.length > 0 && <FooterNavGroup
+                            title={t('menu.policies')}
+                            links={policyLinks}
+                        />}
                     </div>
                     {/* <FooterNavGroup
                         title="Services"

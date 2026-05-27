@@ -253,10 +253,10 @@ export const publicApi = {
   },
 
   // Fetch Articles (Paginated)
-  getArticles: async (cursor?: string, limit?: number, options?: RequestOptions): Promise<PaginatedResponse<PublicArticle>> => {
+  getArticles: async (cursor?: string, limit?: number, isPolicy?: boolean, options?: RequestOptions): Promise<PaginatedResponse<PublicArticle>> => {
     return getJson<PaginatedResponse<PublicArticle>>({
         url: '/articles',
-        params: { cursor, limit },
+        params: { cursor, limit, is_policy: isPolicy },
         signal: options?.signal,
         cache: false
     });

@@ -25,6 +25,9 @@ const resources = {
         theBrands: 'The Brands',
         accessories: 'The Accessories',
         theCompany: 'The Company',
+        ourStory: 'Our Story',
+        contactUs: 'Contact Us',
+        policies: 'Policies',
         newsEvents: 'News & Events',
         inStock: 'In Stock',
         all: 'All'
@@ -157,6 +160,9 @@ const resources = {
         theBrands: 'Thương hiệu',
         accessories: 'Phụ kiện',
         theCompany: 'Về chúng tôi',
+        ourStory: 'Câu chuyện của chúng tôi',
+        contactUs: 'Liên hệ',
+        policies: 'Chính sách',
         newsEvents: 'Tin tức & Sự kiện',
         inStock: 'Đồng hồ có sẵn',
         all: 'Tất cả'
