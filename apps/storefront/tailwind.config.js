@@ -18,6 +18,7 @@ export default {
       },
       fontFamily: {
         branding: ['"Exo 2"', 'sans-serif'],
+        serif: ['Lora', '"Playfair Display"', 'Georgia', 'ui-serif', 'serif'],
       }
     }
   },
