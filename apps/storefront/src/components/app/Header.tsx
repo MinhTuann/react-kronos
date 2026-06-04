@@ -25,8 +25,9 @@ const Header = ({ scrollY }: Props) => {
     const [searchQuery, setSearchQuery] = useState('')
 
     // Nested Menu States
-    const [menuDepth, setMenuDepth] = useState<'main' | 'brands' | 'collections'>('main')
+    const [menuDepth, setMenuDepth] = useState<'main' | 'brands' | 'accessoryBrands' | 'collections'>('main')
     const [brands, setBrands] = useState<PublicBrand[]>([])
+    const [accessoryBrands, setAccessoryBrands] = useState<PublicBrand[]>([])
     const [collections, setCollections] = useState<PublicCollection[]>([])
     const [selectedBrand, setSelectedBrand] = useState<PublicBrand | null>(null)
 
@@ -36,20 +37,24 @@ const Header = ({ scrollY }: Props) => {
 
         const fetchBrands = async () => {
             try {
-                const data = await publicApi.getBrands('watch', { signal: controller.signal });
+                const [watchBrandsData, accessoryBrandsData] = await Promise.all([
+                    brands.length === 0 ? publicApi.getBrands('watch', { signal: controller.signal }) : Promise.resolve(brands),
+                    accessoryBrands.length === 0 ? publicApi.getBrands('accessory', { signal: controller.signal }) : Promise.resolve(accessoryBrands)
+                ]);
                 if (controller.signal.aborted) return;
-                setBrands(data);
+                setBrands(watchBrandsData);
+                setAccessoryBrands(accessoryBrandsData);
             } catch (err) {
                 if (controller.signal.aborted) return;
                 console.error('Failed to fetch brands in Header:', err);
             }
         }
-        if (isMenuOpen && brands.length === 0) {
+        if (isMenuOpen && (brands.length === 0 || accessoryBrands.length === 0)) {
             fetchBrands();
         }
 
         return () => controller.abort();
-    }, [isMenuOpen, brands.length]);
+    }, [isMenuOpen, brands.length, accessoryBrands.length]);
 
     // Handle Brand Selection
     const handleBrandSelect = async (brand: PublicBrand) => {
@@ -243,13 +248,13 @@ const Header = ({ scrollY }: Props) => {
                                                     {t('menu.theBrands')}
                                                     <span className="text-[10px] tracking-[0.2em] font-branding opacity-0 group-hover:opacity-100 transition-all -translate-x-4 group-hover:translate-x-0">{t('menu.discover')}</span>
                                                 </button>
-                                                <Link
-                                                    to="/accessories"
-                                                    onClick={() => setIsMenuOpen(false)}
-                                                    className="text-3xl md:text-4xl italic text-gunmetal hover:text-black transition-colors"
+                                                <button
+                                                    onClick={() => setMenuDepth('accessoryBrands')}
+                                                    className="text-left text-3xl md:text-4xl italic text-gunmetal hover:text-black transition-colors flex items-center justify-between group"
                                                 >
                                                     {t('menu.accessories', 'The Accessories')}
-                                                </Link>
+                                                    <span className="text-[10px] tracking-[0.2em] font-branding opacity-0 group-hover:opacity-100 transition-all -translate-x-4 group-hover:translate-x-0">{t('menu.discover')}</span>
+                                                </button>
                                                 <Link
                                                     to="/collections?in_stock=true"
                                                     onClick={() => setIsMenuOpen(false)}
@@ -295,6 +300,55 @@ const Header = ({ scrollY }: Props) => {
                                                             <button
                                                                 key={brand.id}
                                                                 onClick={() => handleBrandSelect(brand)}
+                                                                className="text-left text-2xl md:text-3xl italic text-gunmetal hover:text-black transition-colors flex items-center justify-between group"
+                                                            >
+                                                                {brand.name}
+                                                                <span className="text-[10px] tracking-[0.2em] font-branding opacity-0 group-hover:opacity-100 transition-all -translate-x-4 group-hover:translate-x-0">{t('menu.view')}</span>
+                                                            </button>
+                                                        ))
+                                                    ) : (
+                                                        <div className="animate-pulse flex flex-col gap-6">
+                                                            {[1, 2, 3, 4, 5].map(i => <div key={i} className="h-8 bg-bone/20 w-3/4 rounded" />)}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </motion.div>
+                                        )}
+
+                                        {menuDepth === 'accessoryBrands' && (
+                                            <motion.div
+                                                key="accessoryBrands"
+                                                initial={{ opacity: 0, x: 20 }}
+                                                animate={{ opacity: 1, x: 0 }}
+                                                exit={{ opacity: 0, x: 20 }}
+                                                transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                                                className="flex flex-col h-full"
+                                            >
+                                                <button
+                                                    onClick={() => setMenuDepth('main')}
+                                                    className="flex items-center gap-2 text-gunmetal/50 hover:text-gunmetal mb-10 transition-colors uppercase tracking-[0.2em] text-[10px] font-branding"
+                                                >
+                                                    <ChevronLeft size={16} /> {t('menu.backToMenu')}
+                                                </button>
+                                                <div className="flex flex-col gap-6 overflow-y-auto pr-4 pb-12 scrollbar-hide">
+                                                    <button
+                                                        onClick={() => {
+                                                            setIsMenuOpen(false);
+                                                            navigate('/accessories');
+                                                        }}
+                                                        className="text-left text-2xl md:text-3xl italic text-stormy hover:text-black transition-colors flex items-center justify-between group"
+                                                    >
+                                                        {t('menu.allAccessories', 'All Accessories')}
+                                                        <span className="text-[10px] tracking-[0.2em] font-branding opacity-0 group-hover:opacity-100 transition-all -translate-x-4 group-hover:translate-x-0">{t('menu.view')}</span>
+                                                    </button>
+                                                    {accessoryBrands.length > 0 ? (
+                                                        accessoryBrands.map((brand) => (
+                                                            <button
+                                                                key={brand.id}
+                                                                onClick={() => {
+                                                                    setIsMenuOpen(false);
+                                                                    navigate(`/accessories?brandName=${encodeURIComponent(brand.name)}`);
+                                                                }}
                                                                 className="text-left text-2xl md:text-3xl italic text-gunmetal hover:text-black transition-colors flex items-center justify-between group"
                                                             >
                                                                 {brand.name}

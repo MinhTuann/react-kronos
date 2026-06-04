@@ -24,6 +24,7 @@ const resources = {
         backToBrands: 'Back to brands',
         theBrands: 'The Brands',
         accessories: 'The Accessories',
+        allAccessories: 'All Accessories',
         theCompany: 'The Company',
         ourStory: 'Our Story',
         contactUs: 'Contact Us',
@@ -44,7 +45,7 @@ const resources = {
         philosophy: 'The Philosophy',
         philosophyText: 'The pinnacle of horological artistry. Crafting timepieces that transcend generations through uncompromising precision and aesthetic mastery. Every movement is a testament to our heritage.',
         promise: 'The Promise',
-        promiseText: 'To possess a Kronos is to hold eternity in the palm of your hand.',
+        promiseText: 'To own a timepiece from Kronos Luxury Timepieces is to hold eternity in the palm of your hand.',
         connect: 'Connect',
         clientRelations: 'Client Relations'
       },
@@ -159,6 +160,7 @@ const resources = {
         backToBrands: 'Quay lại thương hiệu',
         theBrands: 'Thương hiệu',
         accessories: 'Phụ kiện',
+        allAccessories: 'Tất cả phụ kiện',
         theCompany: 'Về chúng tôi',
         ourStory: 'Câu chuyện của chúng tôi',
         contactUs: 'Liên hệ',
@@ -179,7 +181,7 @@ const resources = {
         philosophy: 'Triết lý',
         philosophyText: 'Đỉnh cao của nghệ thuật chế tác đồng hồ. Tạo ra những kiệt tác vượt thời gian qua sự chính xác tuyệt đối và bậc thầy thẩm mỹ. Mỗi chuyển động là một minh chứng cho di sản của chúng tôi.',
         promise: 'Lời hứa',
-        promiseText: 'Sở hữu một chiếc Kronos là nắm giữ sự vĩnh cửu trong lòng bàn tay.',
+        promiseText: 'Sở hữu một chiếc đồng hồ từ Kronos Luxury Timepieces là nắm giữ sự vĩnh cửu trong lòng bàn tay.',
         connect: 'Kết nối',
         clientRelations: 'Quan hệ khách hàng'
       },
