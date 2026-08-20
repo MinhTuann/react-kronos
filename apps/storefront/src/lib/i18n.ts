@@ -133,7 +133,9 @@ const resources = {
       },
       news: {
         title: 'News & Events',
-        subtitle: 'The world’s premium brands in one place',
+        subtitle: "The world’s premium brands in one place",
+        heroTitle: 'The Kronos Journal',
+        heroSubtitle: 'Discover the latest news, private events, and editorial insights from the world of haute horlogerie.',
         viewAll: 'View All News',
         readArticle: 'Read Article'
       }
@@ -271,6 +273,8 @@ const resources = {
       news: {
         title: 'Tin tức & Sự kiện',
         subtitle: 'Những thương hiệu cao cấp nhất thế giới tụ hội',
+        heroTitle: 'Nhật Ký Kronos',
+        heroSubtitle: 'Khám phá tin tức mới nhất, sự kiện đặc quyền và những góc nhìn biên tập từ thế giới chế tác đồng hồ cao cấp.',
         viewAll: 'Xem tất cả tin tức',
         readArticle: 'Đọc bài viết'
       }

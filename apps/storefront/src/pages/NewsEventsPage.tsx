@@ -121,10 +121,10 @@ const NewsEventsPage: React.FC = () => {
                         {t('menu.newsEvents')}
                     </motion.span>
                     <motion.h1 variants={fadeUp} className="text-4xl md:text-6xl lg:text-7xl italic font-serif tracking-tight mb-8 leading-[1.1] text-gunmetal">
-                        The Kronos Journal
+                        {t('news.heroTitle')}
                     </motion.h1>
                     <motion.p variants={fadeUp} className="text-[15px] font-light text-stone-500 leading-relaxed max-w-xl">
-                        Discover the latest news, private events, and editorial insights from the world of haute horlogerie.
+                        {t('news.heroSubtitle')}
                     </motion.p>
                 </motion.div>
             </section>
