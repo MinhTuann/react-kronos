@@ -60,7 +60,7 @@ const AccessoryDetailsPage: React.FC = () => {
         image: accessory?.seo_image_url || accessory?.image,
         canonicalUrl: accessory?.canonical_url || undefined,
         canonicalPath: accessory?.canonical_url ? undefined : (brand_slug && ref ? detailPath : '/accessories'),
-        noindex: accessory ? accessory.noindex : (!accessory && !isLoading),
+        noindex: accessory ? (accessory.noindex !== undefined ? accessory.noindex : true) : (!accessory && !isLoading),
         type: 'product',
         structuredData: accessory ? [
             {

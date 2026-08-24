@@ -64,7 +64,7 @@ const WatchDetailsPage: React.FC = () => {
         image: watch?.seo_image_url || watch?.image,
         canonicalUrl: watch?.canonical_url || undefined,
         canonicalPath: watch?.canonical_url ? undefined : (brand_slug && ref ? detailPath : '/collections'),
-        noindex: watch ? watch.noindex : (!watch && !isLoading),
+        noindex: watch ? (watch.noindex !== undefined ? watch.noindex : true) : (!watch && !isLoading),
         type: 'product',
         structuredData: watch ? [
             {

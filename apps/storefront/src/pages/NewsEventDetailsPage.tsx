@@ -70,7 +70,7 @@ const NewsEventDetailsPage: React.FC = () => {
         image: article?.seo_image_url || article?.image_url,
         canonicalUrl: article ? (article.canonical_url || `${origin}/news-events/${slug}`) : undefined,
         canonicalPath: article ? undefined : '/news-events',
-        noindex: article ? article.noindex : true,
+        noindex: article ? (article.noindex !== undefined ? article.noindex : true) : true,
         type: article ? 'article' : 'website',
         structuredData: article ? [
             {
