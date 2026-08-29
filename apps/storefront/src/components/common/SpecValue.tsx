@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react';
 
-export const SPEC_LINE_SEPARATOR = '||';
+const SPEC_LINE_SEPARATOR = '||';
 
-export const splitSpecLines = (value?: string | null): string[] => {
+const splitSpecLines = (value?: string | null): string[] => {
   if (!value) return [];
 
   return value

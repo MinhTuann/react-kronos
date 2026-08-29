@@ -52,7 +52,7 @@ const NewsEventsPage: React.FC = () => {
             setHasNextPage(response.meta.hasNextPage);
             setLastCursor(response.meta.lastCursor);
         } catch (err) {
-            console.error("Failed to fetch articles:", err);
+            console.error('Failed to fetch articles:', err);
         } finally {
             setLoading(false);
             setIsLoadingMore(false);
@@ -81,7 +81,7 @@ const NewsEventsPage: React.FC = () => {
     const heroRef = useRef(null);
     const { scrollYProgress: heroScroll } = useScroll({
         target: heroRef,
-        offset: ["start start", "end start"]
+        offset: ['start start', 'end start']
     });
     const heroY = useTransform(heroScroll, [0, 1], [0, 150]);
     const heroOpacity = useTransform(heroScroll, [0, 0.8], [1, 0]);
@@ -197,7 +197,7 @@ const NewsEventsPage: React.FC = () => {
                                 key={item.slug || item.id}
                                 initial={{ opacity: 0, y: 40 }}
                                 whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true, margin: "-50px" }}
+                                viewport={{ once: true, margin: '-50px' }}
                                 transition={{ duration: 0.8, delay: (index % 2) * 0.2, ease: customEase }}
                             >
                                 <Link to={`/news-events/${item.slug || item.id}`} className="group cursor-pointer flex flex-col h-full">

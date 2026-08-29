@@ -133,7 +133,7 @@ const resources = {
       },
       news: {
         title: 'News & Events',
-        subtitle: "The world’s premium brands in one place",
+        subtitle: 'The world’s premium brands in one place',
         heroTitle: 'The Kronos Journal',
         heroSubtitle: 'Discover the latest news, private events, and editorial insights from the world of haute horlogerie.',
         viewAll: 'View All News',

@@ -13,16 +13,16 @@ export const WatchItem = ({ watch }: { watch: Watch }) => {
     const [imageLoaded, setImageLoaded] = useState(false);
 
     // 2. The magic: This triggers 'true' ONLY when the item enters the middle 40% of the screen!
-    const isInView = useInView(ref, { margin: "-30% 0px -30% 0px" });
+    const isInView = useInView(ref, { margin: '-30% 0px -30% 0px' });
 
     return (
         <Link
             ref={ref}
             to={getWatchUrl(watch)}
-            className='block group cursor-pointer relative rounded-lg overflow-hidden transition-all duration-500 hover:shadow-[0_20px_50px_rgba(0,0,0,0.05)]'
+            className="block group cursor-pointer relative rounded-lg overflow-hidden transition-all duration-500 hover:shadow-[0_20px_50px_rgba(0,0,0,0.05)]"
         >
             {/* Image Container */}
-            <div className='relative aspect-[4/5] w-full overflow-hidden flex items-center justify-center p-12'>
+            <div className="relative aspect-[4/5] w-full overflow-hidden flex items-center justify-center p-12">
                 {!imageLoaded && (
                     <div className="absolute inset-0 p-12">
                         <Skeleton className="w-full h-full rounded-2xl" />
@@ -41,18 +41,18 @@ export const WatchItem = ({ watch }: { watch: Watch }) => {
             </div>
 
             {/* Content Area */}
-            <div className='flex flex-col items-center text-center pb-10 px-8 space-y-1'>
-                <span className='font-branding text-[8px] tracking-[0.3em] uppercase text-golden font-bold opacity-80 mb-2'>
+            <div className="flex flex-col items-center text-center pb-10 px-8 space-y-1">
+                <span className="font-branding text-[8px] tracking-[0.3em] uppercase text-golden font-bold opacity-80 mb-2">
                     {watch.brand}
                 </span>
 
-                <h3 className='text-lg tracking-tight text-gunmetal italic'>
-                    <span aria-hidden='true' className='absolute inset-0'></span>
+                <h3 className="text-lg tracking-tight text-gunmetal italic">
+                    <span aria-hidden="true" className="absolute inset-0"></span>
                     {watch.collection}
                 </h3>
 
-                <div className='flex flex-col items-center'>
-                    <p className='text-[11px] uppercase tracking-widest text-bone'>
+                <div className="flex flex-col items-center">
+                    <p className="text-[11px] uppercase tracking-widest text-bone">
                         {watch.name}
                     </p>
                     {/* Decorative divider */}
@@ -69,7 +69,7 @@ export const WatchItem = ({ watch }: { watch: Watch }) => {
                     ${isInView ? 'h-6 opacity-100' : 'h-0 opacity-0'}
                     md:h-0 md:opacity-0 md:group-hover:h-6 md:group-hover:opacity-100`}
                 >
-                    <p className='text-[12px] text-gunmetal font-branding mt-2'>
+                    <p className="text-[12px] text-gunmetal font-branding mt-2">
                         REF. {watch.ref}
                     </p>
                 </div>
@@ -84,16 +84,16 @@ export const AccessoryItem = ({ accessory }: { accessory: Accessory }) => {
     const [imageLoaded, setImageLoaded] = useState(false);
 
     // 2. The magic: This triggers 'true' ONLY when the item enters the middle 40% of the screen!
-    const isInView = useInView(ref, { margin: "-30% 0px -30% 0px" });
+    const isInView = useInView(ref, { margin: '-30% 0px -30% 0px' });
 
     return (
         <Link
             ref={ref}
             to={getAccessoryUrl(accessory)}
-            className='block group cursor-pointer relative rounded-lg overflow-hidden transition-all duration-500 hover:shadow-[0_20px_50px_rgba(0,0,0,0.05)]'
+            className="block group cursor-pointer relative rounded-lg overflow-hidden transition-all duration-500 hover:shadow-[0_20px_50px_rgba(0,0,0,0.05)]"
         >
             {/* Image Container */}
-            <div className='relative aspect-[4/5] w-full overflow-hidden flex items-center justify-center p-12'>
+            <div className="relative aspect-[4/5] w-full overflow-hidden flex items-center justify-center p-12">
                 {!imageLoaded && (
                     <div className="absolute inset-0 p-12">
                         <Skeleton className="w-full h-full rounded-2xl" />
@@ -112,18 +112,18 @@ export const AccessoryItem = ({ accessory }: { accessory: Accessory }) => {
             </div>
 
             {/* Content Area */}
-            <div className='flex flex-col items-center text-center pb-10 px-8 space-y-1'>
-                <span className='font-branding text-[8px] tracking-[0.3em] uppercase text-golden font-bold opacity-80 mb-2'>
+            <div className="flex flex-col items-center text-center pb-10 px-8 space-y-1">
+                <span className="font-branding text-[8px] tracking-[0.3em] uppercase text-golden font-bold opacity-80 mb-2">
                     {accessory.brand}
                 </span>
 
-                <h3 className='text-lg tracking-tight text-gunmetal italic'>
-                    <span aria-hidden='true' className='absolute inset-0'></span>
+                <h3 className="text-lg tracking-tight text-gunmetal italic">
+                    <span aria-hidden="true" className="absolute inset-0"></span>
                     {accessory.collection || 'Accessory'}
                 </h3>
 
-                <div className='flex flex-col items-center'>
-                    <p className='text-[11px] uppercase tracking-widest text-bone'>
+                <div className="flex flex-col items-center">
+                    <p className="text-[11px] uppercase tracking-widest text-bone">
                         {accessory.name}
                     </p>
                     {/* Decorative divider */}
@@ -140,7 +140,7 @@ export const AccessoryItem = ({ accessory }: { accessory: Accessory }) => {
                     ${isInView ? 'h-6 opacity-100' : 'h-0 opacity-0'}
                     md:h-0 md:opacity-0 md:group-hover:h-6 md:group-hover:opacity-100`}
                 >
-                    <p className='text-[12px] text-gunmetal font-branding mt-2'>
+                    <p className="text-[12px] text-gunmetal font-branding mt-2">
                         REF. {accessory.ref}
                     </p>
                 </div>
@@ -169,19 +169,19 @@ const InStocks = ({ watches = [], isLoading = false }: { watches?: Watch[], isLo
     };
 
     return (
-        <div className='bg-white overflow-hidden'>
-            <div className='max-w-2xl lg:max-w-7xl mx-auto px-4 py-16 sm:px-6 lg:px-8'>
+        <div className="bg-white overflow-hidden">
+            <div className="max-w-2xl lg:max-w-7xl mx-auto px-4 py-16 sm:px-6 lg:px-8">
 
                 {/* --- Animated Header --- */}
                 <motion.div
                     initial={{ opacity: 0, x: -20 }}
                     whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true, margin: "-50px" }}
+                    viewport={{ once: true, margin: '-50px' }}
                     transition={{ duration: 0.8, ease: customEase }}
-                    className='border-l border-golden pl-4 space-y-2 mb-6 md:mb-10'
+                    className="border-l border-golden pl-4 space-y-2 mb-6 md:mb-10"
                 >
-                    <h2 className='font-branding text-lg tracking-widest uppercase text-golden'>{t('home.inStockTitle')}</h2>
-                    <p className='italic tracking-tight text-bone'>{t('home.inStockSubtitle')}</p>
+                    <h2 className="font-branding text-lg tracking-widest uppercase text-golden">{t('home.inStockTitle')}</h2>
+                    <p className="italic tracking-tight text-bone">{t('home.inStockSubtitle')}</p>
                 </motion.div>
 
                 {/* --- Animated Watch Grid --- */}
@@ -190,8 +190,8 @@ const InStocks = ({ watches = [], isLoading = false }: { watches?: Watch[], isLo
                     initial="hidden"
                     whileInView="visible"
                     /* The negative margin ensures animation triggers slightly before scrolling fully into view */
-                    viewport={{ once: true, margin: "-50px" }}
-                    className='mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8'
+                    viewport={{ once: true, margin: '-50px' }}
+                    className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8"
                 >
                     {isLoading ? (
                         Array.from({ length: 4 }).map((_, i) => (
@@ -213,16 +213,16 @@ const InStocks = ({ watches = [], isLoading = false }: { watches?: Watch[], isLo
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true, margin: "-50px" }}
+                        viewport={{ once: true, margin: '-50px' }}
                         transition={{ duration: 0.8, delay: 0.2, ease: customEase }}
-                        className='flex justify-center mt-12 md:mt-16'
+                        className="flex justify-center mt-12 md:mt-16"
                     >
-                        <Link to='/collections?in_stock=true' className='group relative inline-flex justify-center items-center pb-2 text-xs tracking-[0.4em] uppercase text-bone font-semibold transition-colors duration-500 hover:text-bone'>
+                        <Link to="/collections?in_stock=true" className="group relative inline-flex justify-center items-center pb-2 text-xs tracking-[0.4em] uppercase text-bone font-semibold transition-colors duration-500 hover:text-bone">
                             {/* The Button Text */}
                             <span>{t('home.findYourWatch')}</span>
 
                             {/* The Animated Underline */}
-                            <span className='absolute bottom-0 left-1/2 h-[1px] w-0 -translate-x-1/2 bg-bone transition-all duration-[600ms] ease-out group-hover:w-full group-hover:bg-bone' />
+                            <span className="absolute bottom-0 left-1/2 h-[1px] w-0 -translate-x-1/2 bg-bone transition-all duration-[600ms] ease-out group-hover:w-full group-hover:bg-bone" />
                         </Link>
                     </motion.div>
                 )}

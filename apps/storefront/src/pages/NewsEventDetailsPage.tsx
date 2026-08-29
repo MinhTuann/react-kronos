@@ -29,11 +29,12 @@ const NewsEventDetailsPage: React.FC = () => {
                 setArticle(data);
             } catch (err) {
                 if (controller.signal.aborted) return;
-                console.error("Failed to load article details:", err);
+                console.error('Failed to load article details:', err);
                 setArticle(null);
             } finally {
-                if (controller.signal.aborted) return;
-                setIsLoading(false);
+                if (!controller.signal.aborted) {
+                    setIsLoading(false);
+                }
             }
         };
 
@@ -45,7 +46,7 @@ const NewsEventDetailsPage: React.FC = () => {
     const heroRef = useRef(null);
     const { scrollYProgress } = useScroll({
         target: heroRef,
-        offset: ["start start", "end start"]
+        offset: ['start start', 'end start']
     });
     const heroY = useTransform(scrollYProgress, [0, 1], [0, 200]);
     const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
@@ -212,7 +213,7 @@ const NewsEventDetailsPage: React.FC = () => {
                     className="max-w-3xl mx-auto min-w-0"
                     initial={{ opacity: 0, y: 40 }}
                     whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-100px" }}
+                    viewport={{ once: true, margin: '-100px' }}
                     transition={{ duration: 0.8 }}
                 >
                     {/* Rich Text Formatted Content */}

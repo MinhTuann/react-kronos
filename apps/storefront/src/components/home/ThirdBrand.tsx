@@ -1,10 +1,10 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
-import { useTranslation } from "react-i18next";
-import SpecValue from "@/components/common/SpecValue";
-import type { Watch } from "@/types";
-import { getWatchUrl } from "@/utils";
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
+import SpecValue from '@/components/common/SpecValue';
+import type { Watch } from '@/types';
+import { getWatchUrl } from '@/utils';
 import { BrandSectionSkeleton, Skeleton } from '../common/Skeleton';
 
 const SpecItem = ({ label, value, index }: { label: string; value: string; index: number }) => (

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { Watch, Accessory } from '../types';
+import type { Watch, Accessory, VideoSlide } from '../types';
 import type { PublicBrand, PublicCollection, PublicAccessoryType } from '@kronos/contracts-public';
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -163,6 +163,32 @@ export interface PaginatedResponse<T> {
 export type { PublicBrand, PublicCollection, PublicAccessoryType };
 export type { RequestOptions };
 
+export interface HomePageSlide {
+  id?: string | number;
+  video_url?: string;
+  url?: string;
+  thumbnail_url?: string;
+  title: string;
+  title_en?: string | null;
+  description: string;
+  description_en?: string | null;
+  display_order?: number;
+}
+
+export interface HomePageSections {
+  best_brand?: Watch;
+  second_brand?: Watch;
+  third_brand?: Watch;
+  our_story?: Record<string, unknown>;
+  [key: string]: unknown;
+}
+
+export interface HomePageResponse {
+  slides?: VideoSlide[];
+  news?: PublicArticle[];
+  sections?: HomePageSections;
+}
+
 export const publicApi = {
   // Fetch Brands
   getBrands: async (
@@ -239,8 +265,8 @@ export const publicApi = {
   },
 
   // Fetch Home Page Dynamic Content
-  getHomePageData: async (options?: RequestOptions): Promise<any> => {
-    return getJson<any>({ url: '/homepage', signal: options?.signal, cache: true });
+  getHomePageData: async (options?: RequestOptions): Promise<HomePageResponse> => {
+    return getJson<HomePageResponse>({ url: '/homepage', signal: options?.signal, cache: true });
   },
 
   getSeoSettings: async (options?: RequestOptions): Promise<PublicSeoSettings> => {

@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import type { PublicArticle } from '@/lib/api';
 import { NewsCardSkeleton, Skeleton } from '../common/Skeleton';
 
-const NewsItem = ({ item, title, category, summary, t }: { item: PublicArticle, title: string, category: string, summary: string, t: any }) => {
+const NewsItem = ({ item, title, category, summary, t }: { item: PublicArticle, title: string, category: string, summary: string, t: (key: string) => string }) => {
     const [imageLoaded, setImageLoaded] = useState(false);
     return (
         <Link to={`/news-events/${item.slug}`} className="group block">
@@ -49,9 +49,9 @@ const NewsEvents = ({ news, isLoading = false }: { news?: PublicArticle[], isLoa
         <section className="py-24">
             <div className="max-w-7xl mx-auto px-6">
                 <div className="flex justify-between items-end mb-12">
-                    <div className='border-l border-golden pl-4 space-y-2'>
-                        <h2 className='font-branding text-lg tracking-widest uppercase text-golden'>{t('news.title')}</h2>
-                        <p className='italic tracking-tight text-bone'>{t('news.subtitle')}</p>
+                    <div className="border-l border-golden pl-4 space-y-2">
+                        <h2 className="font-branding text-lg tracking-widest uppercase text-golden">{t('news.title')}</h2>
+                        <p className="italic tracking-tight text-bone">{t('news.subtitle')}</p>
                     </div>
                     {!isLoading && (
                         <Link to="/news-events" className="group relative inline-flex justify-center items-center pb-2 text-[10px] tracking-[0.2em] uppercase text-bone font-semibold transition-colors duration-500 hover:text-golden">

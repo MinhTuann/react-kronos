@@ -5,9 +5,11 @@ import { publicApi } from '@/lib/api';
 import { useTranslation } from 'react-i18next';
 import { createOrganizationJsonLd, useSeo } from '@/seo';
 
+import type { HomePageResponse, HomePageSlide } from '@/lib/api';
+
 const HomePage = () => {
     const [inStockWatches, setInStockWatches] = useState<Watch[]>([]);
-    const [homeData, setHomeData] = useState<any>({ slides: [], news: [], sections: {} });
+    const [homeData, setHomeData] = useState<HomePageResponse>({ slides: [], news: [], sections: {} });
     const [isLoading, setIsLoading] = useState(true);
     const { i18n } = useTranslation();
     const currentLang = i18n.language.split('-')[0];
@@ -38,9 +40,9 @@ const HomePage = () => {
                 }
 
                 // Map backend video_url to url for VideoCarousel
-                const mappedSlides = home.slides?.map((slide: any) => ({
+                const mappedSlides = home.slides?.map((slide: HomePageSlide) => ({
                     ...slide,
-                    url: slide.video_url,
+                    url: slide.video_url || slide.url || '',
                     thumbnail_url: slide.thumbnail_url,
                 })) || [];
 
@@ -52,8 +54,9 @@ const HomePage = () => {
                 if (controller.signal.aborted) return;
                 console.error('Failed to fetch home page data:', error);
             } finally {
-                if (controller.signal.aborted) return;
-                setIsLoading(false);
+                if (!controller.signal.aborted) {
+                    setIsLoading(false);
+                }
             }
         };
         fetchAll();
@@ -72,7 +75,7 @@ const HomePage = () => {
                 </div>
             ) : (
                 <>
-                    {homeData.slides?.length > 0 && <VideoCarousel videos={homeData.slides} />}
+                    {homeData.slides && homeData.slides.length > 0 && <VideoCarousel videos={homeData.slides} />}
                     <InStocks watches={inStockWatches} />
                     <BestBrand watch={homeData.sections?.best_brand} />
                     <SecondBrand watch={homeData.sections?.second_brand} />
@@ -83,6 +86,6 @@ const HomePage = () => {
             )}
         </div>
     );
-}
+};
 
 export default HomePage;

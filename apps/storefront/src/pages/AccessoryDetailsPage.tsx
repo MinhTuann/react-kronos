@@ -108,11 +108,12 @@ const AccessoryDetailsPage: React.FC = () => {
                 setAccessory(data);
             } catch (err) {
                 if (controller.signal.aborted) return;
-                console.error("Failed to load details:", err);
+                console.error('Failed to load details:', err);
                 setAccessory(null);
             } finally {
-                if (controller.signal.aborted) return;
-                setIsLoading(false);
+                if (!controller.signal.aborted) {
+                    setIsLoading(false);
+                }
             }
         };
 
@@ -406,7 +407,7 @@ const AccessoryDetailsPage: React.FC = () => {
                         >
                             <motion.div
                                 animate={{ rotate: isEditorialExpanded ? 180 : 0 }}
-                                transition={{ duration: 0.4, ease: "easeInOut" }}
+                                transition={{ duration: 0.4, ease: 'easeInOut' }}
                                 className="w-6 h-6 sm:w-8 sm:h-8 rounded-full border border-gunmetal/20 flex items-center justify-center group-hover:border-golden transition-colors"
                             >
                                 {isEditorialExpanded ? <Minus size={12} /> : <Plus size={12} />}

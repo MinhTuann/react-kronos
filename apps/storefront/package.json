@@ -10,6 +10,7 @@
     "build:uat": "tsc -b && NODE_ENV=uat vite build --mode uat",
     "build:prod": "tsc -b && NODE_ENV=prod vite build --mode prod",
     "lint": "eslint .",
+    "test": "vitest run",
     "preview": "vite preview",
     "deploy:uat": "npm run build:uat && npx firebase-tools deploy --only hosting:storefront --project uat",
     "deploy:prod": "npm run build:prod && npx firebase-tools deploy --only hosting:storefront --project prod"
@@ -17,9 +18,9 @@
   "dependencies": {
     "@kronos/contracts-public": "file:../../packages/contracts-public",
     "axios": "^1.13.6",
+    "framer-motion": "^12.34.0",
     "i18next": "^26.0.3",
     "i18next-browser-languagedetector": "^8.2.1",
-    "framer-motion": "^12.34.0",
     "lucide-react": "^0.563.0",
     "motion": "^12.34.0",
     "react": "^19.2.0",
@@ -45,6 +46,7 @@
     "tailwindcss": "^3.4.17",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.46.4",
-    "vite": "^7.2.4"
+    "vite": "^7.2.4",
+    "vitest": "^4.1.11"
   }
 }

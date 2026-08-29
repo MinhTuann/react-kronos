@@ -114,7 +114,7 @@ const AboutUsPage: React.FC = () => {
     const heroRef = useRef(null);
     const { scrollYProgress: heroScroll } = useScroll({
         target: heroRef,
-        offset: ["start start", "end start"]
+        offset: ['start start', 'end start']
     });
     const heroY = useTransform(heroScroll, [0, 1], [0, 150]);
     const heroOpacity = useTransform(heroScroll, [0, 0.8], [1, 0]);
@@ -168,7 +168,7 @@ const AboutUsPage: React.FC = () => {
                     <div className="w-[1px] h-12 bg-gunmetal/20 overflow-hidden">
                         <motion.div
                             animate={{ y: [0, 48, 0] }}
-                            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
                             className="w-full h-1/2 bg-gunmetal"
                         />
                     </div>
@@ -184,7 +184,7 @@ const AboutUsPage: React.FC = () => {
                         <div className="lg:sticky lg:top-1/3 flex flex-col pb-12">
                             <motion.span
                                 key={`${lang}-chapter-label`}
-                                initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeUp}
+                                initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-100px' }} variants={fadeUp}
                                 className="font-branding text-[10px] tracking-[0.4em] uppercase text-gunmetal/40 font-bold mb-8 flex items-center gap-4"
                             >
                                 {content.chapterOneLabel}
@@ -193,7 +193,7 @@ const AboutUsPage: React.FC = () => {
 
                             <motion.h2
                                 key={`${lang}-chapter-title`}
-                                initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeUp}
+                                initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-100px' }} variants={fadeUp}
                                 className="text-3xl md:text-5xl font-light text-gunmetal mb-8 leading-tight"
                             >
                                 {content.chapterOneTitle}
@@ -201,7 +201,7 @@ const AboutUsPage: React.FC = () => {
 
                             <motion.div
                                 key={`${lang}-chapter-paragraphs`}
-                                initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}
+                                initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-100px' }} variants={staggerContainer}
                                 className="space-y-6 text-[14px] md:text-[15px] font-light text-stone-500 leading-relaxed"
                             >
                                 {content.chapterOneParagraphs.map((paragraph) => (
@@ -220,7 +220,7 @@ const AboutUsPage: React.FC = () => {
                         <div className="flex flex-col gap-4 md:gap-8">
                             {/* 1. Tall Display Case */}
                             <motion.div
-                                initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 1, ease: customEase }}
+                                initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-100px' }} transition={{ duration: 1, ease: customEase }}
                                 className="aspect-[3/4] w-full bg-stone-100 overflow-hidden group"
                             >
                                 <img
@@ -232,7 +232,7 @@ const AboutUsPage: React.FC = () => {
 
                             {/* 2. Square Lifestyle Shot */}
                             <motion.div
-                                initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 1, delay: 0.2, ease: customEase }}
+                                initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-100px' }} transition={{ duration: 1, delay: 0.2, ease: customEase }}
                                 className="aspect-square w-full bg-stone-100 overflow-hidden group"
                             >
                                 <img
@@ -247,7 +247,7 @@ const AboutUsPage: React.FC = () => {
                         <div className="flex flex-col gap-4 md:gap-8 pt-12 md:pt-24">
                             {/* 3. Square Lounge Shot */}
                             <motion.div
-                                initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 1, delay: 0.1, ease: customEase }}
+                                initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-100px' }} transition={{ duration: 1, delay: 0.1, ease: customEase }}
                                 className="aspect-square w-full bg-stone-100 overflow-hidden group"
                             >
                                 <img
@@ -259,7 +259,7 @@ const AboutUsPage: React.FC = () => {
 
                             {/* 4. Tall Art & Chandelier Shot */}
                             <motion.div
-                                initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 1, delay: 0.3, ease: customEase }}
+                                initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-100px' }} transition={{ duration: 1, delay: 0.3, ease: customEase }}
                                 className="aspect-[3/4] md:aspect-[4/5] w-full bg-stone-100 overflow-hidden group"
                             >
                                 <img
@@ -289,7 +289,7 @@ const AboutUsPage: React.FC = () => {
                     <div className="lg:col-span-5 flex flex-col">
                         <motion.div
                             key={`${lang}-boutique-text`}
-                            initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}
+                            initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-100px' }} variants={staggerContainer}
                             className="max-w-lg"
                         >
                             <motion.h2 variants={fadeUp} className="text-4xl md:text-5xl lg:text-6xl font-serif italic mb-8 leading-tight">
@@ -389,7 +389,7 @@ const AboutUsPage: React.FC = () => {
                             key={`${lang}-pillar-${idx}`}
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true, margin: "-50px" }}
+                            viewport={{ once: true, margin: '-50px' }}
                             transition={{ duration: 0.8, delay: idx * 0.1 }}
                             className="group flex flex-col md:flex-row md:items-center justify-between py-10 border-b border-gunmetal/10 hover:border-gunmetal transition-colors duration-500"
                         >
@@ -435,7 +435,7 @@ const AboutUsPage: React.FC = () => {
                         key={`${lang}-epilogue-text`}
                         initial={{ opacity: 0, y: 40 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true, margin: "-100px" }}
+                        viewport={{ once: true, margin: '-100px' }}
                         transition={{ duration: 1.2, delay: 0.2, ease: customEase }}
                         className="max-w-xl"
                     >

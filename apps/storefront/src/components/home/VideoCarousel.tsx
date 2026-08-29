@@ -115,7 +115,7 @@ const ParallaxVideo = ({
           } else {
             localVideoRef.current.pause();
           }
-        } catch (error) {
+        } catch {
           // Playback might be interrupted
         }
       }
@@ -154,7 +154,7 @@ const ParallaxVideo = ({
               initial={{ opacity: 1 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.8, ease: "easeInOut" }}
+              transition={{ duration: 0.8, ease: 'easeInOut' }}
               className="absolute inset-0 w-full h-full object-cover z-10"
             />
           )}
@@ -235,7 +235,7 @@ const VideoCarousel = ({ videos = [], isLoading = false }: Props) => {
 
   const swipeConfidenceThreshold = 10000;
   const swipePower = (offset: number, velocity: number) => Math.abs(offset) * velocity;
-  const handleDragEnd = (_e: any, info: PanInfo) => {
+  const handleDragEnd = (_e: unknown, info: PanInfo) => {
     const swipe = swipePower(info.offset.x, info.velocity.x);
     if (swipe < -swipeConfidenceThreshold) paginate(1);
     else if (swipe > swipeConfidenceThreshold) paginate(-1);
@@ -243,7 +243,7 @@ const VideoCarousel = ({ videos = [], isLoading = false }: Props) => {
 
   return (
     <div
-      className='relative w-full h-[100dvh] overflow-hidden bg-black cursor-none group flex items-center justify-center'
+      className="relative w-full h-[100dvh] overflow-hidden bg-black cursor-none group flex items-center justify-center"
       onMouseMove={handleMouseMove}
       onMouseLeave={() => setHoverSide(null)}
       onClick={handleClick}
@@ -261,7 +261,7 @@ const VideoCarousel = ({ videos = [], isLoading = false }: Props) => {
           dragConstraints={{ left: 0, right: 0 }}
           dragElastic={0.7}
           onDragEnd={handleDragEnd}
-          className='absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing overflow-hidden'
+          className="absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing overflow-hidden"
         >
           <ParallaxVideo
             url={video.url}
@@ -271,9 +271,9 @@ const VideoCarousel = ({ videos = [], isLoading = false }: Props) => {
             onAutoPlayEnd={() => setIsPlaying(false)}
           />
 
-          <div className='absolute w-full bottom-0 left-0 p-[10dvh] bg-gradient-to-t from-black/80 to-transparent pointer-events-none'>
+          <div className="absolute w-full bottom-0 left-0 p-[10dvh] bg-gradient-to-t from-black/80 to-transparent pointer-events-none">
             <div
-              className='w-fit opacity-60 hover:opacity-100 transition-opacity pointer-events-auto cursor-auto'
+              className="w-fit opacity-60 hover:opacity-100 transition-opacity pointer-events-auto cursor-auto"
               onMouseEnter={() => setHoverSide(null)}
               onMouseMove={(e) => e.stopPropagation()}
               onClick={(e) => e.stopPropagation()}
@@ -284,11 +284,11 @@ const VideoCarousel = ({ videos = [], isLoading = false }: Props) => {
                     {title}
                   </h1>
               )}
-              <p className='italic text-sm text-white my-4 md:my-6 max-w-md border-l border-white pl-2 md:pl-4'>
+              <p className="italic text-sm text-white my-4 md:my-6 max-w-md border-l border-white pl-2 md:pl-4">
                 {(currentLang === 'en' && video.description_en) ? video.description_en : video.description}
               </p>
               <button
-                className='font-branding bg-stormy hover:bg-opacity-90 text-[10px] md:text-[11px] text-white uppercase tracking-widest font-medium px-6 py-3 rounded-lg'
+                className="font-branding bg-stormy hover:bg-opacity-90 text-[10px] md:text-[11px] text-white uppercase tracking-widest font-medium px-6 py-3 rounded-lg"
               >
                 {t('common.exploreMore')}
               </button>
@@ -297,14 +297,14 @@ const VideoCarousel = ({ videos = [], isLoading = false }: Props) => {
         </motion.div>
       </AnimatePresence>
 
-      <AnimatePresence mode='wait'>
+      <AnimatePresence mode="wait">
         {hoverSide && (
           <motion.div
             initial={{ opacity: 0, scale: 0 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0 }}
             style={{ x: cursorX, y: cursorY, translateX: '-50%', translateY: '-50%' }}
-            className='absolute top-0 left-0 z-50 pointer-events-none hidden md:flex items-center justify-center w-12 h-12 bg-white/20 backdrop-blur-md rounded-full text-white shadow-2xl border border-white/30'
+            className="absolute top-0 left-0 z-50 pointer-events-none hidden md:flex items-center justify-center w-12 h-12 bg-white/20 backdrop-blur-md rounded-full text-white shadow-2xl border border-white/30"
           >
             <motion.div
               key={hoverSide}
@@ -319,7 +319,7 @@ const VideoCarousel = ({ videos = [], isLoading = false }: Props) => {
         )}
       </AnimatePresence>
 
-      <div className='absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 pointer-events-none z-10'>
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 pointer-events-none z-10">
         {videos.map((_, i) => (
           <div
             key={i}
@@ -329,7 +329,7 @@ const VideoCarousel = ({ videos = [], isLoading = false }: Props) => {
       </div>
 
       <div
-        className='absolute bottom-4 right-4 pointer-events-auto cursor-auto z-10'
+        className="absolute bottom-4 right-4 pointer-events-auto cursor-auto z-10"
         onMouseEnter={() => setHoverSide(null)}
         onMouseMove={(e) => e.stopPropagation()}
         onClick={(e) => e.stopPropagation()}
@@ -339,7 +339,7 @@ const VideoCarousel = ({ videos = [], isLoading = false }: Props) => {
             e.preventDefault();
             setIsPlaying(!isPlaying)
           }}
-          className='p-4 bg-white/20 hover:bg-white/40 rounded-full backdrop-blur-md text-white'
+          className="p-4 bg-white/20 hover:bg-white/40 rounded-full backdrop-blur-md text-white"
         >
           {isPlaying ? <Pause size={24} strokeWidth={1} /> : <Play size={24} strokeWidth={1} />}
         </button>

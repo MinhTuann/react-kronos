@@ -1,11 +1,11 @@
 export interface VideoSlide {
-  id: number;
+  id?: number | string;
   url: string;
   thumbnail_url?: string;
   title: string;
-  title_en?: string;
+  title_en?: string | null;
   description: string;
-  description_en?: string;
+  description_en?: string | null;
 }
 
 export interface Watch {

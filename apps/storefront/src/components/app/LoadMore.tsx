@@ -44,9 +44,9 @@ const LoadMore: React.FC<LoadMoreProps> = ({
                     {/* The Kinetic Line */}
                     <div className="relative w-10 h-px bg-gunmetal/10 overflow-hidden group-hover:bg-golden/20 group-hover:w-16 transition-all duration-700">
                         <motion.div 
-                            initial={{ x: "-100%" }}
-                            animate={isLoadingMore ? { x: ["-100%", "100%"] } : { x: "-100%" }}
-                            transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+                            initial={{ x: '-100%' }}
+                            animate={isLoadingMore ? { x: ['-100%', '100%'] } : { x: '-100%' }}
+                            transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
                             className="absolute inset-y-0 w-1/2 bg-golden"
                         />
                     </div>

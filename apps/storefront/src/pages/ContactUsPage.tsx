@@ -57,7 +57,7 @@ const ContactUsPage: React.FC = () => {
     const heroRef = useRef(null);
     const { scrollYProgress: heroScroll } = useScroll({
         target: heroRef,
-        offset: ["start start", "end start"]
+        offset: ['start start', 'end start']
     });
     const heroY = useTransform(heroScroll, [0, 1], [0, 150]);
     const heroOpacity = useTransform(heroScroll, [0, 0.8], [1, 0]);
@@ -101,7 +101,7 @@ const ContactUsPage: React.FC = () => {
 
                     {/* Left: The Editorial Form */}
                     <motion.div
-                        initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}
+                        initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-100px' }} variants={staggerContainer}
                         className="flex flex-col bg-stone-50 p-8 md:p-12 lg:p-16 rounded-lg"
                     >
                         <ContactInquiryForm
@@ -116,7 +116,7 @@ const ContactUsPage: React.FC = () => {
 
                         {/* The Consultation Desk Image */}
                         <motion.div
-                            initial={{ opacity: 0, x: 40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 1.2, ease: customEase }}
+                            initial={{ opacity: 0, x: 40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: '-100px' }} transition={{ duration: 1.2, ease: customEase }}
                             className="w-full aspect-[4/3] lg:aspect-auto lg:flex-1 overflow-hidden rounded-lg"
                         >
                             <img
@@ -128,7 +128,7 @@ const ContactUsPage: React.FC = () => {
 
                         {/* Contact Information Grid */}
                         <motion.div
-                            initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}
+                            initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-100px' }} variants={staggerContainer}
                             className="grid grid-cols-1 sm:grid-cols-2 gap-8 lg:gap-12"
                         >
                             <motion.div variants={fadeUp} className="flex flex-col">
@@ -164,7 +164,7 @@ const ContactUsPage: React.FC = () => {
                     {/* Location Image */}
                     <div className="lg:col-span-6">
                         <motion.div
-                            initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 1, ease: customEase }}
+                            initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, margin: '-100px' }} transition={{ duration: 1, ease: customEase }}
                             className="aspect-[2/3] w-full lg:w-[85%] bg-stone-100 overflow-hidden rounded-lg"
                         >
                             <img
@@ -178,7 +178,7 @@ const ContactUsPage: React.FC = () => {
                     {/* Location Details */}
                     <div className="lg:col-span-6 flex flex-col justify-center lg:pl-12 xl:pl-24">
                         <motion.div
-                            initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}
+                            initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-100px' }} variants={staggerContainer}
                         >
                             <motion.span variants={fadeUp} className="font-branding text-[10px] tracking-[0.4em] uppercase text-gunmetal/40 font-bold mb-6 block">
                                 The Flagship

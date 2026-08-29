@@ -43,6 +43,7 @@ export default defineConfig([
       ],
       'jsx-quotes': ['error', 'prefer-double'],
       'react/react-in-jsx-scope': 'off',
+      'react-hooks/set-state-in-effect': 'off',
     }
   },
 ])

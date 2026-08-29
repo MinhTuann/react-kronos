@@ -19,22 +19,22 @@ const Dropdown: React.FC<DropdownProps> = ({ value, onChange }) => {
     const currentLabel = options.find(opt => opt.value === value)?.label;
 
     return (
-        <div className='relative z-50'>
+        <div className="relative z-50">
             {/* The Trigger Button */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className='flex items-center gap-3 group'
+                className="flex items-center gap-3 group"
             >
-                <span className='text-[10px] uppercase tracking-[0.3em] font-semibold text-gunmetal/50 transition-colors group-hover:text-gunmetal/80 hidden sm:block'>
+                <span className="text-[10px] uppercase tracking-[0.3em] font-semibold text-gunmetal/50 transition-colors group-hover:text-gunmetal/80 hidden sm:block">
                     Sort By
                 </span>
-                <span className='text-sm md:text-base italic text-gunmetal group-hover:text-black transition-colors'>
+                <span className="text-sm md:text-base italic text-gunmetal group-hover:text-black transition-colors">
                     {currentLabel}
                 </span>
                 <motion.div
                     animate={{ rotate: isOpen ? 180 : 0 }}
                     transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                    className='text-gunmetal/50 group-hover:text-black'
+                    className="text-gunmetal/50 group-hover:text-black"
                 >
                     <ChevronDown size={14} strokeWidth={1.5} />
                 </motion.div>
@@ -43,7 +43,7 @@ const Dropdown: React.FC<DropdownProps> = ({ value, onChange }) => {
             {/* Invisible Full-Screen Overlay to handle clicking outside */}
             {isOpen && (
                 <div
-                    className='fixed inset-0 z-40'
+                    className="fixed inset-0 z-40"
                     onClick={() => setIsOpen(false)}
                 />
             )}
@@ -56,9 +56,9 @@ const Dropdown: React.FC<DropdownProps> = ({ value, onChange }) => {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 10, scale: 0.98 }}
                         transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                        className='absolute right-0 top-full mt-6 w-56 bg-white shadow-[0_30px_60px_rgba(0,0,0,0.08)] border border-gunmetal/5 py-4 z-50'
+                        className="absolute right-0 top-full mt-6 w-56 bg-white shadow-[0_30px_60px_rgba(0,0,0,0.08)] border border-gunmetal/5 py-4 z-50"
                     >
-                        <div className='flex flex-col'>
+                        <div className="flex flex-col">
                             {options.map((option) => {
                                 const isActive = value === option.value;
                                 return (
@@ -81,7 +81,7 @@ const Dropdown: React.FC<DropdownProps> = ({ value, onChange }) => {
                                             <motion.div 
                                                 initial={{ scale: 0, opacity: 0 }} 
                                                 animate={{ scale: 1, opacity: 1 }}
-                                                className='text-black'
+                                                className="text-black"
                                             >
                                                 <Check size={14} strokeWidth={2} />
                                             </motion.div>

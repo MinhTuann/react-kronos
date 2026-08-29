@@ -1,11 +1,11 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
-import { useTranslation } from "react-i18next";
-import SpecValue from "@/components/common/SpecValue";
-import type { Watch } from "@/types";
-import { getWatchUrl } from "@/utils";
-import { Skeleton, TextSkeleton } from "../common/Skeleton";
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
+import SpecValue from '@/components/common/SpecValue';
+import type { Watch } from '@/types';
+import { getWatchUrl } from '@/utils';
+import { Skeleton, TextSkeleton } from '../common/Skeleton';
 
 const SpecItem = ({ label, value, index }: { label: string; value: string; index: number }) => (
     <motion.div
@@ -13,11 +13,11 @@ const SpecItem = ({ label, value, index }: { label: string; value: string; index
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.8, delay: 0.5 + index * 0.1, ease: [0.16, 1, 0.3, 1] as const }}
-        className='flex flex-col space-y-1 md:items-end'
+        className="flex flex-col space-y-1 md:items-end"
     >
-        <h1 className='font-branding text-vanilla text-[10px] tracking-[0.3em] uppercase'>{label}</h1>
-        <div className='text-white text-[15px] font-light md:text-right'>
-            <SpecValue value={value} className='md:inline-block md:text-left' bulletClassName='pl-1' />
+        <h1 className="font-branding text-vanilla text-[10px] tracking-[0.3em] uppercase">{label}</h1>
+        <div className="text-white text-[15px] font-light md:text-right">
+            <SpecValue value={value} className="md:inline-block md:text-left" bulletClassName="pl-1" />
         </div>
     </motion.div>
 );
@@ -30,20 +30,20 @@ const BestBrand = ({ watch, isLoading = false }: { watch?: Watch, isLoading?: bo
 
     if (isLoading) {
         return (
-            <section className='w-full min-h-[600px] md:h-auto md:aspect-[16/6] overflow-hidden relative bg-gunmetal/20'>
+            <section className="w-full min-h-[600px] md:h-auto md:aspect-[16/6] overflow-hidden relative bg-gunmetal/20">
                 <Skeleton className="absolute inset-0 w-full h-full" />
-                <div className='relative z-10 w-full h-full px-8 py-16 md:px-32 md:py-32 grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-32'>
-                    <div className='flex flex-col space-y-8 md:justify-between h-full'>
+                <div className="relative z-10 w-full h-full px-8 py-16 md:px-32 md:py-32 grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-32">
+                    <div className="flex flex-col space-y-8 md:justify-between h-full">
                         <Skeleton width={100} height={12} />
-                        <div className='space-y-4'>
+                        <div className="space-y-4">
                             <Skeleton width="80%" height={40} className="border-l-2 border-vanilla pl-4" />
                             <Skeleton width={150} height={20} className="ml-4 opacity-60" />
                         </div>
                         <TextSkeleton lines={3} className="max-w-lg opacity-40" />
                         <Skeleton width={180} height={40} className="rounded-lg" />
                     </div>
-                    <div className='flex flex-col justify-end md:items-end'>
-                        <div className='grid grid-cols-2 gap-x-12 gap-y-8'>
+                    <div className="flex flex-col justify-end md:items-end">
+                        <div className="grid grid-cols-2 gap-x-12 gap-y-8">
                             {Array.from({ length: 4 }).map((_, i) => (
                                 <div key={i} className="space-y-2 flex flex-col md:items-end">
                                     <Skeleton width={60} height={10} />
@@ -86,23 +86,23 @@ const BestBrand = ({ watch, isLoading = false }: { watch?: Watch, isLoading?: bo
     };
 
     return (
-        <section className='w-full min-h-[600px] md:h-auto md:aspect-[16/6] overflow-hidden relative'>
+        <section className="w-full min-h-[600px] md:h-auto md:aspect-[16/6] overflow-hidden relative">
             {!imageLoaded && <Skeleton className="absolute inset-0 w-full h-full z-0" />}
             {/* Background Image with Zoom-out Effect */}
             <motion.img
                 initial={{ scale: 1.1, opacity: 0 }}
                 whileInView={{ scale: 1, opacity: 0.8 }}
                 viewport={{ once: true }}
-                transition={{ duration: 2, ease: "easeOut" }}
+                transition={{ duration: 2, ease: 'easeOut' }}
                 alt={watch.name}
                 className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${imageLoaded ? 'opacity-80' : 'opacity-0'}`}
                 src={watch.image}
                 onLoad={() => setImageLoaded(true)}
             />
-            <div className='absolute inset-0 bg-black/70'></div>
+            <div className="absolute inset-0 bg-black/70"></div>
 
             {/* Content Container */}
-            <div className='relative z-10 w-full h-full px-8 py-16 md:px-32 md:py-32 grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-32'>
+            <div className="relative z-10 w-full h-full px-8 py-16 md:px-32 md:py-32 grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-32">
 
                 {/* Left Column: Branding & Main CTA */}
                 <motion.div
@@ -110,29 +110,29 @@ const BestBrand = ({ watch, isLoading = false }: { watch?: Watch, isLoading?: bo
                     whileInView="visible"
                     viewport={{ once: true }}
                     variants={containerVariants}
-                    className='flex flex-col space-y-8 md:justify-between h-full'
+                    className="flex flex-col space-y-8 md:justify-between h-full"
                 >
-                    <motion.span variants={itemVariants} className='font-branding text-[11px] tracking-[0.4em] uppercase text-vanilla font-semibold'>{watch.brand}</motion.span>
+                    <motion.span variants={itemVariants} className="font-branding text-[11px] tracking-[0.4em] uppercase text-vanilla font-semibold">{watch.brand}</motion.span>
 
-                    <motion.div variants={itemVariants} className='space-y-2'>
-                        <h2 className='text-3xl md:text-4xl text-white border-l-2 border-vanilla pl-4 leading-tight uppercase'>{watch.collection || watch.name}</h2>
-                        <h4 className='text-lg md:text-xl text-white/70 pl-4 font-branding'>REF. {watch.ref}</h4>
+                    <motion.div variants={itemVariants} className="space-y-2">
+                        <h2 className="text-3xl md:text-4xl text-white border-l-2 border-vanilla pl-4 leading-tight uppercase">{watch.collection || watch.name}</h2>
+                        <h4 className="text-lg md:text-xl text-white/70 pl-4 font-branding">REF. {watch.ref}</h4>
                     </motion.div>
 
-                    <motion.p variants={itemVariants} className='text-white/80 leading-relaxed max-w-lg'>
+                    <motion.p variants={itemVariants} className="text-white/80 leading-relaxed max-w-lg">
                         {description}
                     </motion.p>
 
                     <motion.div variants={itemVariants}>
-                        <Link to={getWatchUrl(watch)} className='inline-block w-full md:w-auto text-center px-6 py-3 bg-white text-stormy text-[8px] tracking-widest uppercase font-branding hover:bg-opacity-90 transition-all rounded-lg'>
+                        <Link to={getWatchUrl(watch)} className="inline-block w-full md:w-auto text-center px-6 py-3 bg-white text-stormy text-[8px] tracking-widest uppercase font-branding hover:bg-opacity-90 transition-all rounded-lg">
                             {t('home.featured.exploreIcon', 'Explore the Icon')}
                         </Link>
                     </motion.div>
                 </motion.div>
 
                 {/* Right Column: Specifications */}
-                <div className='flex flex-col justify-end md:items-end'>
-                    <div className='grid grid-cols-2 gap-x-4 gap-y-8 md:ml-0 lg:ml-32'>
+                <div className="flex flex-col justify-end md:items-end">
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-8 md:ml-0 lg:ml-32">
                         {watch.size && <SpecItem label={t('watch.specs.size', 'Size')} value={watch.size} index={0} />}
                         {material && <SpecItem label={t('watch.specs.material', 'Material')} value={material} index={1} />}
                         {movement && <SpecItem label={t('watch.specs.movement', 'Movement')} value={movement} index={2} />}

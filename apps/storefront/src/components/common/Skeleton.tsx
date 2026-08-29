@@ -12,18 +12,18 @@ interface SkeletonProps {
  * A luxurious, modern skeleton loader with a subtle shimmer effect.
  */
 export const Skeleton = ({
-  className = "",
+  className = '',
   width,
   height,
   variant = 'rect',
   animate = true
 }: SkeletonProps) => {
-  const baseClasses = "relative overflow-hidden bg-gunmetal/5";
+  const baseClasses = 'relative overflow-hidden bg-gunmetal/5';
 
   const variantClasses = {
-    rect: "rounded-lg",
-    circle: "rounded-full",
-    text: "rounded h-4 my-2"
+    rect: 'rounded-lg',
+    circle: 'rounded-full',
+    text: 'rounded h-4 my-2'
   };
 
   return (
@@ -40,7 +40,7 @@ export const Skeleton = ({
           transition={{
             repeat: Infinity,
             duration: 2,
-            ease: "easeInOut"
+            ease: 'easeInOut'
           }}
         />
       )}
@@ -48,18 +48,18 @@ export const Skeleton = ({
   );
 };
 
-export const MediaSkeleton = ({ className = "", aspect = "aspect-video" }: { className?: string, aspect?: string }) => (
+export const MediaSkeleton = ({ className = '', aspect = 'aspect-video' }: { className?: string, aspect?: string }) => (
   <Skeleton className={`${aspect} w-full ${className}`} />
 );
 
-export const TextSkeleton = ({ lines = 3, className = "" }: { lines?: number, className?: string }) => (
+export const TextSkeleton = ({ lines = 3, className = '' }: { lines?: number, className?: string }) => (
   <div className={`space-y-2 ${className}`}>
     {Array.from({ length: lines }).map((_, i) => (
       <Skeleton
         key={i}
         variant="text"
-        width={i === lines - 1 ? "60%" : "100%"}
-        className={i === 0 ? "h-6 mb-4" : ""} // First line taller like a title
+        width={i === lines - 1 ? '60%' : '100%'}
+        className={i === 0 ? 'h-6 mb-4' : ''} // First line taller like a title
       />
     ))}
   </div>
